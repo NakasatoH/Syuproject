@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <script type="text/javascript" src="{% static 'js/myAnime.js' %}"></script>
+    <meta charset="UTF-8">
+    <title>サブアニメーションページ</title>
+    <style type="text/css">
+        canvas {
+            background-color: #000000;
+            border: 1px solid #999999;
+        }
+    </style>
+</head>
+<body>
+<p>Javascript練習</p>
+<canvas id="yukimi" width="640" height="480"></canvas>
+<script type="text/javascript">
+    window.onload = init();
+</script>
+</body>
+</html>
