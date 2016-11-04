@@ -1,7 +1,4 @@
-/**
- * Created by varuma on 2016/11/01.
- */
-const NUM = 50;
+const NUM = 500;
 const WIDTH = 640;
 const HEIGHT = 480;
 var speedX = new Array(NUM);
@@ -15,7 +12,7 @@ var b = new Array(NUM);
 var ctx;
 
 function init() {
-    var canvas = document.getElementById('yukimi');
+    var canvas = document.getElementById('tutorial');
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         for (var i = 0; i < NUM; i++) {
@@ -34,7 +31,7 @@ function init() {
 
 function draw() {
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色
+    ctx.fillStyle = "rgba(8,8,12,.1)";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.globalCompositeOperation = "lighter";
 
@@ -53,8 +50,8 @@ function draw() {
 
         //更新した座標で円を描く
         ctx.beginPath();
-        ctx.fillStyle = 'rgb(' + r[i] + ',' + g[i] + ',' + b[i] + ')';//それぞれの色固定
-        ctx.arc(locX[i], locY[i], 50, 0, Math.PI * 2.0, true);
+        ctx.fillStyle = 'rgb(' + r[i] + ',' + g[i] + ',' + b[i] + ')';
+        ctx.arc(locX[i], locY[i], radius[i], 0, Math.PI * 2.0, true);
         ctx.fill();
     }
 }
