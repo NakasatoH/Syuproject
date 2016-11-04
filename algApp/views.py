@@ -7,3 +7,6 @@ def index(request):
 
 def subanime(request):
     return render(request, 'subAnime.html')
+
+def imagemove(request):
+    return render(request, 'imageMove.html')

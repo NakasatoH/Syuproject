@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>画像移動</title>
+    <script type="text/javascript" src="{% static STATIC_URL %}js/imageMove.js"></script>
+</head>
+<body>
+    {% csrf_token %}
+    <canvas id='c1' width="200" height="200"></canvas><br>
+
+    <p>
+        数字で座標を指定すると、画像が移動します。<br>
+        x座標：<input type="text" value="0" size="2" id="dx">/200px<br>
+        y座標：<input type="text" value="0" size="2" id="dy">/200px
+    </p>
+</body>
+</html>
