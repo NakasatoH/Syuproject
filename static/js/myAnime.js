@@ -34,7 +34,7 @@ function init() {
 
 function draw() {
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色
+    ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色 ぎっとちぇっく
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.globalCompositeOperation = "xor";
 
