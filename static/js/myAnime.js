@@ -1,7 +1,7 @@
 /**
  * Created by varuma on 2016/11/01.
  */
-const NUM = 10;
+const NUM = 50;
 const WIDTH = 640;
 const HEIGHT = 480;
 var speedX = new Array(NUM);
@@ -34,9 +34,9 @@ function init() {
 
 function draw() {
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(0,0,0,.2)";// 通った跡の色
+    ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.globalCompositeOperation = "xor";
+    ctx.globalCompositeOperation = "lighter";
 
     for (var i = 0; i < NUM; i++) {
         //位置を更新
