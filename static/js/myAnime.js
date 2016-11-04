@@ -36,7 +36,7 @@ function draw() {
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = "xor";
 
     for (var i = 0; i < NUM; i++) {
         //位置を更新
