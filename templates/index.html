@@ -10,7 +10,8 @@
     <form action="">
     <input type="submit" value="送信">
         {% csrf_token %}
-        <a href="{% url 'algApp:subanime' %}">link</a>
+        <a href="{% url 'algApp:subanime' %}">animelink</a>
+        <a href="{% url 'algApp:imagemove' %}">movelink</a>
 </form>
 </body>
 </html>
