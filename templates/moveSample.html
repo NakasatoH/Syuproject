@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>れむりん動かします</title>
+    <style type="text/css">
+        canvas{
+            border: solid 1px black;
+            background: #000000;
+        }
+    </style>
+    <script type="text/javascript">
+        var lemSrc = "{% static 'img/lem.png' %}"
+    </script>
+</head>
+<body>
+    <h1>れむ</h1>
+    <canvas id="cvs" width="640px" height="480px"></canvas>
+</body>
+<script type="text/javascript" src="{% static 'js/moveSample.js' %}"></script>
+</html>
