@@ -7,7 +7,6 @@
     <style type="text/css">
         canvas{
             border: solid 1px black;
-            background: #000000;
         }
     </style>
     <script type="text/javascript">
@@ -17,6 +16,9 @@
 <body>
     <h1>れむ</h1>
     <canvas id="cvs" width="640px" height="480px"></canvas>
+    <form action="">
+        <input type="button" value="動いておねがい" onclick="ImageToCanvas(lemImage);">
+    </form>
 </body>
 <script type="text/javascript" src="{% static 'js/moveSample.js' %}"></script>
 </html>
