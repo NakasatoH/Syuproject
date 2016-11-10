@@ -13,7 +13,7 @@ lemImage.onload = (function () {
     ImageToCanvas(lemImage);
 });
 
-function ImageToCanvas(im,) {
+function ImageToCanvas(im) {
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
 
