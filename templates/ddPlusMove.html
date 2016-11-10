@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>DD and move</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        div {
+            display: block;
+        }
+
+        #wrapper {
+            border: solid 1px #999999;
+        }
+
+        #actionSpace {
+            border: solid 1px #999999;
+            float: left;
+        }
+
+        #codeSpace {
+            border: solid 1px #999999;
+            float: right;
+        }
+
+        #upper, #bottom {
+            width: 500px;
+            height: 100px;
+            margin: 20px 0;
+            padding: 1em;
+            border: 1px solid #ddd;
+        }
+
+        .arrows-rl {
+            width: 115px;
+            height: 90px;
+        }
+        .arrows-tb {
+            width: 90px;
+            height: 115px;
+        }
+    </style>
+    <script type="text/javascript">
+        var lemSrc = "{% static 'img/lem.png' %}"
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <h1>DD and moveサンプル</h1>
+    <div id="actionSpace">
+        <canvas id="cvs" width="480px" height="320px"></canvas>
+        <form action="">
+            <input type="button" value="動いておねがい" onclick="ImageToCanvas(lemImage);">
+        </form>
+    </div>
+    <div id="codeSpace">
+        <h1>img要素をドラッグ＆ドロップ</h1>
+        <p></p>
+        <p>画像を上下のボックスにドラッグ＆ドロップで移動できます。</p>
+        <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
+            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" ondragstart="f_dragstart(event)">
+        </div>
+        <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
+        <script>
+            //ドラッグ開始処理
+            function f_dragstart(event) {
+                //ドラッグするデータのid名をDataTransferオブジェクトにセット
+                event.dataTransfer.setData("text", event.target.id);
+            }
+            //ドラッグ要素がドロップ要素に重なっている間の処理
+            function f_dragover(event) {
+                //dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
+                event.preventDefault();
+            }
+            //ドロップ時の処理
+            function f_drop(event) {
+                //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+                var id_name = event.dataTransfer.getData("text");
+                //id名からドラッグされた要素を取得
+                var drag_elm = document.getElementById(id_name);
+                //ドロップ先にドラッグされた要素を追加
+                event.currentTarget.appendChild(drag_elm);
+                //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+                event.preventDefault();
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

@@ -15,3 +15,7 @@ def imagemove(request):
 
 def movesample(request):
     return render(request, 'moveSample.html')
+
+
+def ddpulsmove(request):
+    return render(request, 'ddPlusMove.html')
