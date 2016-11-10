@@ -75,6 +75,7 @@
             function f_dragstart(event) {
                 //ドラッグするデータのid名をDataTransferオブジェクトにセット
                 event.dataTransfer.setData("text", event.target.id);
+                console.log(event.dataTransfer.getData("text"));
             }
             //ドラッグ要素がドロップ要素に重なっている間の処理
             function f_dragover(event) {
@@ -88,12 +89,30 @@
                 //id名からドラッグされた要素を取得
                 var drag_elm = document.getElementById(id_name);
                 //ドロップ先にドラッグされた要素を追加
-                event.currentTarget.appendChild(drag_elm);
-                //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
-                event.preventDefault();
+//                Sleep(5);
+                var currentTarget = event.currentTarget;
+                window.setTimeout(function () {
+                    currentTarget.appendChild(drag_elm);
+                    //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+                    event.preventDefault();
+                }, 1000);
+//                event.currentTarget.appendChild(drag_elm);
+//                //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+//                event.preventDefault();
             }
+
+            function Sleep(time){
+                time = time * 1000;
+//                window.setTimeout( 'dummy()', time );
+                window.setTimeout(function () {
+                    console.log("sleep : " + time + "ミリ秒");
+                }, time);
+            }
+            
+            
         </script>
     </div>
 </div>
 </body>
+    <script type="text/javascript" src="{% static 'js/moveSample.js' %}"></script>
 </html>
