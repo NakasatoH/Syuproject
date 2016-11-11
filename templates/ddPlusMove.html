@@ -16,6 +16,8 @@
 
         #wrapper {
             border: solid 1px #999999;
+            width: 1024px;
+            margin: 0 0%;
         }
 
         #actionSpace {
@@ -32,8 +34,9 @@
             width: 500px;
             height: 100px;
             margin: 20px 0;
-            padding: 1em;
+            padding: 2em;
             border: 1px solid #ddd;
+            background: rgba(0, 255, 245, 0.5);
         }
 
         .arrows-rl {
@@ -47,6 +50,12 @@
         button{
             padding:4px;
 
+        }
+        #bottom img{
+            border: dashed 2px rgba(255, 150, 0, 0.50);
+            border-radius: 20px ;
+            height: auto;
+            max-width: 100%;
         }
     </style>
     <script type="text/javascript">
@@ -64,10 +73,10 @@
         <p></p>
         <p>画像を上下のボックスにドラッグ＆ドロップで移動できます。</p>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
-            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="40" ondragstart="f_dragstart(event)" >
-            <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r" data-n="40"  ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true" data-d="b" data-n="40" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l" data-n="40" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1" ondragstart="f_dragstart(event)" >
+            <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r" data-n="1"  ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true" data-d="b" data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l" data-n="1" ondragstart="f_dragstart(event)">
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
         <button onclick="resetImages()">戻して</button>
