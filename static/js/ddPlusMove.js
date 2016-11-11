@@ -43,7 +43,10 @@ function f_drop(event) {
             console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
 
             // キャンバスに影響を与える
-            ImageToCanvas(lemImage, data_d, data_n);
+            setInterval(function () {
+                ImageToCanvas(lemImage, data_d, data_n)
+            }, 200);
+            //ImageToCanvas(lemImage, data_d, data_n);
         } else if (currentTarget.id == "upper") {
             // 画像を元のボックスに戻した場合、配列をソートして詰める
             outputArray(id_name);
@@ -147,6 +150,7 @@ function ImageToCanvas(im, direction, num) {
     ctx.translate(dx, dy);
     ctx.drawImage(im, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
+
 }
 /**-------------------------------------------------------
  * ドロップされたIMG群を全て元の位置に戻す
