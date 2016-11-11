@@ -44,6 +44,10 @@
             width: 90px;
             height: 115px;
         }
+        button{
+            padding:4px;
+
+        }
     </style>
     <script type="text/javascript">
         var lemSrc = "{% static 'img/lem.png' %}"
@@ -54,9 +58,6 @@
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
         <canvas id="cvs" width="480px" height="320px"></canvas>
-        <form action="">
-            <input type="button" value="動いておねがい" onclick="ImageToCanvas(lemImage);">
-        </form>
     </div>
     <div id="codeSpace">
         <h1>img要素をドラッグ＆ドロップ</h1>
@@ -69,6 +70,7 @@
             <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l" data-n="40" ondragstart="f_dragstart(event)">
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
+        <button onclick="resetImages()">戻して</button>
     </div>
 </div>
 <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>

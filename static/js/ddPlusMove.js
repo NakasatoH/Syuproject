@@ -30,6 +30,7 @@ function f_drop(event) {
      * また、更にその中でもevent.preventDefault()の方が処理順が速いため、currentTargetを見失ってしまう。
      * その対策として、変数に値を代入して保持して億必要がある。
      */
+
     var currentTarget = event.currentTarget;
     window.setTimeout(function () {
         // ドロップ先にドラッグされた要素を追加をする
@@ -47,6 +48,7 @@ function f_drop(event) {
             // 画像を元のボックスに戻した場合、配列をソートして詰める
             outputArray(id_name);
         }
+        imagesLog();
         currentTarget.appendChild(drag_elm);
         // エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
         event.preventDefault();
@@ -57,6 +59,7 @@ function f_drop(event) {
  * 配列処理関系
  * ------------------------------------------------------
  */
+// div#bottomにドロップされたとき、idを配列に格納
 function inputArray(id) {
     var arrayFlg = false;
     for (var i = 0; i < images.length; i++) {
@@ -64,31 +67,31 @@ function inputArray(id) {
             arrayFlg = true;
         }
     }
-    if (arrayFlg == false) {
-        images[images.length] = id;
+    if (arrayFlg == true) {
+        outputArray(id);
     }
-    // 表示用
-    for (i = 0; i < images.length; i++) {
-        console.log("images配列[" + i + "] : " + images[i]);
-    }
+    images[images.length] = id;
 }
+// div#bottom から div#upperに戻したときに配列を詰める
 function outputArray(id) {
     for (var i = 0; i < images.length; i++) {
         if (images[i] == id) {
-            for(i; i < images.length; i++){
-                if(i + 1 < images.length) {
+            for (i; i < images.length; i++) {
+                if (i + 1 < images.length) {
                     images[i] = images[i + 1]
                 }
             }
         }
     }
     images.pop();
+}
+// 表示用関数
+function imagesLog() {
     // 表示用
     for (i = 0; i < images.length; i++) {
         console.log("images配列[" + i + "] : " + images[i]);
     }
 }
-
 /**------------------------------------------------------
  * 画像処理関係
  * ------------------------------------------------------
@@ -127,10 +130,35 @@ function ImageToCanvas(im, direction, num) {
     }
     dx += old_dx;
     dy += old_dy;
+    if (dx < 0) {
+        dx = 0;
+    } else if (dx > canvas.width - im.width) {
+        dx = canvas.width - im.width;
+    }
+    if (dy < 0) {
+        dy = 0;
+    } else if (dy > canvas.height - im.height) {
+        dy = canvas.height - im.height;
+    }
+
     old_dx = dx;
     old_dy = dy;
     console.log("dx : " + dx + "  dy : " + dy);
     ctx.translate(dx, dy);
     ctx.drawImage(im, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
+}
+/**-------------------------------------------------------
+ * ドロップされたIMG群を全て元の位置に戻す
+ * -------------------------------------------------------
+ */
+function resetImages() {
+    var upper_elm = document.getElementById("upper");
+    for (var i = 0; i < images.length; i++) {
+        var drag_elm = document.getElementById(images[i]);
+        upper_elm.appendChild(drag_elm);
+    }
+    // 配列の長さを0にすることで配列を初期化（全要素を削除）
+    images.length = 0;
+    console.log("ドロップされた画像、配列を初期化")
 }
