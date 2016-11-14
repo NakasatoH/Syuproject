@@ -47,11 +47,13 @@ function f_drop(event) {
              * キャンバス内の画像を動かす処理
              */
             var cnt = 0;// 無限ループを防ぐための変数cnt
-            setInterval(function () {// setIntervalは引数を与える場合, 無名関数  →　function(){関数名(引数1,引数2,...)}　を使用しなければならない
-                if (cnt < 100) {// if文を使用しないとループし続ける
-                    cnt++;
-                    ImageToCanvas(lemImage, data_d, data_n)
+            var imageMoveInterval = setInterval(function () {// setIntervalは引数を与える場合, 無名関数  →　function(){関数名(引数1,引数2,...)}　を使用しなければならない
+                console.log(imageMoveInterval);
+                if (cnt >= 100) {// if文を使用しないとループし続ける
+                    clearInterval(imageMoveInterval);
                 }
+                cnt++;
+                ImageToCanvas(lemImage, data_d, data_n)
             }, 10);
         } else if (currentTarget.id == "upper") {
 
@@ -153,7 +155,6 @@ function ImageToCanvas(im, direction, num) {
 
     old_dx = dx;
     old_dy = dy;
-    console.log("dx : " + dx + "  dy : " + dy);
     ctx.translate(dx, dy);
     ctx.drawImage(im, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
