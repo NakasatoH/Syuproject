@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ajaxSample</title>
+</head>
+<body>
+<script>
+    // JavaScript
+    // 送信用フォーマットの日付を作成
+
+
+    var date = new Date();
+    var dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    var dateStr = dateFormat.format(date);
+    var sendData = {'datetime': dateStr};
+
+    // 送信
+    $.ajax({
+        url: "http://www.xxxx.com/",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        datatype: "json",
+        data: $.toJSON(sendData),
+        success: function (data) {
+            alert("送信成功");
+        },
+        error: function () {
+            alert("失敗");
+        }
+    });
+
+</script>
+</body>
+</html>

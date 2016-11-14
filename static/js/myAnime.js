@@ -28,15 +28,20 @@ function init() {
             g[i] = Math.floor(Math.random() * 64);
             b[i] = Math.floor(Math.random() * 64);
         }
+        /*
+         drawを呼び出し、位置を更新する
+         */
         setInterval(draw, 33);
     }
-}
+
+
+}// function init() End
 
 function draw() {
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(0,0,0,.2)";// 通った跡の色
+    ctx.fillStyle = "rgba(8,8,12,.1)";// 通った跡の色 ぎっとちぇっく
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.globalCompositeOperation = "xor";
+    ctx.globalCompositeOperation = "lighter";
 
     for (var i = 0; i < NUM; i++) {
         //位置を更新
