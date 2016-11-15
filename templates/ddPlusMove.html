@@ -23,10 +23,17 @@
             padding: 4px;
 
         }
+        select{
+            padding: 4px;
+            background: #eeeeee;
+        }
+        option{
+
+        }
 
         #wrapper {
             border: solid 1px #999999;
-            width: 1024px;
+            width: 1200px;
             margin: 0 0%;
         }
 
@@ -58,6 +65,7 @@
             height: auto;
             max-width: 100%;
         }
+
         .arrows-rl {
             width: 115px;
             height: 90px;
@@ -70,16 +78,20 @@
 
     </style>
     <script type="text/javascript">
-        var lemSrc = "{% static 'img/lem.png' %}"
+        var lemSrc = "{% static 'img/lem.png' %}";
+        var t26e5Src = "{% static 'img/t26e5mini.png' %}";
+        var mainImageSrc = "{% static 'img/lem.png' %}";
+        var masaruSrc = "{% static 'img/masaru.png' %}";
     </script>
     <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
+    {% csrf_token %}
 </head>
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
 <div id="wrapper">
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
-        <canvas id="cvs" width="480px" height="320px"></canvas>
+        <canvas id="cvs" width="640px" height="460px"></canvas>
     </div>
     <div id="codeSpace">
         <h1>img要素をドラッグ＆ドロップ</h1>
@@ -97,7 +109,13 @@
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
         <button onclick="resetImages()">戻して</button>
-        <button onclick="Action()">実行</button>
+        <button onclick="action()">実行</button>
+        <select name="characters" id="characters" onchange="changeCharacter()">
+            <option value="">キャラクター選択</option>
+            <option value="">れむりん</option>
+            <option value="">T26E4</option>
+            <option value="">勝君</option>
+        </select>
     </div>
 </div>
 <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
