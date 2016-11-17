@@ -1,6 +1,7 @@
 /**
  * Created by nakasato on 2016/11/10.
  */
+
 var old_dx = 0; // 今までの位置を保持しておくための変数old_...
 var old_dy = 0;
 var images = [];// ドロップした順にidを保管するための配列
@@ -218,12 +219,13 @@ function action() {
     // 全ての画像を順番に動かす。
     function action() {
         // ドロップされている画像群の個数と内容を把握する
-        id = images[i];
-        drop_elm = document.getElementById(id);
-        data_d = drop_elm.getAttribute("data-d");// 方向データ
-        data_n = drop_elm.getAttribute("data-n");// 移動量
-        console.log("dropElm,dataD,dataN :::" + drop_elm.id + " , " + data_d + " , " + data_n);
-        cnt = 0;
+        if(i < images.length) {
+            id = images[i];
+            drop_elm = document.getElementById(id);
+            data_d = drop_elm.getAttribute("data-d");// 方向データ
+            data_n = drop_elm.getAttribute("data-n");// 移動量
+            cnt = 0;
+        }
         var itc = setInterval(function () {
             if (cnt < moveNum) {
                 ImageToCanvas(image1, data_d, data_n);
@@ -237,5 +239,4 @@ function action() {
             cnt++;
         }, 10);
     }
-
 }

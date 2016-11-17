@@ -54,7 +54,6 @@
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
-
             border: 1px solid #ddd;
             background: rgba(0, 0, 0, 0.05);
         }
@@ -75,23 +74,34 @@
             width: 90px;
             height: 115px;
         }
-
+        #backCvs,#cvs {
+            border: solid 1px black;
+            position: absolute;
+            top:35px;
+            left:0;
+        }
+        #backCvs{
+            background: rgba(200,0,0,0.2);
+        }
+        #cvs{
+            background: rgba(0,0,255,0.2);
+        }
     </style>
     <script type="text/javascript">
         var lemSrc = "{% static 'img/lem.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
         var mainImageSrc = "{% static 'img/lem.png' %}";
         var masaruSrc = "{% static 'img/masaru.png' %}";
+        var block_bSrc = "{% static 'img/block_b.png' %}";
     </script>
-    <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
     {% csrf_token %}
 </head>
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
 <div id="wrapper">
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
-        <canvas id="cvs" width="640px" height="460px"></canvas>
+        <canvas id="backCvs" width="650px" height="450px"></canvas>
+        <canvas id="cvs" width="650px" height="450px"></canvas>
     </div>
     <div id="codeSpace">
         <h1>img要素をドラッグ＆ドロップ</h1>
@@ -118,6 +128,8 @@
         </select>
     </div>
 </div>
+
+<script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
 </body>
 </html>

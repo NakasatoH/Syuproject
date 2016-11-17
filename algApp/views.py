@@ -1,4 +1,7 @@
 from django.shortcuts import render
+import configparser
+import sys
+import io
 
 
 def index(request):
@@ -18,4 +21,10 @@ def movesample(request):
 
 
 def ddpulsmove(request):
-    return render(request, 'ddPlusMove.html')
+    # -*- coding: utf-8 -*-
+
+    message = "こんにちはぱいそんでーたです"
+    data = {
+        'message' : message,
+    }
+    return render(request, 'ddPlusMove.html',data)
