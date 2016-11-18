@@ -26,7 +26,11 @@ var map = [
     ["*","0","0","0","0","0","0","0","0","0","0","0","*"],
     ["*","*","*","*","*","*","*","*","*","*","*","*","*"]// (,13)まで
 ];
+var map2 = mapData;
 
+function arrayConverter() {
+    
+}
 var blockWidth = image2.width;//ブロックの横幅
 var blockHeight = image2.height;
 

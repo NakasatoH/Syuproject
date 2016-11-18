@@ -23,11 +23,13 @@
             padding: 4px;
 
         }
-        select{
+
+        select {
             padding: 4px;
             background: #eeeeee;
         }
-        option{
+
+        option {
 
         }
 
@@ -74,25 +76,34 @@
             width: 90px;
             height: 115px;
         }
-        #backCvs,#cvs {
+
+        #backCvs, #cvs {
             border: solid 1px black;
             position: absolute;
-            top:35px;
-            left:0;
+            top: 35px;
+            left: 0;
         }
-        #backCvs{
-            background: rgba(200,0,0,0.2);
+
+        #backCvs {
+            background: rgba(200, 0, 0, 0.2);
         }
-        #cvs{
-            background: rgba(0,0,255,0.2);
+
+        #cvs {
+            background: rgba(0, 0, 255, 0.2);
         }
     </style>
+    <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
     <script type="text/javascript">
         var lemSrc = "{% static 'img/lem.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
         var mainImageSrc = "{% static 'img/lem.png' %}";
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var block_bSrc = "{% static 'img/block_b.png' %}";
+
+        var mapData = "{{ mapData|safe }}";
+        var block_size = {{ block_size }};
+        console.log(mapData);
     </script>
     {% csrf_token %}
 </head>

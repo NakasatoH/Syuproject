@@ -5,7 +5,7 @@
 var old_dx = 0; // 今までの位置を保持しておくための変数old_...
 var old_dy = 0;
 var images = [];// ドロップした順にidを保管するための配列
-const moveNum = 100;
+const moveNum = 50;
 
 // 画像オブジェクト生成
 var image1 = new Image();
@@ -180,6 +180,8 @@ function ImageToCanvas(im, direction, num) {
         dy = canvas.height - im.height;
     }
 
+    // 移動先に障害物が有る場合の処理
+    var checkX = dx / moveNum;
     old_dx = dx;
     old_dy = dy;
     ctx.translate(dx, dy);
