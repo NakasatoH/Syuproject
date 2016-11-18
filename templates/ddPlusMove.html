@@ -8,15 +8,34 @@
         * {
             margin: 0;
             padding: 0;
+
+        }
+
+        body {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         div {
             display: block;
         }
 
+        button {
+            padding: 4px;
+
+        }
+
+        select {
+            padding: 4px;
+            background: #eeeeee;
+        }
+
+        option {
+
+        }
+
         #wrapper {
             border: solid 1px #999999;
-            width: 1024px;
+            width: 1200px;
             margin: 0 0%;
         }
 
@@ -34,54 +53,94 @@
             width: 500px;
             height: 100px;
             margin: 20px 0;
-            padding: 2em;
+            padding-top: 2em;
+            padding-right: 2em;
+            padding-bottom: 3em;
             border: 1px solid #ddd;
-            background: rgba(0, 255, 245, 0.5);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        #bottom img {
+            border: dashed 2px rgba(255, 255, 0, 0.8);
+            border-radius: 20px;
+            height: auto;
+            max-width: 100%;
         }
 
         .arrows-rl {
             width: 115px;
             height: 90px;
         }
+
         .arrows-tb {
             width: 90px;
             height: 115px;
         }
-        button{
-            padding:4px;
 
+        #backCvs, #cvs {
+            border: solid 1px black;
+            position: absolute;
+            top: 35px;
+            left: 0;
         }
-        #bottom img{
-            border: dashed 2px rgba(255, 150, 0, 0.50);
-            border-radius: 20px ;
-            height: auto;
-            max-width: 100%;
+
+        #backCvs {
+            background: rgba(200, 0, 0, 0.2);
+        }
+
+        #cvs {
+            background: rgba(0, 0, 255, 0.2);
         }
     </style>
+    <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
     <script type="text/javascript">
-        var lemSrc = "{% static 'img/lem.png' %}"
+        var lemSrc = "{% static 'img/lem.png' %}";
+        var t26e5Src = "{% static 'img/t26e5mini.png' %}";
+        var mainImageSrc = "{% static 'img/lem.png' %}";
+        var masaruSrc = "{% static 'img/masaru.png' %}";
+        var block_bSrc = "{% static 'img/block_b.png' %}";
+
+        var mapData = "{{ mapData|safe }}";
+        var block_size = {{ block_size }};
+        console.log(mapData);
     </script>
+    {% csrf_token %}
 </head>
-<body>
+<body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
 <div id="wrapper">
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
-        <canvas id="cvs" width="480px" height="320px"></canvas>
+        <canvas id="backCvs" width="650px" height="450px"></canvas>
+        <canvas id="cvs" width="650px" height="450px"></canvas>
     </div>
     <div id="codeSpace">
         <h1>img要素をドラッグ＆ドロップ</h1>
         <p></p>
         <p>画像を上下のボックスにドラッグ＆ドロップで移動できます。</p>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
-            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1" ondragstart="f_dragstart(event)" >
-            <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r" data-n="1"  ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true" data-d="b" data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l" data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r"
+                 data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true" data-d="b"
+                 data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l"
+                 data-n="1" ondragstart="f_dragstart(event)">
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
         <button onclick="resetImages()">戻して</button>
+        <button onclick="action()">実行</button>
+        <select name="characters" id="characters" onchange="changeCharacter()">
+            <option value="">キャラクター選択</option>
+            <option value="">れむりん</option>
+            <option value="">T26E4</option>
+            <option value="">勝君</option>
+        </select>
     </div>
 </div>
+
+<script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
 </body>
 </html>
