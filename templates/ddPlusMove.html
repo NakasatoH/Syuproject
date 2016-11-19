@@ -101,14 +101,17 @@
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var block_bSrc = "{% static 'img/block_b.png' %}";
 
-        var mapData = "{{ mapData|safe }}";
+        var mapData = {{ mapData|safe }};
+        var ans = new Array();
+        ans = JSON.parse(JSON.stringify(mapData));
+        console.log(ans[1][1]);
         var block_size = {{ block_size }};
         console.log(mapData);
     </script>
     {% csrf_token %}
 </head>
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
-<div id="wrapper">
+<div id="wrapper">cd s
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
         <canvas id="backCvs" width="650px" height="450px"></canvas>

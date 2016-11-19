@@ -27,7 +27,8 @@ var map = [
     ["*","*","*","*","*","*","*","*","*","*","*","*","*"]// (,13)まで
 ];
 var map2 = mapData;
-
+console.log(map);
+console.log(map2);
 function arrayConverter() {
     
 }
