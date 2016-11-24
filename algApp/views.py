@@ -61,28 +61,28 @@ def ddpulsmove(request):
     else:
         print("settings正常")
 
+    pPositionX = "" # プレイヤーのx座標
+    pPositionY = "" # 　〃        y座標
     cnt = 0
     print(str2)
     for y in range(0, h_blocks):
         for x in range(0, w_blocks):
             mapArray[y][x] = str2[cnt]
+            # プレイヤーの位置を確認する
+            if str2[cnt] == "p":
+                pPositionX = x
+                pPositionY = y
             cnt += 1
-    print(repr(mapArray))
 
-    newArray = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0'],
-                ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']]
-
-    print(type(newArray))
+    print(str(pPositionX) + str(pPositionY))
+    # print(repr(mapArray))
     json.JSONEncoder(mapArray)
     data = {
         'mapData': mapArray,
         'block_size': block_size,
+        'pPositionX': pPositionX,
+        'pPositionY': pPositionY,
+        'cvs_width': cvs_width,
+        'cvs_height': cvs_height,
     }
     return render(request, 'ddPlusMove.html', data)

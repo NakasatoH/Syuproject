@@ -2,10 +2,12 @@
  * Created by nakasato on 2016/11/10.
  */
 
+var dx = 0;
+var dy = 0;
 var old_dx = 0; // 今までの位置を保持しておくための変数old_...
 var old_dy = 0;
 var images = [];// ドロップした順にidを保管するための配列
-const moveNum = 50;
+const moveNum = block_size;
 
 // 画像オブジェクト生成
 var image1 = new Image();
@@ -15,13 +17,24 @@ image1.src = mainImageSrc;
 
 // 画像の初回ロード時に画像を表示する
 image1.onload = (function () {
-    ImageToCanvas(image1);
+    var canvas = document.getElementById('cvs');
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    console.log("posiX: " + pPositionX + "  block : " + block_size);
+    dx = pPositionX * block_size;
+    dy = ( pPositionY + 1 ) * block_size - image1.height;
+    old_dx = dx;
+    old_dy = dy;
+    console.log("dx : " + dx + " dy : " + dy);
+    ctx.translate(dx, dy);
+    ctx.drawImage(image1, 0, 0);
+    ctx.translate(-1 * dx, -1 * dy);
 });
-
 
 function changeCharacter() {
     var charElm = document.getElementById("characters");
-    switch (charElm.selectedIndex){
+    ImageToCanvas(image1);// 画像を表示してからイメージ画像のsrcを変更することで不自然な挙動を解消
+    switch (charElm.selectedIndex) {
         case 0:
             break;
         case 1:
@@ -34,7 +47,6 @@ function changeCharacter() {
             this.image1.src = masaruSrc;
             break;
     }
-    ImageToCanvas(this.image1);
 }
 
 /**---------------------------------------------------------------------
@@ -63,7 +75,7 @@ function f_drop(event) {
     /**
      * window.setTimeoutは並行処理であるため、currentTarget.appendChild()もpreventDefaultもsetTimeout内に入れる必要がある
      * また、更にその中でもevent.preventDefault()の方が処理順が速いため、currentTargetを見失ってしまう。
-     * その対策として、変数に値を代入して保持して億必要がある。
+     * その対策として、変数に値を代入して保持しておく必要がある。
      */
     var currentTarget = event.currentTarget;
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
@@ -82,17 +94,16 @@ function f_drop(event) {
             var cnt = 0;// 無限ループを防ぐための変数cnt
             var imageMoveInterval = setInterval(function () {// setIntervalは引数を与える場合, 無名関数  →　function(){関数名(引数1,引数2,...)}　を使用しなければならない
                 console.log(imageMoveInterval);
-                if (cnt >= moveNum) {// if文を使用しないとループし続ける
+                if (cnt >= moveNum) {// if文を使用しないとループし続ける 移動px回ループする
                     clearInterval(imageMoveInterval);
                 }
                 cnt++;
                 //----------------------------------------------------------------------------------
-                //ImageToCanvas(image1, data_d, data_n)
+                //ImageToCanvas(image1, data_d, data_n)// 現在は画像をドロップしただけで画像が動く必要が無いのでコメントアウト
                 //----------------------------------------------------------------------------------
 
             }, 10);
         } else if (currentTarget.id == "upper") {
-
             outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
         }
         imagesLog();
@@ -144,12 +155,25 @@ function imagesLog() {
  * 画像処理関係
  * ------------------------------------------------------
  */
+/*
+* if(map[pPositionY][pPositionX + 1] != "*") {
+                map[pPositionY][pPositionX] = "0";
+                pPositionX += 1;
+                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                dx = n;
+            }else{
+                blockFlg = true;
+            }
+* */
 
-
-// canvas内の画像を動かす関数
+/**------------------------------------------------------------
+ *  画像を動かす処理 引数は(イメージファイル,方向データ,数値)
+ * ------------------------------------------------------------
+ */
 function ImageToCanvas(im, direction, num) {
-    var dx = 0;
-    var dy = 0;
+    dx = 0;
+    dy = 0;
+    blockFlg = false;
     var n = parseInt(num);
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
@@ -166,6 +190,7 @@ function ImageToCanvas(im, direction, num) {
             break;
         case "l":
             dx = -1 * n;
+            break;
     }
     dx += old_dx;
     dy += old_dy;
@@ -180,14 +205,11 @@ function ImageToCanvas(im, direction, num) {
         dy = canvas.height - im.height;
     }
 
-    // 移動先に障害物が有る場合の処理
-    var checkX = dx / moveNum;
     old_dx = dx;
     old_dy = dy;
     ctx.translate(dx, dy);
     ctx.drawImage(im, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
-
 }
 
 /**-------------------------------------------------------
@@ -221,7 +243,7 @@ function action() {
     // 全ての画像を順番に動かす。
     function action() {
         // ドロップされている画像群の個数と内容を把握する
-        if(i < images.length) {
+        if (i < images.length) {
             id = images[i];
             drop_elm = document.getElementById(id);
             data_d = drop_elm.getAttribute("data-d");// 方向データ
@@ -233,10 +255,10 @@ function action() {
                 ImageToCanvas(image1, data_d, data_n);
             } else {
                 i++;
-                if (i < images.length) {
+                if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
                     action();
                 }
-                clearInterval(itc);
+                clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
             }
             cnt++;
         }, 10);

@@ -78,35 +78,39 @@
         }
 
         #backCvs, #cvs {
+
             border: solid 1px black;
             position: absolute;
-            top: 35px;
+            top: 50px;
             left: 0;
         }
 
         #backCvs {
-            background: rgba(200, 0, 0, 0.2);
+            background: rgba(255, 0, 0, 0.2);
         }
 
         #cvs {
-            background: rgba(0, 0, 255, 0.2);
+            background: rgba(0, 255, 255, 0.2);
         }
     </style>
     <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
     <script type="text/javascript">
-        var lemSrc = "{% static 'img/lem.png' %}";
+        var lemSrc = "{% static 'img/lemmini.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
-        var mainImageSrc = "{% static 'img/lem.png' %}";
+        var mainImageSrc = "{% static 'img/lemmini.png' %}";
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var block_bSrc = "{% static 'img/block_b.png' %}";
 
-        var mapData = {{ mapData|safe }};
-        var ans = new Array();
-        ans = JSON.parse(JSON.stringify(mapData));
-        console.log(ans[1][1]);
-        var block_size = {{ block_size }};
-        console.log(mapData);
+        var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
+        var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
+        var cvs_width = {{ cvs_width }};
+        var cvs_height = {{ cvs_height }};
+        var pPositionX = {{ pPositionX }};// プレイヤー初期X座標
+        var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
+
+        // 数値変換
+        console.log(block_size);
     </script>
     {% csrf_token %}
 </head>
