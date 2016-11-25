@@ -104,13 +104,10 @@
 
         var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
         var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
-        var cvs_width = {{ cvs_width }};
+        var cvs_width =     {{ cvs_width }};
         var cvs_height = {{ cvs_height }};
         var pPositionX = {{ pPositionX }};// プレイヤー初期X座標
         var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
-
-        // 数値変換
-        console.log(block_size);
     </script>
     {% csrf_token %}
 </head>

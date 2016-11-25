@@ -93,7 +93,6 @@ function f_drop(event) {
 
             var cnt = 0;// 無限ループを防ぐための変数cnt
             var imageMoveInterval = setInterval(function () {// setIntervalは引数を与える場合, 無名関数  →　function(){関数名(引数1,引数2,...)}　を使用しなければならない
-                console.log(imageMoveInterval);
                 if (cnt >= moveNum) {// if文を使用しないとループし続ける 移動px回ループする
                     clearInterval(imageMoveInterval);
                 }
@@ -107,6 +106,12 @@ function f_drop(event) {
             outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
         }
         imagesLog();
+
+        /** -------------------------------------------------------------------------------
+         *  while,if文の後にmarginを加える処理実装予定
+         *  -------------------------------------------------------------------------------
+         */
+        // drag_elm.style.marginLeft = '30px';
         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 50);
@@ -156,15 +161,15 @@ function imagesLog() {
  * ------------------------------------------------------
  */
 /*
-* if(map[pPositionY][pPositionX + 1] != "*") {
-                map[pPositionY][pPositionX] = "0";
-                pPositionX += 1;
-                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                dx = n;
-            }else{
-                blockFlg = true;
-            }
-* */
+ * if(map[pPositionY][pPositionX + 1] != "*") {
+ map[pPositionY][pPositionX] = "0";
+ pPositionX += 1;
+ map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+ dx = n;
+ }else{
+ blockFlg = true;
+ }
+ * */
 
 /**------------------------------------------------------------
  *  画像を動かす処理 引数は(イメージファイル,方向データ,数値)
@@ -236,9 +241,10 @@ function action() {
     var data_d;// 方向
     var data_n;// 移動量
     var drop_elm;// ドロップ済みエレメント
+
     var cnt = 0;// 無限ループを防ぐための変数cnt
     var i = 0;
-
+    var blockFlg = false;
     action();
     // 全ての画像を順番に動かす。
     function action() {
@@ -248,19 +254,82 @@ function action() {
             drop_elm = document.getElementById(id);
             data_d = drop_elm.getAttribute("data-d");// 方向データ
             data_n = drop_elm.getAttribute("data-n");// 移動量
+            switch (data_d) {
+                case "t":
+                    if (map[pPositionY - 1][pPositionX] != "*") {
+                        map[pPositionY][pPositionX] = "0";
+                        pPositionY -= 1;
+                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                    } else {
+                        blockFlg = true;
+                    }
+                    break;
+                case "r":
+                    if (map[pPositionY][pPositionX + 1] != "*") {
+                        map[pPositionY][pPositionX] = "0";
+                        pPositionX += 1;
+                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                    } else {
+                        blockFlg = true;
+                    }
+                    break;
+                case "b":
+                    if (map[pPositionY + 1][pPositionX] != "*") {
+                        map[pPositionY][pPositionX] = "0";
+                        pPositionY += 1;
+                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                    } else {
+                        blockFlg = true;
+                    }
+                    break;
+                case "l":
+                    if (map[pPositionY][pPositionX - 1] != "*") {
+                        map[pPositionY][pPositionX] = "0";
+                        pPositionX -= 1;
+                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                    } else {
+                        blockFlg = true;
+                    }
+                    break;
+            }
             cnt = 0;
         }
+        console.table(map);
+        console.log("");
+        //debugData(map);//console.tableかどっちか
         var itc = setInterval(function () {
-            if (cnt < moveNum) {
-                ImageToCanvas(image1, data_d, data_n);
-            } else {
-                i++;
-                if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
-                    action();
+                if (cnt < moveNum) {
+                    if (!blockFlg) {//前に壁が無い場合
+                        ImageToCanvas(image1, data_d, data_n);
+                    }
+                } else {
+                    i++;
+                    if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                        blockFlg = false;
+                        action();
+                    }
+                    clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
                 }
-                clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
+                cnt++;
+            },
+            10
+        );
+    }
+}
+
+// ２次元配列表示用関数
+function debugData(data) {
+    if (data == null) {
+        debug('データはnullです');
+    } else {
+        for (var i = 0; i < data.length; i++) {
+            var ent = data[i];
+            if (ent == null) {
+                console.log('エンティティはnull');
+            } else {
+                msg = ent.join(',');
+                console.log(msg + " : " + i + "列目");
             }
-            cnt++;
-        }, 10);
+        }
     }
 }
