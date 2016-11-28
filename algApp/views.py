@@ -29,7 +29,6 @@ def movesample(request):
 w_blocks = 0
 h_blocks = 0
 
-
 def ddpulsmove(request):
     # mapという変数名を生成してエラーを確認。
 
@@ -64,6 +63,7 @@ def ddpulsmove(request):
     pPositionX = "" # プレイヤーのx座標
     pPositionY = "" # 　〃        y座標
     cnt = 0
+
     print(str2)
     for y in range(0, h_blocks):
         for x in range(0, w_blocks):
@@ -74,9 +74,6 @@ def ddpulsmove(request):
                 pPositionY = y
             cnt += 1
 
-    print(str(pPositionX) + str(pPositionY))
-    # print(repr(mapArray))
-    json.JSONEncoder(mapArray)
     data = {
         'mapData': mapArray,
         'block_size': block_size,

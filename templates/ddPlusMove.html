@@ -21,7 +21,6 @@
 
         button {
             padding: 4px;
-
         }
 
         select {
@@ -34,8 +33,7 @@
         }
 
         #wrapper {
-            border: solid 1px #999999;
-            width: 1200px;
+            width: auto;
             margin: 0 0%;
         }
 
@@ -46,22 +44,32 @@
 
         #codeSpace {
             border: solid 1px #999999;
-            float: right;
+            position: absolute;
+            top: 50px;
+            left: {{ cvs_width }}px;
         }
 
         #upper, #bottom {
-            width: 500px;
-            height: 100px;
-            margin: 20px 0;
+            width: 600px;
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
-            border: 1px solid #ddd;
-            background: rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+            background: rgba(255, 249, 16, 0.8);
+        }
+        #bottom {
+            border-bottom: 1px solid #ddd;
+            height: 100px;
+            background: rgb(0, 255, 244);
+        }
+        #upper {
+            height: 100px;
         }
 
         #bottom img {
-            border: dashed 2px rgba(255, 255, 0, 0.8);
+            border: dashed 2px rgba(0, 0, 0, 0.8);
             border-radius: 20px;
             height: auto;
             max-width: 100%;
@@ -78,7 +86,6 @@
         }
 
         #backCvs, #cvs {
-
             border: solid 1px black;
             position: absolute;
             top: 50px;
@@ -104,7 +111,7 @@
 
         var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
         var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
-        var cvs_width =     {{ cvs_width }};
+        var cvs_width = {{ cvs_width }};
         var cvs_height = {{ cvs_height }};
         var pPositionX = {{ pPositionX }};// プレイヤー初期X座標
         var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
@@ -112,11 +119,11 @@
     {% csrf_token %}
 </head>
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
-<div id="wrapper">cd s
+<div id="wrapper">
     <h1>DD and moveサンプル</h1>
     <div id="actionSpace">
-        <canvas id="backCvs" width="650px" height="450px"></canvas>
-        <canvas id="cvs" width="650px" height="450px"></canvas>
+        <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
+        <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
     </div>
     <div id="codeSpace">
         <h1>img要素をドラッグ＆ドロップ</h1>
@@ -131,6 +138,8 @@
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l"
                  data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="arWhile" draggable="true" data-d="w"
+                 data-n="3" ondragstart="f_dragstart(event)">
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
         <button onclick="resetImages()">戻して</button>

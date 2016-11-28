@@ -20,12 +20,10 @@ image1.onload = (function () {
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log("posiX: " + pPositionX + "  block : " + block_size);
     dx = pPositionX * block_size;
     dy = ( pPositionY + 1 ) * block_size - image1.height;
     old_dx = dx;
     old_dy = dy;
-    console.log("dx : " + dx + " dy : " + dy);
     ctx.translate(dx, dy);
     ctx.drawImage(image1, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
@@ -71,6 +69,15 @@ function f_drop(event) {
 
     var data_d = drag_elm.getAttribute("data-d");// 方向データ
     var data_n = drag_elm.getAttribute("data-n");// 移動量
+
+    var canvas = document.getElementById('cvs');
+    var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
+    var rect = bottomDiv.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+    x = Math.floor(x);// 四捨五入　整数型にキャスト
+    y = Math.floor(y);
+    console.log("x : " + x + " y : " + y);
 
     /**
      * window.setTimeoutは並行処理であるため、currentTarget.appendChild()もpreventDefaultもsetTimeout内に入れる必要がある
@@ -195,6 +202,9 @@ function ImageToCanvas(im, direction, num) {
         case "l":
             dx = -1 * n;
             break;
+        // case "w":
+        //     wAction(data_n);
+        //     break;
     }
     dx += old_dx;
     dy += old_dy;
@@ -332,3 +342,8 @@ function debugData(data) {
         }
     }
 }
+
+// // While処理実装
+// function wAction() {
+//
+// }
