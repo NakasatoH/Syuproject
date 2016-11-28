@@ -8,8 +8,10 @@
  */
 // 画像オブジェクト生成
 var image2 = new Image();
+var haikei = new Image();
 // 画像パスを画像obj.srcに設定
 image2.src = block_bSrc;
+haikei.src = umiSrc;
 // 画像の初回ロード時に画像を表示する
 image2.onload = (function () {
     ITC2(image2);
@@ -25,6 +27,7 @@ function ITC2(im) {
     var canvas2 = document.getElementById('backCvs');
     var ctx2 = canvas2.getContext('2d');
     ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+    ctx2.drawImage(haikei, 0, 0);
     for(var y = 0; y * image2.height< canvas2.height;y++ ){
         dy = blockHeight * y;
         for(var x = 0; x < 13;x++){

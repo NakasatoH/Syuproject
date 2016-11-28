@@ -44,6 +44,12 @@ function changeCharacter() {
         case 3:
             this.image1.src = masaruSrc;
             break;
+        case 4:
+            this.image1.src = tyagumaSrc;
+            break;
+        case 5:
+            this.image1.src = sunagauoSrc;
+            break;
     }
 }
 
@@ -343,7 +349,7 @@ function debugData(data) {
     }
 }
 
-// // While処理実装
-// function wAction() {
-//
-// }
+// While処理実装
+ function wAction() {
+    
+ }
