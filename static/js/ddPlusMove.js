@@ -81,10 +81,11 @@ function f_drop(event) {
     var data_d = drag_elm.getAttribute("data-d");// 方向データ
     var data_n = drag_elm.getAttribute("data-n");// 移動量
 
-    var canvas = document.getElementById('cvs');
     var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
     var rect = bottomDiv.getBoundingClientRect();
     var btmX = rect.left;// ドロップ先boxのx座標を保持
+    var bwFlg = false;// div bottom から bottom へwhile画像を繰り返しドロップすることで起こる不正な挙動を防ぐフラグ
+
     var x = event.clientX - rect.left;// ドロップ位置情報
     var y = event.clientY - rect.top;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
@@ -102,9 +103,17 @@ function f_drop(event) {
     window.setTimeout(function () {
 
         // ドロップ先がエディットボックス(id = "bottom")の場合
-        if (currentTarget.id == "bottom") {
-            inputArray(id_name);// 全ての画像をもとのボックスに戻すため配列の中に入れる処理を追加
 
+        if (currentTarget.id == "bottom") {
+            for (var i = 1; i < images.length; i++) {
+                if (images[i] == drag_elm.id) {
+                    bwFlg = true;
+                }
+            }
+            if (!bwFlg) {
+                inputArray(id_name);// 全ての画像をもとのボックスに戻すため配列の中に入れる処理を追加
+            }
+            bwFlg = false;
             // while画像よりもx座標が +か -か判定して -の場合 whileのエンドマークをimages配列に挿入する
             console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
@@ -126,14 +135,15 @@ function f_drop(event) {
         }
         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
 
+
         // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
-        if (data_d == "w") {
+        if (currentTarget.id == "bottom" && data_d == "w") {
             wCnt++;
             var rect = drag_elm.getBoundingClientRect();// 一番最後にドロップしたwhileイメージの座標を保持
             while_x = Math.floor(rect.left + image1.width - btmX);
             console.log("x : " + while_x);
         }
-        imagesLog();
+        //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 50);
 
@@ -166,49 +176,100 @@ function f_drop(event) {
 
     // div#bottom から div#upperに戻したときに配列を詰める関数
     function outputArray(id) {
+        var e_index;
         for (var i = 0; i < images.length; i++) {
             if (images[i] == id) {
-                // whileが始まっていて終わっていない場合
-                if (wCnt > 0) {
-                    // images[i]の２つ後に要素が存在する場合
-                    if (images[i + 2]) {
-                        // images[i]の１つ前に while画像がある　かつ　一つ後がエンドマークなら
-                        var left_elm = document.getElementById(images[i - 1]);
-                        var d = left_elm.getAttribute("data-d");
-                        if(d == "w" && images[i + 1] == "endWhile"){
-                            currentTarget.appendChild(left_elm);// ドロップ先にドラッグされた要素を追加をする
-                            images.splice(i - 1, 3);// "w" ドロップした要素、エンドマークすべて削除
-                        }else{
-                            images.splice(i,1);
-                        }
-                    } else {
-                        //２つとなりに要素が存在しない場合 ドロップしたidとエンドマークを削除
-                        if (images[i + 1]) {
-                            if (images[i + 1] = "endWhile") {
-                                wCnt ++;
-                                images.splice(i,2);
-                            }else{
-                                images.pop();
-                            }
+                //取得した画像がwhileなら
+                if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                    for (var j = i + 1; j < images.length; j++) {
+                        if (images[j] != "endWhile") {
+                            //endWhileの要素番号を保持
+                            e_index = j;
+                            break;
+                        } else {
+                            // 既についているインデントを減らす
+                            var w_elm = document.getElementById(images[j]);
+                            w_elm.style.marginLeft -= 32;
                         }
                     }
+                    if (images[e_index]) {
+                        images.splice(e_index, 1);// endWhileを削除
+                    }
+                    images.splice(i, 1);
+                    wCnt--;
                 } else {
-                    // i番目から1つ要素を削除
-                    images.splice(i,1);
+                    if (images[i - 1]) {
+                        if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
+                            // iの一つ後が存在していて かつendWhileであるなら
+                            if (images[i + 1] && images[i + 1] == "endWhile") {
+                                // images[i-1]のエレメント(while画像)をupperに表示
+                                currentTarget.appendChild(document.getElementById(images[i - 1]));
+                                images.splice(i - 1, 3);
+                                wCnt--;
+                            } else {
+                                images.splice(i, 1)
+                            }
+                        } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
+                            //一つ前がendWhile　かつ １つ後が存在しないなら
+                            images.splice(i - 1, 2);
+                            wCnt++;
+                        } else {
+                            images.splice(i, 1);
+                        }
+                    } else {
+                        images.splice(i, 1);
+                    }
                 }
+                drag_elm.style.marginLeft = 0 + "px";
+               // console.log(drag_elm.style.marginLeft);
             }
-        }
+        }//for (var i = 0; i < image.length; i++) End
     }
 
-    // 表示用関数
-    function imagesLog() {
-        for (i = 0; i < images.length; i++) {
-            console.log("images配列[" + i + "] : " + images[i]);
-        }
-    }
+    /*function outputArray(id) {
+     for (var i = 0; i < images.length; i++) {
+     if (images[i] == id) {
+     // whileが始まっていて終わっていない場合
+     if (wCnt > 0) {
+     // images[i]の２つ後に要素が存在する場合
+     if (images[i + 2]) {
+     // images[i]の１つ前に while画像がある　かつ　一つ後がエンドマークなら
+     var left_elm = document.getElementById(images[i - 1]);
+     var d = left_elm.getAttribute("data-d");
+     if(d == "w" && images[i + 1] == "endWhile"){
+     currentTarget.appendChild(left_elm);// ドロップ先にドラッグされた要素を追加をする
+     images.splice(i - 1, 3);// "w" ドロップした要素、エンドマークすべて削除
+     }else{
+     images.splice(i,1);
+     }
+     } else {
+     //２つとなりに要素が存在しない場合 ドロップしたidとエンドマークを削除
+     if (images[i + 1]) {
+     if (images[i + 1] = "endWhile") {
+     wCnt ++;
+     images.splice(i,2);
+     }else{
+     images.pop();
+     }
+     }
+     }
+     } else {
+     // i番目から1つ要素を削除
+     images.splice(i,1);
+     }
+     }
+     }
+     }*/
+
+
 }// function f_drop(event) End
 
-
+// 表示用関数
+function imagesLog() {
+    for (var i = 0; i < images.length; i++) {
+        console.log("images配列[" + i + "] : " + images[i]);
+    }
+}
 /**------------------------------------------------------
  * 画像処理関係
  *
@@ -218,7 +279,6 @@ function f_drop(event) {
 function ImageToCanvas(im, direction, num) {
     dx = 0;
     dy = 0;
-    blockFlg = false;
     var n = parseInt(num);
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
@@ -265,10 +325,14 @@ function resetImages() {
     var upper_elm = document.getElementById("upper");
     for (var i = 0; i < images.length; i++) {
         var drag_elm = document.getElementById(images[i]);
+        // 画像に付与された余白を除去
+        drag_elm.style.marginLeft = 0 + "px";
+        // コードボックス内に移動
         upper_elm.appendChild(drag_elm);
     }
     // 配列の長さを0にすることで配列を初期化（全要素を削除）
     images.length = 0;
+    wCnt = 0;
     console.log("ドロップされた画像、配列を初期化")
 }
 
@@ -277,14 +341,14 @@ function resetImages() {
  * --------------------------------------------------------
  */
 
+
 function action() {
-    console.log("----------FirstAction--------------");
+    var firstFlg = true;// action()呼び出し時、一度のみの処理に使用
     var id;// ドロップされた画像のidを格納する変数
     var data_d;// 方向
     var data_n;// 移動量
     var drop_elm;// ドロップ済みエレメント
     var w_elm;// whileデータ持ちエレメント
-    var flg = false;// "w"マークが検出された際再度switch文を通るためのwhile用フラグ
     var cnt = 0;// 無限ループを防ぐための変数cnt この変数は再利用有り
     var i = 0;
     var blockFlg = false;
@@ -292,50 +356,51 @@ function action() {
     var wNum = [];// images配列の中でwhileが見つかった場合data_nをwNum配列に格納
     var bkImages = [];// 処理終了後 images配列を元の状態に戻す
 
-    /*
-     * images配列の中に"w"マークを持ったidが発見され、"e"マークを持ったidが無い場合
-     * hiddenのデータを呼び出し"e"マークを持ったidを格納する
-     */
-    for (i = images.length - 1; i > -1; i--) {
-        console.log("繰り返されてる？ i:" + i + " length: " + images.length + " images [i] : " + images[i]);
-        drop_elm = document.getElementById(images[i]);
-        console.log(drop_elm + " i -> " + i);
-        data_d = drop_elm.getAttribute("data-d");// 方向データ
 
+    for (i = images.length - 1; i > -1; i--) {
         // 抽出したデータが"w"ならば
-        if (data_d == "w") {
+        if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
             whileIndex[cnt] = i;
             w_elm = document.getElementById(images[whileIndex[cnt]]);
-            console.log(images.length + "<- 長さ : id ->" + whileIndex[cnt]);
+            //console.log(images.length + "<- 長さ : id ->" + whileIndex[cnt]);
             data_n = w_elm.getAttribute("data-n");
             wNum[cnt] = data_n;// 繰り返し画像がドロップされている場合 繰り返し回数data_nを変数wNumに保持
             cnt++;// whileマークの数を数える変数cnt この変数は再利用有り
-            console.log("data-d : w 検出 : while開始");
+            //console.log("data-d : w 検出 : while開始");
         }
     }
 
-
-    bkImages = images;// バックアップを生成;
+    // 最後に見た目通りの配列に戻すためのバックアップを生成;
+    bkImages = images;
     // whileを解体して"w"と"e"マークの無い配列を生成、代入
-    for (i = 0; i < whileIndex.length; i++) {
-        // whileマークが検出された場合配列を解体し、作り直す
-        images = wBreakDown(whileIndex[i], wNum[i]);
+    if(firstFlg) {
+        firstAction();
     }
-
+    for (i = 0; i < whileIndex.length; i++) {
+        /**
+         * 引数説明：　
+         *       引数１＝ while画像の要素番号を格納した配列のi番目
+         *       引数２は images配列のより後ろにあるwhileから見ていくため、今見ているWhileよりも後ろの位置にあるwhileの数を送る  例： w1 w2 w3 で　w2を解体している場合 whileは w3 一個のため 引数2 = 1になる
+         *       引数３は引数１に対応したwhileのエレメントが持つ繰り返し回数のデータ
+         */
+        // whileマークが検出された場合配列を解体し、作り直す
+        images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
+    }
+    imagesLog();
     i = 0;// 初期化
     // 内側で宣言したactionを呼び出す
     action2();
     // 全ての画像を順番に動かす。
     function action2() {
-        console.log("----------SecondAction--------------");
+        //console.log("----------SecondAction--------------");
         // ドロップされている画像群の個数と内容を把握する
         if (i < images.length) {
             id = images[i];
             drop_elm = document.getElementById(id);
-            console.log(images.length + "<- 長さ : id ->" + id);
+            //console.log(images.length + "<- 長さ : id ->" + id);
             // 表示用　削除項目
             for (var z = 0; z < images.length; z++) {
-                console.log("images[" + z + "]" + images[z]);
+                //console.log("images[" + z + "]" + images[z]);
             }
             data_d = drop_elm.getAttribute("data-d");// 方向データ
             data_n = drop_elm.getAttribute("data-n");// 移動量
@@ -377,12 +442,11 @@ function action() {
                     }
                     break;
             }// switch (data_d) End
-            //whileを抜けるため フラグをTrueに切り替え
         }//if (i < images.length) End
 
         // Console上で2次元配列を表示　※デベロッパーツールのサイズが小さいとテーブルの中身が上手く表示されない場合がある
-        console.table(map);
-        console.log("");
+        //console.table(map);
+        //console.log("");
         cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
         var itc = setInterval(function () {
             if (cnt < moveNum) {
@@ -411,6 +475,26 @@ function action() {
             cnt++;
         }, 10);
     }
+        /*
+     * images配列の中に"w"マークを持ったidが発見され、"e"マークを持ったidが無い場合
+     * hiddenのデータを呼び出し"e"マークを持ったidを格納する
+     * whileの数に対応したendWhileをimages配列の最後に挿入する
+     * endWhileの数を数える
+     */
+
+    function firstAction(){
+        var endCnt = 0;
+        for (i = 0; i < images.length; i++) {
+            if (images[i] == "endWhile") {
+                endCnt++;
+            }
+        }
+        for (i = 0; i < endCnt; i++) {
+            images[images.length] = "endWhile";
+        }
+        imagesLog();
+        firstFlg = false;
+    }
 }
 
 /**--------------------------------------------------------
@@ -429,32 +513,37 @@ function action() {
  *     backIsolateArray = [0]"r"1　配列の後部分
  *
  * 処理手順
- *   images配列内の"w"マークから"e"マークまでの間にあるデータ（繰返される処理）をworkArrayに格納する
+ *   images配列内の"w"マークの数を数え、その数と同じ数の"e"マークが検出されない場合、足りない数分 images配列に"e"マークを追加する
+ *   images配列内の"w"マークから"e"マークまでの間にあるデータ（繰返される処理）をworkArrayに格納する <- 改良
+ *                    改良内容：
+ *                           抽出した"w"マークから最初に発見した"e"マークまでに他の"w"マークが複数確認できた場合
+ *                           発見した"w"マークの数だけ"e"マークをスルーする
+ *
  *   images配列内の"w"マーク以前のデータをfrontIsolateArrayに格納する
  *   images配列内の読み込んだ"w"マークの次にある"e"マークより後の処理をbackIsolateArrayに格納する
- * 　frontIsolateArray配列に images配列内の"w"から"e"マークまでのデータ(workArray)を"w"のdata_n回繰り返し追加する
+ *   frontIsolateArray配列に images配列内の"w"から"e"マークまでのデータ(workArray)を"w"のdata_n回繰り返し追加する
  *   frontIsolateArray配列にbackIsolateArrayを結合する
  *   初期化したimages配列に 結合済みfrontIsolateArrayを代入する
  */
-function wBreakDown(index, wNum) {// 引数: whileマークがある要素番号, whileマーク持ちidのdata_n(数値
+function wBreakDown(index, wIdx, wNum) {
     var cnt = 0;
     var workNum = 0;
     var workNum2 = 0;
     var workArray = [];// 繰り返し処理部分を格納する配列
     var frontIsolateArray = [];// 隔離用配列(前)
     var backIsolateArray = [];// 隔離用配列(後)
-    var endWFlg = false;
-    /**
-     * endWhileを最後に挿入する処理を事前にしているため images.lengthの処理がいらないが念のため取っておく
-     */
     // 繰り返される処理をworkArray配列に格納
-    for (var i = index + 1; i < images.length; i++) {// <--　バグ発生　条件注意
+    for (var i = index + 1; i < images.length; i++) {
         if (images[i] == "endWhile") {
-            endWFlg = true;
-        }
-        if (!endWFlg) {
+            //console.log("i break: " + i);
+            wIdx--;
+            if (wIdx < 1) {
+                break;
+            }
+        } else {
+            //console.log("i : " + i);
             workArray[workNum] = images[i];// images配列の要素を格納
-            console.log(workArray[workNum] + " : workArray[" + workNum + "]");
+            //console.log(workArray[workNum] + " : workArray[" + workNum + "]");
             workNum++;// workArrayの要素番号を進める
         }
     }
@@ -462,13 +551,15 @@ function wBreakDown(index, wNum) {// 引数: whileマークがある要素番号
     // "w"マークより前のデータをfrontIsolateArrayに格納
     for (i = index - 1; i > -1; i--) {
         frontIsolateArray[i] = images[i];
-        console.log("frontIsolateArray[" + frontIsolateArray[i] + "]")
+        //console.log("frontIsolateArray[" + frontIsolateArray[i] + "]")
     }
 
     // "e"マーク以降のデータをbackIsolateArrayに格納
-    if(images[index + workNum + 1]) {
-        for (i = index + workNum + 1; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
+    if (images[index + workNum + 2]) {
+        console.log("くまくまぽいんと" + images[index + workNum + 2]);
+        for (i = index + workNum + 2; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
             backIsolateArray[workNum2] = images[i];
+            console.log(backIsolateArray[workNum2]);
             workNum2++;
         }
     }
@@ -482,10 +573,11 @@ function wBreakDown(index, wNum) {// 引数: whileマークがある要素番号
     // frontIsolateArray配列とbackIsolateArray配列を結合
     for (i = 0; i < backIsolateArray.length; i++) {
         frontIsolateArray[index + cnt + i] = backIsolateArray[i];
+        console.log(frontIsolateArray[index + cnt + i]);
     }
 
     // images配列中身確認
-    console.log("-------------");
+    //console.log("-------------");
     for (var x = 0; x < images.length; x++) {
         console.log(x + "images[" + x + "] : " + images[x]);
     }
