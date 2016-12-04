@@ -124,21 +124,6 @@ function f_drop(event) {
         } else if (currentTarget.id == "upper") {
             outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
         }
-        imagesLog();
-
-        /** -------------------------------------------------------------------------------
-         *  while,if文の後にmarginを加える処理実装予定
-         *  -------------------------------------------------------------------------------
-         */
-        //whileイメージよりも左側にドロップした場合
-        if(wCnt > 0 && while_x >= x){
-            wCnt -= 1;
-            images[images.length] = "endWhile";
-        }
-        if (wCnt > 0) {
-            var l_margin = wCnt * 32;
-            drag_elm.style.marginLeft = l_margin + 'px';
-        }
         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
 
         // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
@@ -148,6 +133,7 @@ function f_drop(event) {
             while_x = Math.floor(rect.left + image1.width - btmX);
             console.log("x : " + while_x);
         }
+        imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 50);
 
@@ -164,7 +150,16 @@ function f_drop(event) {
             }
         }
         if (arrayFlg == true) {
-            outputArray(id);
+            outputArray(id);// 同じbottomからbottomにD and Dされた場合一度配列を整理してから　配列の最後にidを格納
+        }
+        //whileイメージよりも左側にドロップした場合
+        if (wCnt > 0 && while_x >= x) {
+            wCnt -= 1;
+            images[images.length] = "endWhile";
+        }
+        if (wCnt > 0) {
+            var l_margin = wCnt * 32;
+            drag_elm.style.marginLeft = l_margin + 'px';
         }
         images[images.length] = id;
     }
@@ -173,14 +168,36 @@ function f_drop(event) {
     function outputArray(id) {
         for (var i = 0; i < images.length; i++) {
             if (images[i] == id) {
-                for (i; i < images.length; i++) {
-                    if (i + 1 < images.length) {
-                        images[i] = images[i + 1]
+                // whileが始まっていて終わっていない場合
+                if (wCnt > 0) {
+                    // images[i]の２つ後に要素が存在する場合
+                    if (images[i + 2]) {
+                        // images[i]の１つ前に while画像がある　かつ　一つ後がエンドマークなら
+                        var left_elm = document.getElementById(images[i - 1]);
+                        var d = left_elm.getAttribute("data-d");
+                        if(d == "w" && images[i + 1] == "endWhile"){
+                            currentTarget.appendChild(left_elm);// ドロップ先にドラッグされた要素を追加をする
+                            images.splice(i - 1, 3);// "w" ドロップした要素、エンドマークすべて削除
+                        }else{
+                            images.splice(i,1);
+                        }
+                    } else {
+                        //２つとなりに要素が存在しない場合 ドロップしたidとエンドマークを削除
+                        if (images[i + 1]) {
+                            if (images[i + 1] = "endWhile") {
+                                wCnt ++;
+                                images.splice(i,2);
+                            }else{
+                                images.pop();
+                            }
+                        }
                     }
+                } else {
+                    // i番目から1つ要素を削除
+                    images.splice(i,1);
                 }
             }
         }
-        images.pop();
     }
 
     // 表示用関数
@@ -188,8 +205,6 @@ function f_drop(event) {
         for (i = 0; i < images.length; i++) {
             console.log("images配列[" + i + "] : " + images[i]);
         }
-
-
     }
 }// function f_drop(event) End
 
@@ -451,9 +466,11 @@ function wBreakDown(index, wNum) {// 引数: whileマークがある要素番号
     }
 
     // "e"マーク以降のデータをbackIsolateArrayに格納
-    for (i = index + workNum + 1; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
-        isolateArray[workNum2] = images[i];
-        workNum2++;
+    if(images[index + workNum + 1]) {
+        for (i = index + workNum + 1; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
+            backIsolateArray[workNum2] = images[i];
+            workNum2++;
+        }
     }
     // frontIsolateArray配列に images配列内の"w"から"e"マークまでのデータ(workArray)を"w"のdata_n回繰り返し追加する
     for (var j = 0; j < wNum; j++) {
