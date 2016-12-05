@@ -164,7 +164,8 @@ function f_drop(event) {
         }
         //whileイメージよりも左側にドロップした場合
         if (wCnt > 0 && while_x >= x) {
-            wCnt -= 1;
+            wCnt -= 1
+            console.log("エンドマーク挿入2");
             images[images.length] = "endWhile";
         }
         if (wCnt > 0) {
@@ -221,7 +222,7 @@ function f_drop(event) {
                     }
                 }
                 drag_elm.style.marginLeft = 0 + "px";
-               // console.log(drag_elm.style.marginLeft);
+                // console.log(drag_elm.style.marginLeft);
             }
         }//for (var i = 0; i < image.length; i++) End
     }
@@ -373,7 +374,7 @@ function action() {
     // 最後に見た目通りの配列に戻すためのバックアップを生成;
     bkImages = images;
     // whileを解体して"w"と"e"マークの無い配列を生成、代入
-    if(firstFlg) {
+    if (firstFlg) {
         firstAction();
     }
     for (i = 0; i < whileIndex.length; i++) {
@@ -468,6 +469,7 @@ function action() {
                      */
                     // 処理終了後　images配列を画面上の見た目通りに戻す
                     images = bkImages;
+                    wCnt = 0;
                 }
                 clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
 
@@ -475,23 +477,28 @@ function action() {
             cnt++;
         }, 10);
     }
-        /*
+
+    /*
      * images配列の中に"w"マークを持ったidが発見され、"e"マークを持ったidが無い場合
      * hiddenのデータを呼び出し"e"マークを持ったidを格納する
      * whileの数に対応したendWhileをimages配列の最後に挿入する
      * endWhileの数を数える
      */
 
-    function firstAction(){
+    function firstAction() {
         var endCnt = 0;
         for (i = 0; i < images.length; i++) {
             if (images[i] == "endWhile") {
                 endCnt++;
             }
         }
-        for (i = 0; i < endCnt; i++) {
-            images[images.length] = "endWhile";
+        if (wCnt - endCnt > 0) {
+            for (i = wCnt; i < endCnt; i++) {
+                console.log("wCnt , endCnt; エンドマーク挿入" + wCnt + "" + endCnt);
+                images[images.length] = "endWhile";
+            }
         }
+
         imagesLog();
         firstFlg = false;
     }
