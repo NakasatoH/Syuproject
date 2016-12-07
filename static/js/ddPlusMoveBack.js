@@ -11,11 +11,12 @@ var image2 = new Image();
 var haikei = new Image();
 // 画像パスを画像obj.srcに設定
 image2.src = block_bSrc;
-haikei.src = umiSrc;
+haikei.src = umiSrc + "?" + new Date() .getTime();
 // 画像の初回ロード時に画像を表示する
-image2.onload = (function () {
+haikei.onload = (function () {
     ITC2(image2);
 });
+
 
 var map = mapData;
 var blockWidth = image2.width;//ブロックの横幅

@@ -66,7 +66,7 @@
             background: rgb(0, 255, 244);
         }
         #upper {
-            height: 100px;
+            height: 150px;
         }
 
         #bottom img {
@@ -144,10 +144,12 @@
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="arWhile" draggable="true" data-d="w"
+            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While" draggable="true" data-d="w"
                  data-n="3" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="arWhile2" draggable="true" data-d="w"
+            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While2" draggable="true" data-d="w"
                  data-n="2" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/if_brake.png' %}" class="arrows-wh" id="if_break" draggable="true" data-d="i"
+                 data-n="1" ondragstart="f_dragstart(event)">
         </div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
         <button onclick="resetImages()">戻して</button>
