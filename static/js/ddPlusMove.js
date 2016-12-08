@@ -185,6 +185,7 @@ function f_drop(event) {
 
     // div#bottom から div#upperに戻したときに配列を詰める関数
     function outputArray(id) {
+
         var e_index;
         for (var i = 0; i < images.length; i++) {
             if (images[i] == id) {
@@ -229,46 +230,12 @@ function f_drop(event) {
                         images.splice(i, 1);
                     }
                 }
-                drag_elm.style.marginLeft = 0 + "px";
+                document.getElementById(id).style.marginLeft = 0 + "px";
                 // console.log(drag_elm.style.marginLeft);
             }
         }//for (var i = 0; i < image.length; i++) End
     }
 
-    /*function outputArray(id) {
-     for (var i = 0; i < images.length; i++) {
-     if (images[i] == id) {
-     // whileが始まっていて終わっていない場合
-     if (wCnt > 0) {
-     // images[i]の２つ後に要素が存在する場合
-     if (images[i + 2]) {
-     // images[i]の１つ前に while画像がある　かつ　一つ後がエンドマークなら
-     var left_elm = document.getElementById(images[i - 1]);
-     var d = left_elm.getAttribute("data-d");
-     if(d == "w" && images[i + 1] == "endWhile"){
-     currentTarget.appendChild(left_elm);// ドロップ先にドラッグされた要素を追加をする
-     images.splice(i - 1, 3);// "w" ドロップした要素、エンドマークすべて削除
-     }else{
-     images.splice(i,1);
-     }
-     } else {
-     //２つとなりに要素が存在しない場合 ドロップしたidとエンドマークを削除
-     if (images[i + 1]) {
-     if (images[i + 1] = "endWhile") {
-     wCnt ++;
-     images.splice(i,2);
-     }else{
-     images.pop();
-     }
-     }
-     }
-     } else {
-     // i番目から1つ要素を削除
-     images.splice(i,1);
-     }
-     }
-     }
-     }*/
 }// function f_drop(event) End
 
 // 表示用関数
@@ -361,10 +328,64 @@ function resetImage() {
         if (target.localName !== "img")
             return;
 
+        outputArray2(target.id);
         upper_elm.appendChild(target);
-        images.length -= 1;
     })
 }
+
+
+function outputArray2(id) {
+    var e_index;
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] == id) {
+            //取得した画像がwhileなら
+            if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                for (var j = i + 1; j < images.length; j++) {
+                    if (images[j] == "endWhile") {
+                        //endWhileの要素番号を保持
+                        e_index = j;
+                        break;
+                    } else {
+                        // 既についているインデントを減らす
+                        var w_elm = document.getElementById(images[j]);
+                        w_elm.style.marginLeft = (wCnt - 1) * indent + "px";
+                    }
+                }
+                if (images[e_index]) {
+                    images.splice(e_index, 1);// endWhileを削除
+                }
+                images.splice(i, 1);
+                wCnt--;
+            } else {
+                if (images[i - 1]) {
+                    if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
+                        // iの一つ後が存在していて かつWhileであるなら
+                        if (images[i + 1] && images[i + 1] == "endWhile") {
+                            // images[i-1]のエレメント(while画像)をupperに表示
+                            document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
+                            images.splice(i - 1, 3);
+                            wCnt--;
+                        } else {
+                            images.splice(i, 1)
+                        }
+                    } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
+                        //一つ前がendWhile　かつ １つ後が存在しないなら
+                        images.splice(i - 1, 2);
+                        wCnt++;
+                    } else {
+                        images.splice(i, 1);
+                    }
+                } else {
+                    images.splice(i, 1);
+                }
+            }
+            document.getElementById(id).style.marginLeft = 0 + "px";
+            // console.log(drag_elm.style.marginLeft);
+        }
+    }//for (var i = 0; i < image.length; i++) End
+}
+
+
 /**--------------------------------------------------------
  * ドロップされている画像群に従い、一斉に動作
  * --------------------------------------------------------
@@ -532,6 +553,7 @@ function action() {
         firstFlg = false;
     }
 }
+
 
 /**--------------------------------------------------------
  * 繰り返し処理 wBreakDown()
