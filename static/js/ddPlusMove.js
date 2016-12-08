@@ -175,8 +175,8 @@ function f_drop(event) {
                 images[images.length] = "endWhile";
             }
         }
-
-        if (wCnt > 0) {
+        console.log("wCnt" + wCnt);
+        if (wCnt >= 0) {
             var l_margin = wCnt * indent;
             drag_elm.style.marginLeft = l_margin + 'px';
         }
@@ -215,7 +215,6 @@ function f_drop(event) {
                                 // images[i-1]のエレメント(while画像)をupperに表示
                                 currentTarget.appendChild(document.getElementById(images[i - 1]));
                                 images.splice(i - 1, 3);
-                                wCnt--;
                             } else {
                                 images.splice(i, 1)
                             }
@@ -327,9 +326,12 @@ function resetImage() {
         var target = e.target;
         if (target.localName !== "img")
             return;
-
+        imagesLog();
+        console.log("wCnt前" + wCnt + "indent : " + indent);
         outputArray2(target.id);
         upper_elm.appendChild(target);
+        console.log("wCnt後" + wCnt + "indent : " + indent);
+        imagesLog();
     })
 }
 
@@ -349,6 +351,7 @@ function outputArray2(id) {
                         // 既についているインデントを減らす
                         var w_elm = document.getElementById(images[j]);
                         w_elm.style.marginLeft = (wCnt - 1) * indent + "px";
+                        console.log("wCnt: " + wCnt + " indent: " + indent);
                     }
                 }
                 if (images[e_index]) {
@@ -356,6 +359,7 @@ function outputArray2(id) {
                 }
                 images.splice(i, 1);
                 wCnt--;
+                console.log(wCnt);
             } else {
                 if (images[i - 1]) {
                     if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
@@ -364,10 +368,10 @@ function outputArray2(id) {
                             // images[i-1]のエレメント(while画像)をupperに表示
                             document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
                             images.splice(i - 1, 3);
-                            wCnt--;
-                        } else {
+                        } else{
                             images.splice(i, 1)
                         }
+                        console.log("前がwhile後がendWhile インデントは " + indent + " : wcnt : " + wCnt);
                     } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
                         //一つ前がendWhile　かつ １つ後が存在しないなら
                         images.splice(i - 1, 2);
@@ -381,6 +385,7 @@ function outputArray2(id) {
             }
             document.getElementById(id).style.marginLeft = 0 + "px";
             // console.log(drag_elm.style.marginLeft);
+        // インデント更新処理
         }
     }//for (var i = 0; i < image.length; i++) End
 }
