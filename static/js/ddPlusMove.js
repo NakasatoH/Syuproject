@@ -112,12 +112,21 @@ function f_drop(event) {
 
         if (currentTarget.id == "bottom") {
             for (var i = 1; i < images.length; i++) {
+                // bottomからbottomへドロップした場合処理を実行しない
                 if (images[i] == drag_elm.id) {
                     bwFlg = true;
                 }
             }
             if (!bwFlg) {
-                inputArray(id_name);// 全ての画像をもとのボックスに戻すため配列の中に入れる処理を追加
+                inputArray(id_name);//bottomにドロップした画像のIDをimages配列に格納
+                // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
+                if (data_d == "w") {
+                    wCnt++;
+                    var rect = drag_elm.getBoundingClientRect();// 一番最後にドロップしたwhileイメージの座標を保持
+                    while_x = Math.floor((wCnt - 1) * indent + drag_elm.width);
+                    wWidthSize = drag_elm.width;
+                }
+                currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
             }
             bwFlg = false;
             // while画像よりもx座標が +か -か判定して -の場合 whileのエンドマークをimages配列に挿入する
@@ -125,29 +134,10 @@ function f_drop(event) {
             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
             console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
 
-            // キャンバス内の画像を動かす処理
-            /*var cnt = 0;// 無限ループを防ぐための変数cnt
-             var imageMoveInterval = setInterval(function () {// setIntervalは引数を与える場合, 無名関数  →　function(){関数名(引数1,引数2,...)}　を使用しなければならない
-             if (cnt >= moveNum) {// if文を使用しないとループし続ける 移動px回ループする
-             clearInterval(imageMoveInterval);
-             }
-             cnt++;
-             ImageToCanvas(image1, data_d, data_n)// 現在は画像をドロップしただけで画像が動く必要が無いのでコメントアウト
-             }, 10);*/
-
             // ドロップ先がコードボックス(id = "upper")の場合
         } else if (currentTarget.id == "upper") {
             outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
-        }
-        currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
-
-
-        // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
-        if (currentTarget.id == "bottom" && data_d == "w") {
-            wCnt++;
-            var rect = drag_elm.getBoundingClientRect();// 一番最後にドロップしたwhileイメージの座標を保持
-            while_x = Math.floor((wCnt - 1) * indent + drag_elm.width);
-            wWidthSize = drag_elm.width;
+            currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
         }
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
@@ -183,7 +173,6 @@ function f_drop(event) {
                 wCnt -= 1;
                 console.log("エンドマーク挿入2");
                 images[images.length] = "endWhile";
-
             }
         }
 
@@ -280,8 +269,6 @@ function f_drop(event) {
      }
      }
      }*/
-
-
 }// function f_drop(event) End
 
 // 表示用関数
@@ -356,7 +343,28 @@ function resetImages() {
     wCnt = 0;
     console.log("ドロップされた画像、配列を初期化")
 }
+/**
+ * window.onload
+ * 疑似プログラム上の画像がクリックされた場合コードボックスに画像を戻す
+ *
+ */
+window.onload = function () {
 
+    resetImage();
+};
+
+function resetImage() {
+    var upper_elm = document.getElementById("upper");
+    var bottom_elm = document.getElementById("bottom");
+    bottom_elm.addEventListener("click", function (e) {
+        var target = e.target;
+        if (target.localName !== "img")
+            return;
+
+        upper_elm.appendChild(target);
+        images.length -= 1;
+    })
+}
 /**--------------------------------------------------------
  * ドロップされている画像群に従い、一斉に動作
  * --------------------------------------------------------
