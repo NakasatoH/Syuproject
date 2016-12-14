@@ -34,7 +34,7 @@
         }
 
         #wrapper {
-            width: auto;
+            width: 1400px;
             margin: 0 0%;
         }
 
@@ -131,9 +131,9 @@
         <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
     </div>
     <div id="codeSpace">
-        <h2>img要素をドラッグ＆ドロップ</h2>
+        <h2>疑似コードをドラッグ＆ドロップ</h2>
         <p></p>
-        <p>画像を上下のボックスにドラッグ＆ドロップで移動できます。</p>
+        <p>擬似コードを上下のボックスにドラッグ＆ドロップで移動できます。</p>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
             <input type="hidden" id="endWhile" data-d="e" data-n="0" >
             <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1"

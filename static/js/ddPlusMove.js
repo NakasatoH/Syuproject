@@ -4,17 +4,18 @@
 
 var dx = 0;
 var dy = 0;
-var old_dx = 0; // 今までの位置を保持しておくための変数old_...
+var old_dx = 0; // canvas内 キャラクターの今までの位置を保持しておくための変数old_...
 var old_dy = 0;
+var indentPoint = 0;
 var wCnt = 0; // 疑似プログラム内にある終了していないwhileの数を数える変数
 var while_x = 0;// 最も後にドロップされたwhileイメージの位置情報
-var while_y = 0;
-
+var shadowFlg = 0;// 影の表示に使うフラグ
+var checkFlg = 0;// 影を表示後に座標が変更された際その都度一度だけ影を削除し、インデントを調整するための変数
 var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
 var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
 const moveNum = block_size;
-const indent = 48;
+const indent = 83;
 // 画像オブジェクト生成
 var image1 = new Image();
 
@@ -63,23 +64,79 @@ function changeCharacter() {
  * D＆D関係
  * ----------------------------------------------------------------------
  */
-
+var target_elm;
 // ドラッグ開始処理
 function f_dragstart(event) {
     event.dataTransfer.setData("text", event.target.id);// ドラッグするデータのid名をDataTransferオブジェクトにセット
+    target_elm = event.target;
 }
+
 
 // ドラッグ要素がドロップ要素に重なっている間の処理
 function f_dragover(event) {
     var btm_elm = document.getElementById("bottom");
-
+    var id;
+    var t_wCnt = wCnt;
+    var shadowDiv;
     x = event.clientX - rect.left;
     y = event.clientY - rect.top;
-    if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-        console.log("x:" + x + "y:" + y);
+    /**
+     * 処理概要:
+     *  ドラッグ中にドラッグエレメントから座標を取得し、
+     *  その座標がbottom内に存在する場合 wCnt(終了していないwhileの数) * indent よりも小さい値であるか判定し、
+     *  小さいならindentの数を減らし、大きいのなら一つ前のwhile画像からindentを加算した位置にcreateElementでdiv（影）を表示する
+     */
+    if (!shadowFlg) {
+        shadowView();
+    }else if(t_wCnt > indentPoint){
+        deleteShadow();
+        shadowView();
+    }else if(x/indent != indentPoint){
+        deleteShadow();
+        shadowView();
     }
+    function shadowView() {
+        shadowDiv = document.createElement("div");
+        shadowDiv.id = "shadowDiv";
+        shadowDiv.style.display = "block";
+        shadowDiv.style.borderRadius = "20px";
+        shadowDiv.style.border = "dashed 2px rgba(0, 0, 0, 0.8)";
+        shadowDiv.style.backgroundColor = "rgba(0,0,0,0.5)";
+        shadowDiv.style.width = target_elm.width + "px";
+        shadowDiv.style.height = target_elm.height + "px";
+        while_x = Math.floor((t_wCnt - 1) * indent + target_elm.width);
+
+        // x座標、前回挿入したコードを確認
+        if (images[images.length - 1] && document.getElementById(images[images.length - 1]).getAttribute("data-d") == "w") {
+            shadowDiv.style.marginLeft = t_wCnt * indent + "px";
+            document.getElementById("bottom").appendChild(shadowDiv);
+            indentPoint = t_wCnt;
+        } else {
+            while (t_wCnt > 0) {
+                if (x >= 0 && x < t_wCnt * indent) {
+                    t_wCnt -= 1;
+                } else {
+                    break;
+                }
+            }
+            // ドラッグ時に移動した際影を動かすために、ポジションを保持する
+            indentPoint = t_wCnt;
+            shadowDiv.style.marginLeft = t_wCnt * indent + "px";
+            document.getElementById("bottom").appendChild(shadowDiv);
+        }
+        shadowFlg = true;
+
+    }
+
     // dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
     event.preventDefault();
+}
+// 影を削除したらチェックフラグ()をTrueに 削除していない場合はFalseに
+function deleteShadow() {
+    if (shadowFlg) {
+        document.getElementById("bottom").removeChild(document.getElementById("shadowDiv"));
+        shadowFlg = false;
+    }
 }
 
 // ドロップ時の処理
@@ -104,7 +161,8 @@ function f_drop(event) {
      * その対策として、変数に値を代入して保持しておく必要がある。
      */
 
-    var currentTarget = event.currentTarget;
+    var currentTarget = event.currentTarget;// ドロップ先
+    deleteShadow();
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
     window.setTimeout(function () {
 
@@ -118,7 +176,7 @@ function f_drop(event) {
                 }
             }
             if (!bwFlg) {
-                inputArray(id_name);//bottomにドロップした画像のIDをimages配列に格納
+                inputArray(id_name);// bottomにドロップした画像のIDをimages配列に格納
                 // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
                 if (data_d == "w") {
                     wCnt++;
@@ -180,6 +238,7 @@ function f_drop(event) {
             var l_margin = wCnt * indent;
             drag_elm.style.marginLeft = l_margin + 'px';
         }
+        document.getElementById(id).setAttribute("data-m",document.getElementById(id).style.marginLeft);
         images[images.length] = id;
     }
 
@@ -234,7 +293,6 @@ function f_drop(event) {
             }
         }//for (var i = 0; i < image.length; i++) End
     }
-
 }// function f_drop(event) End
 
 // 表示用関数
@@ -322,15 +380,13 @@ window.onload = function () {
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
-    bottom_elm.addEventListener("click", function (e) {
+    bottom_elm.addEventListener("dblclick", function (e) {
         var target = e.target;
         if (target.localName !== "img")
             return;
         imagesLog();
-        console.log("wCnt前" + wCnt + "indent : " + indent);
         outputArray2(target.id);
         upper_elm.appendChild(target);
-        console.log("wCnt後" + wCnt + "indent : " + indent);
         imagesLog();
     })
 }
@@ -368,7 +424,7 @@ function outputArray2(id) {
                             // images[i-1]のエレメント(while画像)をupperに表示
                             document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
                             images.splice(i - 1, 3);
-                        } else{
+                        } else {
                             images.splice(i, 1)
                         }
                         console.log("前がwhile後がendWhile インデントは " + indent + " : wcnt : " + wCnt);
@@ -385,7 +441,7 @@ function outputArray2(id) {
             }
             document.getElementById(id).style.marginLeft = 0 + "px";
             // console.log(drag_elm.style.marginLeft);
-        // インデント更新処理
+            // インデント更新処理
         }
     }//for (var i = 0; i < image.length; i++) End
 }
