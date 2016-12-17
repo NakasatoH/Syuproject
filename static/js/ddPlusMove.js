@@ -16,6 +16,11 @@ var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
 const moveNum = block_size;
 const indent = 83;
+var goalFlg = false;
+// 影バグ対策　コメント調整
+bottomDiv.style.zIndex = 1;
+
+
 // 画像オブジェクト生成
 var image1 = new Image();
 
@@ -57,6 +62,9 @@ function changeCharacter() {
         case 5:
             this.image1.src = sunagauoSrc;
             break;
+        case 6:
+            this.image1.src = ebataSrc;
+            break;
     }
 }
 
@@ -70,7 +78,6 @@ function f_dragstart(event) {
     event.dataTransfer.setData("text", event.target.id);// ドラッグするデータのid名をDataTransferオブジェクトにセット
     target_elm = event.target;
 }
-
 
 // ドラッグ要素がドロップ要素に重なっている間の処理
 function f_dragover(event) {
@@ -88,10 +95,7 @@ function f_dragover(event) {
      */
     if (!shadowFlg) {
         shadowView();
-    }else if(t_wCnt > indentPoint){
-        deleteShadow();
-        shadowView();
-    }else if(x/indent != indentPoint){
+    } else if (x / indent != indentPoint) {
         deleteShadow();
         shadowView();
     }
@@ -102,8 +106,13 @@ function f_dragover(event) {
         shadowDiv.style.borderRadius = "20px";
         shadowDiv.style.border = "dashed 2px rgba(0, 0, 0, 0.8)";
         shadowDiv.style.backgroundColor = "rgba(0,0,0,0.5)";
-        shadowDiv.style.width = target_elm.width + "px";
-        shadowDiv.style.height = target_elm.height + "px";
+        if (target_elm.localName === "img") {
+            shadowDiv.style.width = target_elm.width + "px";
+            shadowDiv.style.height = target_elm.height + "px";
+        } else {
+            shadowDiv.style.width = 200 + "px";
+            shadowDiv.style.height = 30 + "px";
+        }
         while_x = Math.floor((t_wCnt - 1) * indent + target_elm.width);
 
         // x座標、前回挿入したコードを確認
@@ -165,9 +174,7 @@ function f_drop(event) {
     deleteShadow();
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
     window.setTimeout(function () {
-
         // ドロップ先がエディットボックス(id = "bottom")の場合
-
         if (currentTarget.id == "bottom") {
             for (var i = 1; i < images.length; i++) {
                 // bottomからbottomへドロップした場合処理を実行しない
@@ -193,14 +200,15 @@ function f_drop(event) {
             console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
 
             // ドロップ先がコードボックス(id = "upper")の場合
-        } else if (currentTarget.id == "upper") {
-            outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
-            currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
         }
+        /* else if (currentTarget.id == "upper") {
+         outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
+         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
+         }*/
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 50);
-
+    checkFlg = false;// 影の上にドラッグしているときのバグを防止するフラグ
     /**------------------------------------------------------
      * 配列処理関系
      * ------------------------------------------------------
@@ -234,12 +242,14 @@ function f_drop(event) {
             }
         }
         console.log("wCnt" + wCnt);
+
         if (wCnt >= 0) {
             var l_margin = wCnt * indent;
             drag_elm.style.marginLeft = l_margin + 'px';
         }
-        document.getElementById(id).setAttribute("data-m",document.getElementById(id).style.marginLeft);
-        images[images.length] = id;
+        document.getElementById(id).setAttribute("data-m", wCnt);//indent dataを挿入
+        images[images.length] = id;// idを挿入
+        console.log("data-m : " + document.getElementById(id).getAttribute("data-m"));
     }
 
     // div#bottom から div#upperに戻したときに配列を詰める関数
@@ -263,9 +273,11 @@ function f_drop(event) {
                     }
                     if (images[e_index]) {
                         images.splice(e_index, 1);// endWhileを削除
+                    } else {
+                        // endWhileがimages内に存在する場合、wCntを減らしてはいけない
+                        wCnt--;
                     }
                     images.splice(i, 1);
-                    wCnt--;
                 } else {
                     if (images[i - 1]) {
                         if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
@@ -373,16 +385,17 @@ function resetImages() {
  *
  */
 window.onload = function () {
-
     resetImage();
 };
+
 
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
     bottom_elm.addEventListener("dblclick", function (e) {
         var target = e.target;
-        if (target.localName !== "img")
+        console.log(target.localName);
+        if (target.localName !== ("img") && target.className != ("divCode"))
             return;
         imagesLog();
         outputArray2(target.id);
@@ -398,7 +411,7 @@ function outputArray2(id) {
         if (images[i] == id) {
             //取得した画像がwhileなら
             if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
-                for (var j = i + 1; j < images.length; j++) {
+                for (var j = i; j < images.length; j++) {
                     if (images[j] == "endWhile") {
                         //endWhileの要素番号を保持
                         e_index = j;
@@ -406,15 +419,28 @@ function outputArray2(id) {
                     } else {
                         // 既についているインデントを減らす
                         var w_elm = document.getElementById(images[j]);
-                        w_elm.style.marginLeft = (wCnt - 1) * indent + "px";
+                        w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
                         console.log("wCnt: " + wCnt + " indent: " + indent);
                     }
                 }
                 if (images[e_index]) {
                     images.splice(e_index, 1);// endWhileを削除
+                    if (images[e_index]) {
+                        var workArray = [];
+                        for (var k = images.length - 1; k > e_index; k--) {
+                         // 未実装
+
+                        }
+                        for (k = e_index; k < images.length; k++) {
+                            w_elm = document.getElementById(images[k]);
+                            w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
+                        }
+                    }
+                } else {
+                    // endWhileがimages内に存在する場合、wCntを減らしてはいけない
+                    wCnt--;
                 }
                 images.splice(i, 1);
-                wCnt--;
                 console.log(wCnt);
             } else {
                 if (images[i - 1]) {
@@ -502,7 +528,17 @@ function action() {
     i = 0;// 初期化
     // 内側で宣言したactionを呼び出す
     action2();
-    // 全ての画像を順番に動かす。
+    /**
+     * action2()メソッド
+     * 処理概要：
+     *  　　　　進行方向に壁があるか確認
+     *          壁がなければ動かす
+     *          images配列を動作以前の状態に戻す　（バックアップファイルで上書き）
+     *          images配列上にまだ処理し終えていないデータがある場合再帰する。
+     *   　　　 全ての画像を順番に動かす。
+     *
+     *
+     */
     function action2() {
         //console.log("----------SecondAction--------------");
         // ドロップされている画像群の個数と内容を把握する
@@ -510,47 +546,52 @@ function action() {
             id = images[i];
             drop_elm = document.getElementById(id);
             //console.log(images.length + "<- 長さ : id ->" + id);
-            // 表示用　削除項目
-            for (var z = 0; z < images.length; z++) {
-                //console.log("images[" + z + "]" + images[z]);
-            }
             data_d = drop_elm.getAttribute("data-d");// 方向データ
             data_n = drop_elm.getAttribute("data-n");// 移動量
             switch (data_d) {
                 case "t":
-                    if (map[pPositionY - 1][pPositionX] != "*") {
+                    if (map[pPositionY - 1][pPositionX] == "*") {
+                        blockFlg = true;
+                    } else if (map[pPositionY - 1][pPositionX] == "g") {
+                        // ゴール時の処理
+                        goalFlg = true;
+                    } else {
                         map[pPositionY][pPositionX] = "0";
                         pPositionY -= 1;
                         map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    } else {
-                        blockFlg = true;
                     }
                     break;
                 case "r":
-                    if (map[pPositionY][pPositionX + 1] != "*") {
+                    if (map[pPositionY][pPositionX + 1] == "*") {
+                        blockFlg = true;
+                    } else if (map[pPositionY][pPositionX + 1] == "g") {
+                        goalFlg = true;
+                    } else {
                         map[pPositionY][pPositionX] = "0";
                         pPositionX += 1;
                         map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    } else {
-                        blockFlg = true;
                     }
                     break;
                 case "b":
-                    if (map[pPositionY + 1][pPositionX] != "*") {
+                    if (map[pPositionY + 1][pPositionX] == "*") {
+                        blockFlg = true;
+                    } else if (map[pPositionY + 1][pPositionX] == "g") {
+                        goalFlg = true;
+                    } else {
                         map[pPositionY][pPositionX] = "0";
                         pPositionY += 1;
                         map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    } else {
-                        blockFlg = true;
                     }
                     break;
                 case "l":
-                    if (map[pPositionY][pPositionX - 1] != "*") {
+                    if (map[pPositionY][pPositionX - 1] == "*") {
+                        blockFlg = true;
+                    } else if (map[pPositionY][pPositionX - 1] == "g") {
+                        goalFlg = true;
+                    } else {
                         map[pPositionY][pPositionX] = "0";
                         pPositionX -= 1;
                         map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    } else {
-                        blockFlg = true;
                     }
                     break;
             }// switch (data_d) End
@@ -581,9 +622,13 @@ function action() {
                     // 処理終了後　images配列を画面上の見た目通りに戻す
                     images = bkImages;
                     wCnt = 0;
+                    if (goalFlg) {
+                        alert("ゴール！！１１！！！！１！！");
+                    }
+                    goalFlg = false;
                 }
-                clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
 
+                clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
             }
             cnt++;
         }, 10);
@@ -595,7 +640,6 @@ function action() {
      * whileの数に対応したendWhileをimages配列の最後に挿入する
      * endWhileの数を数える
      */
-
     function firstAction() {
         var endCnt = 0;
         for (i = 0; i < images.length; i++) {
@@ -622,7 +666,10 @@ function action() {
  * 予備知識、情報
  * images配列にはドロップされた画像の id が入る
  *
- * 処理概要                      ↓読み込み中
+ * 処理概要
+ *     主な機能：繰り返し処理の調査、分解、結合
+ *
+ *                               ↓読み込み中
  *   イメージ : images [0]:"t"1 [1]"w"2 [2]"l"1 [3]"t"1 [4]"e"0 [5]"r"1
  *                               ↓処理開始
  *     処理後 →images [0]:"t"1 [1]"l"1 [2]"t"1 [3]"l"1 [4]"t"1 [5]"r"1

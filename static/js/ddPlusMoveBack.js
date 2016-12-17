@@ -7,35 +7,40 @@
  * ------------------------------------------------------------
  */
 // 画像オブジェクト生成
-var image2 = new Image();
+var imageB = new Image();
+var imageG = new Image();
 var haikei = new Image();
 // 画像パスを画像obj.srcに設定
-image2.src = block_bSrc;
+imageB.src = block_bSrc;
+imageG.src = goalSrc;
 haikei.src = umiSrc + "?" + new Date() .getTime();
 // 画像の初回ロード時に画像を表示する
 haikei.onload = (function () {
-    ITC2(image2);
+    ITC2(imageB,imageG);
 });
 
 
 var map = mapData;
-var blockWidth = image2.width;//ブロックの横幅
-var blockHeight = image2.height;
+var blockWidth = imageB.width;//ブロックの横幅
+var blockHeight = imageB.height;
 
-function ITC2(im) {
+function ITC2(imgB,imgG) {
     var dx = 0;// x座標
     var dy = 0;// y座標
     var canvas2 = document.getElementById('backCvs');
     var ctx2 = canvas2.getContext('2d');
     ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
     ctx2.drawImage(haikei, 0, 0);
-    for(var y = 0; y * image2.height< canvas2.height;y++ ){
+    for(var y = 0; y * imgB.height < canvas2.height;y++ ){
         dy = blockHeight * y;
         for(var x = 0; x < 13;x++){
             dx = blockWidth * x;
             ctx2.translate(dx,dy);
             if(map[y][x] == "*") {
-                ctx2.drawImage(im, 0, 0);
+                ctx2.drawImage(imgB, 0, 0);
+            }
+            if(map[y][x] == "g"){
+                ctx2.drawImage(imgG, 0, 0);
             }
             ctx2.translate(-1 * dx, -1 * dy);
         }
