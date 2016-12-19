@@ -433,7 +433,9 @@ function outputArray2(id) {
                         }
                         for (k = e_index; k < images.length; k++) {
                             w_elm = document.getElementById(images[k]);
-                            w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
+                            if(w_elm.getAttribute("data-m") > 0) {
+                                w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
+                            }
                         }
                     }
                 } else {
