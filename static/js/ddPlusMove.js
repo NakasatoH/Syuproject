@@ -16,7 +16,8 @@ var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
 const moveNum = block_size;
 const indent = 83;
-var goalFlg = false;
+var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
+var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
 bottomDiv.style.zIndex = 1;
 
@@ -40,6 +41,10 @@ image1.onload = (function () {
     ctx.drawImage(image1, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
 });
+
+ // 音声オブジェクト生成
+ var dragSound = new Audio();
+dragSound.src = dragSoundSrc;
 
 function changeCharacter() {
     var charElm = document.getElementById("characters");
@@ -73,10 +78,15 @@ function changeCharacter() {
  * ----------------------------------------------------------------------
  */
 var target_elm;
+var target_src;
 // ドラッグ開始処理
 function f_dragstart(event) {
     event.dataTransfer.setData("text", event.target.id);// ドラッグするデータのid名をDataTransferオブジェクトにセット
     target_elm = event.target;
+    if(target_elm.getAttribute("src")) {
+        target_src = target_elm.getAttribute("src");
+    }
+    console.log(target_src);
 }
 
 // ドラッグ要素がドロップ要素に重なっている間の処理
@@ -84,7 +94,6 @@ function f_dragover(event) {
     var btm_elm = document.getElementById("bottom");
     var id;
     var t_wCnt = wCnt;
-    var shadowDiv;
     x = event.clientX - rect.left;
     y = event.clientY - rect.top;
     /**
@@ -100,25 +109,21 @@ function f_dragover(event) {
         shadowView();
     }
     function shadowView() {
-        shadowDiv = document.createElement("div");
-        shadowDiv.id = "shadowDiv";
-        shadowDiv.style.display = "block";
-        shadowDiv.style.borderRadius = "20px";
-        shadowDiv.style.border = "dashed 2px rgba(0, 0, 0, 0.8)";
-        shadowDiv.style.backgroundColor = "rgba(0,0,0,0.5)";
+        /**
+         * 影の各種css情報設定
+         */
+        bottomDiv.style.backgroundImage =  'url(' + target_src + ')';
+        bottomDiv.style.backgroundRepeat = "no-repeat";
         if (target_elm.localName === "img") {
-            shadowDiv.style.width = target_elm.width + "px";
-            shadowDiv.style.height = target_elm.height + "px";
+                bottomDiv.style.backgroundSize = target_elm.width + "px " + target_elm.height  + "px";
         } else {
-            shadowDiv.style.width = 200 + "px";
-            shadowDiv.style.height = 30 + "px";
+            bottomDiv.style.backgroundSize = "200px 30px";
         }
         while_x = Math.floor((t_wCnt - 1) * indent + target_elm.width);
 
         // x座標、前回挿入したコードを確認
         if (images[images.length - 1] && document.getElementById(images[images.length - 1]).getAttribute("data-d") == "w") {
-            shadowDiv.style.marginLeft = t_wCnt * indent + "px";
-            document.getElementById("bottom").appendChild(shadowDiv);
+            bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
             indentPoint = t_wCnt;
         } else {
             while (t_wCnt > 0) {
@@ -130,8 +135,7 @@ function f_dragover(event) {
             }
             // ドラッグ時に移動した際影を動かすために、ポジションを保持する
             indentPoint = t_wCnt;
-            shadowDiv.style.marginLeft = t_wCnt * indent + "px";
-            document.getElementById("bottom").appendChild(shadowDiv);
+            bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
         }
         shadowFlg = true;
 
@@ -143,7 +147,9 @@ function f_dragover(event) {
 // 影を削除したらチェックフラグ()をTrueに 削除していない場合はFalseに
 function deleteShadow() {
     if (shadowFlg) {
-        document.getElementById("bottom").removeChild(document.getElementById("shadowDiv"));
+        bottomDiv.style.backgroundPositionX ="0";
+        bottomDiv.style.backgroundPositionY ="500px";
+        bottomDiv.style.backgroundImage =  'url(' + umiSrc + ')';
         shadowFlg = false;
     }
 }
@@ -191,6 +197,7 @@ function f_drop(event) {
                     while_x = Math.floor((wCnt - 1) * indent + drag_elm.width);
                     wWidthSize = drag_elm.width;
                 }
+                dragSound.play();// ドロップ時に効果音を再生
                 currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
             }
             bwFlg = false;
@@ -207,7 +214,7 @@ function f_drop(event) {
          }*/
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
-    }, 50);
+    }, 40);
     checkFlg = false;// 影の上にドラッグしているときのバグを防止するフラグ
     /**------------------------------------------------------
      * 配列処理関系
@@ -379,6 +386,7 @@ function resetImages() {
     wCnt = 0;
     console.log("ドロップされた画像、配列を初期化")
 }
+
 /**
  * window.onload
  * 疑似プログラム上の画像がクリックされた場合コードボックスに画像を戻す
@@ -386,21 +394,33 @@ function resetImages() {
  */
 window.onload = function () {
     resetImage();
+    actionBtnOnClick();
 };
+// 未実装！！
+function actionBtnOnClick() {
+    var aBtn = document.getElementById("actionBtn");
+    aBtn.addEventListener("click", function () {
+        if (!runFlg) {
+            action();
+        }
+    })
+}
 
-
+/**
+ * 混乱注意！！
+ * resetImages() = div #bottom上すべてのエレメントを#upperに戻す
+ * resetImage() = クリックされたエレメントのみ#upperに戻す
+ */
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
-    bottom_elm.addEventListener("dblclick", function (e) {
+    bottom_elm.addEventListener("click", function (e) {
         var target = e.target;
         console.log(target.localName);
         if (target.localName !== ("img") && target.className != ("divCode"))
             return;
-        imagesLog();
         outputArray2(target.id);
         upper_elm.appendChild(target);
-        imagesLog();
     })
 }
 
@@ -409,6 +429,7 @@ function outputArray2(id) {
     var e_index;
     for (var i = 0; i < images.length; i++) {
         if (images[i] == id) {
+
             //取得した画像がwhileなら
             if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
                 for (var j = i; j < images.length; j++) {
@@ -428,12 +449,12 @@ function outputArray2(id) {
                     if (images[e_index]) {
                         var workArray = [];
                         for (var k = images.length - 1; k > e_index; k--) {
-                         // 未実装
+                            // 未実装
 
                         }
                         for (k = e_index; k < images.length; k++) {
                             w_elm = document.getElementById(images[k]);
-                            if(w_elm.getAttribute("data-m") > 0) {
+                            if (w_elm.getAttribute("data-m") > 0) {
                                 w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
                             }
                         }
@@ -444,6 +465,8 @@ function outputArray2(id) {
                 }
                 images.splice(i, 1);
                 console.log(wCnt);
+
+                // 選択したコードがwhileではない場合
             } else {
                 if (images[i - 1]) {
                     if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
@@ -482,6 +505,7 @@ function outputArray2(id) {
 
 
 function action() {
+    runFlg = true;// 排他制御にするためのフラグ
     var firstFlg = true;// action()呼び出し時、一度のみの処理に使用
     var id;// ドロップされた画像のidを格納する変数
     var data_d;// 方向
@@ -494,6 +518,7 @@ function action() {
     var whileIndex = [];// images配列の中でwhileが見つかった場合idをwhileIndex配列に格納
     var wNum = [];// images配列の中でwhileが見つかった場合data_nをwNum配列に格納
     var bkImages = [];// 処理終了後 images配列を元の状態に戻す
+    var bkWCnt = 0;// 処理終了後wCnt を元の数に戻す
 
 
     for (i = images.length - 1; i > -1; i--) {
@@ -511,6 +536,7 @@ function action() {
 
     // 最後に見た目通りの配列に戻すためのバックアップを生成;
     bkImages = images;
+    bkWCnt = wCnt;
     // whileを解体して"w"と"e"マークの無い配列を生成、代入
     if (firstFlg) {
         firstAction();
@@ -612,7 +638,7 @@ function action() {
                 i++;
                 if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
                     blockFlg = false;
-                    action2();
+                    action2();// 再帰
                 } else {
                     /**
                      * 原因不明の挙動
@@ -623,11 +649,12 @@ function action() {
                      */
                     // 処理終了後　images配列を画面上の見た目通りに戻す
                     images = bkImages;
-                    wCnt = 0;
+                    wCnt = bkWCnt;
                     if (goalFlg) {
                         alert("ゴール！！１１！！！！１！！");
                     }
                     goalFlg = false;
+                    runFlg = false;
                 }
 
                 clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
@@ -749,4 +776,12 @@ function wBreakDown(index, wIdx, wNum) {
         console.log(x + "images[" + x + "] : " + images[x]);
     }
     return frontIsolateArray;
+}
+function debug() {
+    console.table(map);
+    console.log("wCnt:" + wCnt);
+    for (var i = 0; i < images.length; i++) {
+        console.log("images[" + i + "] : " + images[i]);
+    }
+
 }

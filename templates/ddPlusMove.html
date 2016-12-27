@@ -12,6 +12,7 @@
         }
 
         body {
+            background-size: cover;
             background: rgba(0, 0, 0, 0.3);
         }
 
@@ -40,18 +41,22 @@
 
         #actionSpace {
             border: solid 1px #999999;
-            float: left;
+            float: right;
+            position: absolute;
+            top: 50px;
+            left: 950px;
         }
 
         #codeSpace {
             border: solid 1px #999999;
             position: absolute;
             top: 50px;
-            left: {{ cvs_width }}px;
+            left: 50px;
         }
 
-        #upper, #bottom {
-            width: auto;
+        #upper {
+            width: 800px;
+            height: 150px;
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
@@ -61,16 +66,42 @@
             background: rgba(255, 249, 16, 0.8);
             overflow: scroll;
         }
-        #bottom {
-            border-bottom: 1px solid #ddd;
+
+        #bottomBack {
+            width: 800px;
+            padding-top: 2em;
+            padding-right: 2em;
+            padding-bottom: 3em;
+            position: absolute;
+            top: 307px;
+            left: 0;
             height: 500px;
-            background: rgb(0, 255, 244);
-        }
-        #upper {
-            height: 150px;
+            z-index: -10;
+            overflow: scroll;
         }
 
-        #bottom img,#bottom div{
+        #bottom {
+            position: absolute;
+            left: 0;
+            height: 500px;
+            width: 800px;
+            padding-top: 2em;
+            padding-right: 2em;
+            padding-bottom: 3em;
+            border-top: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            z-index: 20;
+            overflow: scroll;
+        }
+        #buttons{
+            position: absolute;
+            top:897px;
+            left:0;
+        }
+
+        #bottom img, #bottom div {
             border: dashed 2px rgba(0, 0, 0, 0.8);
             border-radius: 20px;
             height: auto;
@@ -91,7 +122,7 @@
         #backCvs, #cvs {
             border: solid 1px black;
             position: absolute;
-            top: 50px;
+            top: 0;
             left: 0;
         }
 
@@ -113,9 +144,10 @@
         }
 
     </style>
-    <script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.json.min.js' %}"></script>
     <script type="text/javascript">
+        /**
+         * 外部jsファイルではsrcを取得することが出来ないため、html内で取得
+         */
         var lemSrc = "{% static 'img/lemmini.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
         var mainImageSrc = "{% static 'img/lemmini.png' %}";
@@ -126,6 +158,11 @@
         var umiSrc = "{% static 'img/umi.jpg' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var ebataSrc = "{% static 'img/ebata.jpg' %}";
+        var dragSoundSrc = "{% static 'audio/switch01.mp3' %}"
+
+        /**
+         * サーバー側から送信されるデータを取得
+         */
         var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
         var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
         var cvs_width = {{ cvs_width }};
@@ -138,16 +175,16 @@
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
 <div id="wrapper">
     <h1>DD and moveサンプル</h1>
-    <div id="actionSpace">
-        <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
-        <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
-    </div>
+    <!-- codeSpace
+    概要 :
+            擬似コード,各種ボタン（移動予定）擬似プログラムエディターの配置をするdiv codeSpace
+            配置はcssのposition absoluteで設定
+     -->
     <div id="codeSpace">
         <h2>疑似コードをドラッグ＆ドロップ</h2>
-        <p></p>
-        <p>擬似コードを上下のボックスにドラッグ＆ドロップで移動できます。</p>
+        <button id="helpBtn">困ったら</button>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
-            <input type="hidden" id="endWhile" data-d="e" data-n="0" >
+            <input type="hidden" id="endWhile" data-d="e" data-n="0">
             <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1"
                  ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r"
@@ -165,24 +202,38 @@
             <img src="{% static 'img/if_brake.png' %}" class="arrows-wh" id="if_break" draggable="true" data-d="i"
                  data-n="1" ondragstart="f_dragstart(event)">
             <div id="sample" class="divCode" draggable="true" data-d="t" data-n="1"
-                 ondragstart="f_dragstart(event)">コード</div>
+                 ondragstart="f_dragstart(event)">sample
+            </div>
         </div>
-        <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"></div>
-        <button onclick="resetImages()">戻して</button>
-        <button onclick="action()">実行</button>
-        <select name="characters" id="characters" onchange="changeCharacter()">
-            <option value="">キャラクター選択</option>
-            <option value="">れむりん</option>
-            <option value="">T26E4</option>
-            <option value="">勝君</option>
-            <option value="">茶熊</option>
-            <option value="">須永魚</option>
-            <option value="">若いEBT</option>
-        </select>
+        <div id="bottomBack"></div>
+        <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)" onscroll="document.getElementById('bottomBack').scrollTop = this.scrollTop;"></div>
+        <div id="buttons">
+            <button onclick="resetImages()">戻して</button>
+            <button id="actionBtn" onclick="actionBtnOnClick()">実行</button>
+            <select name="characters" id="characters" onchange="changeCharacter()">
+                <option value="">キャラクター選択</option>
+                <option value="">れむりん</option>
+                <option value="">T26E4</option>
+                <option value="">勝君</option>
+                <option value="">茶熊</option>
+                <option value="">須永魚</option>
+                <option value="">若いEBT</option>
+            </select>
+            <button onclick="debug()">デバッグ表示</button>
+        </div>
+        <!-- actionSpace
+        概要 :
+               背景用canvas：backCvs　と　表面動作確認用canvas：cvs の二つで構成されているdiv actionSpace
+                それぞれ width,heightはPython側のconfig.iniファイルで設定
+                配置はcssのposition absoluteで設定
+         -->
+        <div id="actionSpace">
+            <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
+            <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
+        </div>
     </div>
-</div>
 
-<script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
 </body>
 </html>
