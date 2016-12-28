@@ -88,10 +88,7 @@
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
-            border-top: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-left: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
             z-index: 20;
             overflow: scroll;
         }
@@ -159,6 +156,7 @@
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var ebataSrc = "{% static 'img/ebata.jpg' %}";
         var dragSoundSrc = "{% static 'audio/switch01.mp3' %}"
+        var ifBreakSrc = "{% static 'img/if_brake.png' %}";
 
         /**
          * サーバー側から送信されるデータを取得
@@ -202,8 +200,7 @@
             <img src="{% static 'img/if_brake.png' %}" class="arrows-wh" id="if_break" draggable="true" data-d="i"
                  data-n="1" ondragstart="f_dragstart(event)">
             <div id="sample" class="divCode" draggable="true" data-d="t" data-n="1"
-                 ondragstart="f_dragstart(event)">sample
-            </div>
+                 ondragstart="f_dragstart(event)">sample</div>
         </div>
         <div id="bottomBack"></div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)" onscroll="document.getElementById('bottomBack').scrollTop = this.scrollTop;"></div>
