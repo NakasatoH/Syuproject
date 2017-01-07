@@ -85,9 +85,9 @@ function f_dragstart(event) {
     event.dataTransfer.setData("text", event.target.id);// ドラッグするデータのid名をDataTransferオブジェクトにセット
     target_elm = event.target;
     // 影として表示する画像を設定　IMGの場合そのまま取得したsrcを設定　DIVの場合予め用意された文字列の影を設定
-    if (target_elm.getAttribute("src")) {
+    if (target_elm.hasAttribute("src")) {
         target_src = target_elm.getAttribute("src");
-    }else{
+    } else {
         target_src = ifBreakSrc;
     }
     console.log(target_src);
@@ -187,12 +187,16 @@ function f_drop(event) {
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
     window.setTimeout(function () {
         // ドロップ先がエディットボックス(id = "bottom")の場合
-        if (currentTarget.id == "bottom") {
+        if (currentTarget.id == "bottom") {/*
             for (var i = 1; i < images.length; i++) {
                 // bottomからbottomへドロップした場合処理を実行しない
                 if (images[i] == drag_elm.id) {
                     bwFlg = true;
                 }
+            }*/
+            if(drag_elm.parentNode.id == "bottom"){
+                bwFlg = true;
+                alert("エディターの中からのドラッグアンドドロップは出来ません。")
             }
             if (!bwFlg) {
                 inputArray(id_name);// bottomにドロップした画像のIDをimages配列に格納
@@ -262,9 +266,9 @@ function f_drop(event) {
         document.getElementById(id).setAttribute("data-m", wCnt);//indent dataを挿入
 
         var elmHeight;
-        if(drag_elm.localName === "img"){
+        if (drag_elm.localName === "img") {
             elmHeight = drag_elm.height;
-        }else{
+        } else {
             elmHeight = 30;
         }
         hMax = hMax + elmHeight + 2;
@@ -343,6 +347,9 @@ function imagesLog() {
 function ImageToCanvas(im, direction, num) {
     dx = 0;
     dy = 0;
+    if (!num) {
+        num = 1;
+    }
     var n = parseInt(num);
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
@@ -410,7 +417,9 @@ window.onload = function () {
     resetImage();
     actionBtnOnClick();
 };
-// 未実装！！
+/**
+ * 複数回同時実行禁止！
+ */
 function actionBtnOnClick() {
     var aBtn = document.getElementById("actionBtn");
     aBtn.addEventListener("click", function () {
@@ -431,7 +440,7 @@ function resetImage() {
     bottom_elm.addEventListener("click", function (e) {
         var target = e.target;
         console.log(target.localName);
-        if (target.localName !== ("img") && target.className != ("div"))
+        if (target.localName !== ("img") && target.className != ("divCode"))
             return;
         outputArray2(target.id);
         upper_elm.appendChild(target);
@@ -536,7 +545,12 @@ function action() {
     var wNum = [];// images配列の中でwhileが見つかった場合data_nをwNum配列に格納
     var bkImages = [];// 処理終了後 images配列を元の状態に戻す
     var bkWCnt = 0;// 処理終了後wCnt を元の数に戻す
-
+    var data_d;// 方向
+    var old_d = "t";// 保持している過去のdata_d
+    var data_n;// 移動量
+    var drop_elm;// ドロップ済みエレメント
+    var w_elm;// whileデータ持ちエレメント
+    var whileIndex = [];// images配列の中でwhileが見つかった場合idをwhileIndex配列に格納
 
     for (var i = images.length - 1; i > -1; i--) {
         // 抽出したデータが"w"ならば
@@ -581,104 +595,117 @@ function action() {
      *          images配列を動作以前の状態に戻す　（バックアップファイルで上書き）
      *          images配列上にまだ処理し終えていないデータがある場合再帰する。
      *   　　　 全ての画像を順番に動かす。
-     *
-     *
      */
     function action2() {
         //console.log("----------SecondAction--------------");
-        // ドロップされている画像群の個数と内容を把握する
-        if (i < images.length) {
-            id = images[i];
-            drop_elm = document.getElementById(id);
-            //console.log(images.length + "<- 長さ : id ->" + id);
-            data_d = drop_elm.getAttribute("data-d");// 方向データ
-            data_n = drop_elm.getAttribute("data-n");// 移動量
-            switch (data_d) {
-                case "t":
-                    if (map[pPositionY - 1][pPositionX] == "*") {
-                        blockFlg = true;
-                    } else if (map[pPositionY - 1][pPositionX] == "g") {
-                        // ゴール時の処理
-                        goalFlg = true;
-                    } else {
-                        map[pPositionY][pPositionX] = "0";
-                        pPositionY -= 1;
-                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    }
-                    break;
-                case "r":
-                    if (map[pPositionY][pPositionX + 1] == "*") {
-                        blockFlg = true;
-                    } else if (map[pPositionY][pPositionX + 1] == "g") {
-                        goalFlg = true;
-                    } else {
-                        map[pPositionY][pPositionX] = "0";
-                        pPositionX += 1;
-                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    }
-                    break;
-                case "b":
-                    if (map[pPositionY + 1][pPositionX] == "*") {
-                        blockFlg = true;
-                    } else if (map[pPositionY + 1][pPositionX] == "g") {
-                        goalFlg = true;
-                    } else {
-                        map[pPositionY][pPositionX] = "0";
-                        pPositionY += 1;
-                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    }
-                    break;
-                case "l":
-                    if (map[pPositionY][pPositionX - 1] == "*") {
-                        blockFlg = true;
-                    } else if (map[pPositionY][pPositionX - 1] == "g") {
-                        goalFlg = true;
-                    } else {
-                        map[pPositionY][pPositionX] = "0";
-                        pPositionX -= 1;
-                        map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                    }
-                    break;
-            }// switch (data_d) End
-        }//if (i < images.length) End
-
-        // Console上で2次元配列を表示　※デベロッパーツールのサイズが小さいとテーブルの中身が上手く表示されない場合がある
-        //console.table(map);
-        //console.log("");
-        cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
-        var itc = setInterval(function () {
-            if (cnt < moveNum) {
-                if (!blockFlg) {//前に壁が無い場合
-                    ImageToCanvas(image1, data_d, data_n);
-                }
-            } else {
-                i++;
-                if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
-                    blockFlg = false;
-                    action2();// 再帰
+        // 移動量データが存在するなら
+        console.log("i : " + i);
+        id = images[i];
+        drop_elm = document.getElementById(id);
+        if (drop_elm.hasAttribute("data-n")) {
+            // ドロップされている画像群の個数と内容を把握する
+            if (i < images.length) {
+                // console.log(images.length + "<- 長さ : id ->" + id);
+                data_d = drop_elm.getAttribute("data-d");// 方向データ
+                // 方向データを取得し、nullである場合事前に設定されていたデータを上書き
+                if (data_d) {
+                    old_d = data_d;
                 } else {
-                    /**
-                     * 原因不明の挙動
-                     *  条件: i < images.length の else側にclearInterval()を記述すると移動動作が重複し、不自然な速度の動作になる
-                     *
-                     *  また、else内ではなく、clearInterval()の上に 配列のバックアップbkImagesをimagesに上書きする処理を書いた場合も
-                     *  不自然な動作になる。
-                     */
-                    // 処理終了後　images配列を画面上の見た目通りに戻す
-                    images = bkImages;
-                    wCnt = bkWCnt;
-                    if (goalFlg) {
-                        alert("ゴール！！１１！！！！１！！");
-                    }
-                    goalFlg = false;
-                    runFlg = false;
+                    data_d = old_d;
                 }
+                data_n = drop_elm.getAttribute("data-n");// 移動量
+                switch (data_d) {
+                    case "t":
+                        if (map[pPositionY - 1][pPositionX] == "*") {
+                            blockFlg = true;
+                        } else if (map[pPositionY - 1][pPositionX] == "g") {
+                            // ゴール時の処理
+                            goalFlg = true;
+                        } else {
+                            map[pPositionY][pPositionX] = "0";
+                            pPositionY -= 1;
+                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }
+                        break;
+                    case "r":
+                        if (map[pPositionY][pPositionX + 1] == "*") {
+                            blockFlg = true;
+                        } else if (map[pPositionY][pPositionX + 1] == "g") {
+                            goalFlg = true;
+                        } else {
+                            map[pPositionY][pPositionX] = "0";
+                            pPositionX += 1;
+                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }
+                        break;
+                    case "b":
+                        if (map[pPositionY + 1][pPositionX] == "*") {
+                            blockFlg = true;
+                        } else if (map[pPositionY + 1][pPositionX] == "g") {
+                            goalFlg = true;
+                        } else {
+                            map[pPositionY][pPositionX] = "0";
+                            pPositionY += 1;
+                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }
+                        break;
+                    case "l":
+                        if (map[pPositionY][pPositionX - 1] == "*") {
+                            blockFlg = true;
+                        } else if (map[pPositionY][pPositionX - 1] == "g") {
+                            goalFlg = true;
+                        } else {
+                            map[pPositionY][pPositionX] = "0";
+                            pPositionX -= 1;
+                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }
+                        break;
+                }// switch (data_d) End
+            }//if (i < images.length) End
 
-                clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
+            cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
+            var itc = setInterval(function () {
+                if (cnt < moveNum) {// ブロックサイズ  = moveNUM
+                    if (!blockFlg) {//前に壁が無い場合
+                        ImageToCanvas(image1, data_d, data_n);
+                    }
+                } else {
+                    i++;
+                    if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                        blockFlg = false;
+                        action2();// 再帰
+                    } else {
+                        /**
+                         * 原因不明の挙動
+                         *  条件: i < images.length の else側にclearInterval()を記述すると移動動作が重複し、不自然な速度の動作になる
+                         *
+                         *  また、else内ではなく、clearInterval()の上に 配列のバックアップbkImagesをimagesに上書きする処理を書いた場合も
+                         *  不自然な動作になる。
+                         */
+                        // 処理終了後　images配列を画面上の見た目通りに戻す
+                        images = bkImages;
+                        wCnt = bkWCnt;
+                        if (goalFlg) {
+                            alert("ゴール！");
+                        }
+                        goalFlg = false;
+                        runFlg = false;
+                    }
+                    clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
+                }
+                cnt++;
+            }, 10);
+        } else {
+            // 移動量データが存在しないなら 方向データを保存
+            old_d = drop_elm.getAttribute("data-d");
+            console.log(old_d);
+            i++;
+            if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                blockFlg = false;
+                action2();// 再帰
             }
-            cnt++;
-        }, 10);
-    }
+        }
+    }// action2() END
 
     /*
      * images配列の中に"w"マークを持ったidが発見され、"e"マークを持ったidが無い場合

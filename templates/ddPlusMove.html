@@ -8,12 +8,12 @@
         * {
             margin: 0;
             padding: 0;
-
+            color: #CECFD3;
         }
 
         body {
             background-size: cover;
-            background: rgba(0, 0, 0, 0.3);
+            background: #3B3F42;
         }
 
         div {
@@ -43,19 +43,18 @@
             border: solid 1px #999999;
             float: right;
             position: absolute;
-            top: 50px;
-            left: 950px;
+            top:  84px;
+            left: 725px;
         }
 
         #codeSpace {
-            border: solid 1px #999999;
             position: absolute;
             top: 50px;
             left: 50px;
         }
 
         #upper {
-            width: 800px;
+            width: 600px;
             height: 150px;
             padding-top: 2em;
             padding-right: 2em;
@@ -63,18 +62,37 @@
             border-top: 1px solid #ddd;
             border-right: 1px solid #ddd;
             border-left: 1px solid #ddd;
-            background: rgba(255, 249, 16, 0.8);
+            background: #3B3F42;
             overflow: scroll;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+
+        .sidePoint {
+            width: 49px;
+            position: absolute;
+            top: 307px;
+            left: 0;
+            background: #141414;
+            height: 580px;
+            border-right: solid #dddddd 1px;
+            overflow-x: scroll;
+        }
+        #sidePoint{
+            background-image: url("{% static  'img/redpoint.png' %}");
+            background-size: 50px;
+            background-repeat: no-repeat;
         }
 
         #bottomBack {
-            width: 800px;
+            background: #1E1E1E;
+            width: 552px;
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
             position: absolute;
             top: 307px;
-            left: 0;
+            left: 50px;
             height: 500px;
             z-index: -10;
             overflow: scroll;
@@ -82,20 +100,21 @@
 
         #bottom {
             position: absolute;
-            left: 0;
+            top: 307px;
+            left: 50px;
             height: 500px;
-            width: 800px;
+            width: 552px;
             padding-top: 2em;
             padding-right: 2em;
             padding-bottom: 3em;
-            border: 1px solid #ddd;
             z-index: 20;
             overflow: scroll;
         }
-        #buttons{
+
+        #buttons {
             position: absolute;
-            top:897px;
-            left:0;
+            top: 947px;
+            left: 0;
         }
 
         #bottom img, #bottom div {
@@ -131,15 +150,33 @@
             background: rgba(0, 255, 255, 0.2);
         }
 
+        #upper > .divCode {
+            border: solid 1px black;
+        }
+
         .divCode {
             width: 250px;
-            height: 20px;
+            height: 23px;
             padding-top: 5px;
             padding-left: 5px;
             padding-bottom: 5px;
             font-size: 20px;
         }
 
+        .btn {
+            width: 116px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            padding: 8px 0 10px;
+            color: #e8e8e8;
+            background-color: rgba(206, 207, 211, 0.18);
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            text-shadow: 0 -1px rgba(206, 207, 211, 0.12);
+        }
     </style>
     <script type="text/javascript">
         /**
@@ -177,21 +214,39 @@
     概要 :
             擬似コード,各種ボタン（移動予定）擬似プログラムエディターの配置をするdiv codeSpace
             配置はcssのposition absoluteで設定
+            img,divによるコードに設定するデータは 　data-d = 方向データ,特殊：while = "w" if = "i"
+               　　　　　　　　　　　　　　　　　　　data-n = whileなら繰り返し回数、その他の場合 1を指定
+
+            例：<img src="url" class="arrows-tb" id="arBottom" draggable="true" data-d="b"
+                 data-n="1" ondragstart="f_dragstart(event)">
+
+                 設定されている情報：ドラッグ可能 , 方向：下(Bottom) , 値：1 (条件文ではない)
      -->
     <div id="codeSpace">
-        <h2>疑似コードをドラッグ＆ドロップ</h2>
-        <button id="helpBtn">困ったら</button>
+        <button id="helpBtn" class="btn">困ったら</button>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
             <input type="hidden" id="endWhile" data-d="e" data-n="0">
-            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t" data-n="1"
+            <img src="{% static 'img/1foward.png' %}"  id="forward_1" draggable="true"
+                 data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/changeRight.png' %}"  id="change_r_1" draggable="true" data-d="r"
                  ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnNorth.png' %}"  id="turn_n" draggable="true" data-d="t"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnEast.png' %}"  id="turn_e" draggable="true" data-d="r"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnSouth.png' %}"  id="turn-s" draggable="true" data-d="b"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnWest.png' %}"  id="turn-w" draggable="true" data-d="l"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t"
+                 data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowR.png' %}" class="arrows-rl" id="arRight" draggable="true" data-d="r"
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowB.png' %}" class="arrows-tb" id="arBottom" draggable="true" data-d="b"
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/arrowL.png' %}" class="arrows-rl" id="arLeft" draggable="true" data-d="l"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While" draggable="true" data-d="w"
+            <img src="{% static 'img/base.png' %}" class="arrows-wh" id="While" draggable="true" data-d="w"
                  data-n="3" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While2" draggable="true" data-d="w"
                  data-n="2" ondragstart="f_dragstart(event)">
@@ -200,10 +255,14 @@
             <img src="{% static 'img/if_brake.png' %}" class="arrows-wh" id="if_break" draggable="true" data-d="i"
                  data-n="1" ondragstart="f_dragstart(event)">
             <div id="sample" class="divCode" draggable="true" data-d="t" data-n="1"
-                 ondragstart="f_dragstart(event)">sample</div>
+                 ondragstart="f_dragstart(event)">sample
+            </div>
         </div>
+        <div id="spBack" class="sidePoint"></div>
+        <div id="sidePoint" class="sidePoint"></div>
         <div id="bottomBack"></div>
-        <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)" onscroll="document.getElementById('bottomBack').scrollTop = this.scrollTop;"></div>
+        <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"
+             onscroll="document.getElementById('bottomBack').scrollTop = this.scrollTop;"></div>
         <div id="buttons">
             <button onclick="resetImages()">戻して</button>
             <button id="actionBtn" onclick="actionBtnOnClick()">実行</button>
@@ -218,19 +277,19 @@
             </select>
             <button onclick="debug()">デバッグ表示</button>
         </div>
-        <!-- actionSpace
+    </div>
+    <!-- actionSpace
         概要 :
                背景用canvas：backCvs　と　表面動作確認用canvas：cvs の二つで構成されているdiv actionSpace
                 それぞれ width,heightはPython側のconfig.iniファイルで設定
                 配置はcssのposition absoluteで設定
          -->
-        <div id="actionSpace">
-            <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
-            <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
-        </div>
+    <div id="actionSpace">
+        <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
+        <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
     </div>
-
     <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
+</div>
 </body>
 </html>
