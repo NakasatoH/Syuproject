@@ -15,8 +15,11 @@ var checkFlg = 0;// 影を表示後に座標が変更された際その都度一
 var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
 var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
+var codeNums = [];// images配列に合わせてコード番号を保管する配列
+var bkCodeNums = [];// codeNumsのバックアップ用配列
 const moveNum = block_size;
 const indent = 83;
+const codeSize = 37.5;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -188,13 +191,13 @@ function f_drop(event) {
     window.setTimeout(function () {
         // ドロップ先がエディットボックス(id = "bottom")の場合
         if (currentTarget.id == "bottom") {/*
-            for (var i = 1; i < images.length; i++) {
-                // bottomからbottomへドロップした場合処理を実行しない
-                if (images[i] == drag_elm.id) {
-                    bwFlg = true;
-                }
-            }*/
-            if(drag_elm.parentNode.id == "bottom"){
+         for (var i = 1; i < images.length; i++) {
+         // bottomからbottomへドロップした場合処理を実行しない
+         if (images[i] == drag_elm.id) {
+         bwFlg = true;
+         }
+         }*/
+            if (drag_elm.parentNode.id == "bottom") {
                 bwFlg = true;
                 alert("エディターの中からのドラッグアンドドロップは出来ません。")
             }
@@ -271,7 +274,7 @@ function f_drop(event) {
         } else {
             elmHeight = 30;
         }
-        hMax = hMax + elmHeight + 2;
+        hMax = hMax + elmHeight + 4.5;
         images[images.length] = id;// idを挿入
         console.log("data-m : " + document.getElementById(id).getAttribute("data-m"));
     }
@@ -581,6 +584,7 @@ function action() {
          */
         // whileマークが検出された場合配列を解体し、作り直す
         images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
+        // debug();
     }
 
     imagesLog();
@@ -599,9 +603,11 @@ function action() {
     function action2() {
         //console.log("----------SecondAction--------------");
         // 移動量データが存在するなら
-        console.log("i : " + i);
+        //console.log("i : " + i);
         id = images[i];
         drop_elm = document.getElementById(id);
+        // 実行中コード可視化用関数sidePoint
+        sidePoint(i);
         if (drop_elm.hasAttribute("data-n")) {
             // ドロップされている画像群の個数と内容を把握する
             if (i < images.length) {
@@ -664,6 +670,7 @@ function action() {
             }//if (i < images.length) End
 
             cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
+
             var itc = setInterval(function () {
                 if (cnt < moveNum) {// ブロックサイズ  = moveNUM
                     if (!blockFlg) {//前に壁が無い場合
@@ -684,7 +691,9 @@ function action() {
                          */
                         // 処理終了後　images配列を画面上の見た目通りに戻す
                         images = bkImages;
+                        codeNums = bkCodeNums;
                         wCnt = bkWCnt;
+                        document.getElementById("sidePoint").style.backgroundPositionY = 35
                         if (goalFlg) {
                             alert("ゴール！");
                         }
@@ -696,14 +705,19 @@ function action() {
                 cnt++;
             }, 10);
         } else {
-            // 移動量データが存在しないなら 方向データを保存
-            old_d = drop_elm.getAttribute("data-d");
-            console.log(old_d);
-            i++;
-            if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
-                blockFlg = false;
-                action2();// 再帰
-            }
+            // 遅延実行
+            (function () {
+                setTimeout(function () {
+                    // 移動量データが存在しないなら 方向データを保存
+                    old_d = drop_elm.getAttribute("data-d");
+                    // console.log(old_d);
+                    i++;
+                    if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                        blockFlg = false;
+                        action2();// 再帰
+                    }
+                }, 180);
+            })();
         }
     }// action2() END
 
@@ -712,23 +726,31 @@ function action() {
      * hiddenのデータを呼び出し"e"マークを持ったidを格納する
      * whileの数に対応したendWhileをimages配列の最後に挿入する
      * endWhileの数を数える
+     * codeNums配列にコード番号を挿入する
      */
     function firstAction() {
         var endCnt = 0;
+        var codeCnt = 0;
         for (i = 0; i < images.length; i++) {
             if (images[i] == "endWhile") {
                 endCnt++;
+                codeCnt--;
+                codeNums[i] = codeCnt;
+            } else {
+                codeNums[i] = codeCnt;
             }
+            codeCnt++;
         }
         if (wCnt - endCnt > 0) {
             for (i = wCnt; i < endCnt; i++) {
                 console.log("wCnt , endCnt; エンドマーク挿入" + wCnt + "" + endCnt);
                 images[images.length] = "endWhile";
+                codeNums[codeNums.length] = codeNums[codeNums.length - 1];
             }
         }
-
         imagesLog();
         firstFlg = false;
+        bkCodeNums = codeNums;
     }
 }
 
@@ -765,12 +787,18 @@ function action() {
  *   初期化したimages配列に 結合済みfrontIsolateArrayを代入する
  */
 function wBreakDown(index, wIdx, wNum) {
+    // images配列用
     var cnt = 0;
     var workNum = 0;
     var workNum2 = 0;
     var workArray = [];// 繰り返し処理部分を格納する配列
     var frontIsolateArray = [];// 隔離用配列(前)
     var backIsolateArray = [];// 隔離用配列(後)
+
+    // 可視化用
+    var wa2 = [];
+    var fia2 = [];
+    var bia2 = [];
     // 繰り返される処理をworkArray配列に格納
     for (var i = index + 1; i < images.length; i++) {
         if (images[i] == "endWhile") {
@@ -782,6 +810,7 @@ function wBreakDown(index, wIdx, wNum) {
         } else {
             //console.log("i : " + i);
             workArray[workNum] = images[i];// images配列の要素を格納
+            wa2[workNum] = codeNums[i];// images配列と同様にコード番号を挿入
             //console.log(workArray[workNum] + " : workArray[" + workNum + "]");
             workNum++;// workArrayの要素番号を進める
         }
@@ -790,6 +819,7 @@ function wBreakDown(index, wIdx, wNum) {
     // "w"マークより前のデータをfrontIsolateArrayに格納
     for (i = index - 1; i > -1; i--) {
         frontIsolateArray[i] = images[i];
+        fia2[i] = codeNums[i];
         //console.log("frontIsolateArray[" + frontIsolateArray[i] + "]")
     }
 
@@ -797,6 +827,7 @@ function wBreakDown(index, wIdx, wNum) {
     if (images[index + workNum + 2]) {
         for (i = index + workNum + 2; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
             backIsolateArray[workNum2] = images[i];
+            bia2[workNum2] = codeNums[i];
             console.log(backIsolateArray[workNum2]);
             workNum2++;
         }
@@ -805,12 +836,14 @@ function wBreakDown(index, wIdx, wNum) {
     for (var j = 0; j < wNum; j++) {
         for (var k = 0; k < workArray.length; k++) {
             frontIsolateArray[index + cnt] = workArray[k];
+            fia2[index + cnt] = wa2[k];
             cnt++;
         }
     }
     // frontIsolateArray配列とbackIsolateArray配列を結合
     for (i = 0; i < backIsolateArray.length; i++) {
         frontIsolateArray[index + cnt + i] = backIsolateArray[i];
+        fia2[index + cnt + i] = bia2[i];
         console.log(frontIsolateArray[index + cnt + i]);
     }
 
@@ -819,6 +852,7 @@ function wBreakDown(index, wIdx, wNum) {
     for (var x = 0; x < images.length; x++) {
         console.log(x + "images[" + x + "] : " + images[x]);
     }
+    codeNums = fia2;
     return frontIsolateArray;
 }
 function debug() {
@@ -829,4 +863,21 @@ function debug() {
     }
     console.log("backgroundPositionY: " + bottomDiv.style.backgroundPositionY);
     console.log("hMax : " + hMax);
+    for (var i = 0; i < codeNums.length; i++) {
+        console.log("codeNums[" + i + "] : " + codeNums[i]);
+    }
+}
+
+/**
+ * 疑似プログラム実行中にリアルタイムでどのコードを実行しているか認識できるようにするための
+ * 背景画像の位置を変更するメソッド
+ * 処理概要：
+ *              DIV sidePoint の背景画像の位置調整、及び表示
+ *
+ *              Action() , Action2() wBreakDown() メソッド内で同時に別の配列に、プログラムのコード番号を挿入
+ *              以下のメソッドでは挿入済み配列の値に合わせて背景画像のPositionYを調整する
+ */
+function sidePoint(index) {
+    var sideElm = document.getElementById("sidePoint");
+    sideElm.style.backgroundPositionY = 35 + codeNums[index] * codeSize + "px";
 }
