@@ -18,7 +18,8 @@ var images = [];// ドロップした順にidを保管するための配列
 var codeNums = [];// images配列に合わせてコード番号を保管する配列
 var bkCodeNums = [];// codeNumsのバックアップ用配列
 const moveNum = block_size;
-const indent = 83;
+const indent = 84;
+const wWidthSize = 142;
 const codeSize = 37.5;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
@@ -50,6 +51,7 @@ image1.onload = (function () {
 var dragSound = new Audio();
 dragSound.src = dragSoundSrc;
 
+// キャラクターを変更用メソッド
 function changeCharacter() {
     var charElm = document.getElementById("characters");
     ImageToCanvas(image1);// 画像を表示してからイメージ画像のsrcを変更することで不自然な挙動を解消
@@ -125,13 +127,12 @@ function f_dragover(event) {
         bottomDiv.style.backgroundPositionY = hMax + "px";
         if (target_elm.localName === "img") {
             bottomDiv.style.backgroundSize = target_elm.width + "px " + target_elm.height + "px";
-            while_x = Math.floor((t_wCnt - 1) * indent + target_elm.width);
         } else {
             bottomDiv.style.backgroundSize = "200px 30px";
-            while_x = Math.floor((t_wCnt - 1) * indent + 200);
         }
+        while_x = t_wCnt * indent;
 
-        // x座標、前回挿入したコードを確認
+        // x座標、前回挿入したコード（画像）を確認
         if (images[images.length - 1] && document.getElementById(images[images.length - 1]).getAttribute("data-d") == "w") {
             bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
             indentPoint = t_wCnt;
@@ -163,7 +164,11 @@ function deleteShadow() {
     }
 }
 
-// ドロップ時の処理
+/**
+ * ドロップ時の処理
+ * 概要：
+ * @param event
+ */
 function f_drop(event) {
     var id_name = event.dataTransfer.getData("text");// ドラッグされたデータのid名をDataTransferオブジェクトから取得
     var drag_elm = document.getElementById(id_name);// id名からドラッグされた要素を取得
@@ -184,9 +189,9 @@ function f_drop(event) {
      * また、更にその中でもevent.preventDefault()の方が処理順が速いため、currentTargetを見失ってしまう。
      * その対策として、変数に値を代入して保持しておく必要がある。
      */
-
     var currentTarget = event.currentTarget;// ドロップ先
     deleteShadow();
+
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
     window.setTimeout(function () {
         // ドロップ先がエディットボックス(id = "bottom")の場合
@@ -207,8 +212,8 @@ function f_drop(event) {
                 if (data_d == "w") {
                     wCnt++;
                     var rect = drag_elm.getBoundingClientRect();// 一番最後にドロップしたwhileイメージの座標を保持
-                    while_x = Math.floor((wCnt - 1) * indent + drag_elm.width);
-                    wWidthSize = drag_elm.width;
+                    while_x = Math.floor((wCnt - 1) * indent + wWidthSize);///////////////////////////////////////////////////////////////////////////////////////////////////
+
                 }
                 dragSound.play();// ドロップ時に効果音を再生
                 currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
@@ -218,12 +223,7 @@ function f_drop(event) {
             console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
             console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
-            // ドロップ先がコードボックス(id = "upper")の場合
         }
-        /* else if (currentTarget.id == "upper") {
-         outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
-         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
-         }*/
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 40);
@@ -243,8 +243,8 @@ function f_drop(event) {
         if (arrayFlg == true) {
             outputArray(id);// 同じbottomからbottomにD and Dされた場合一度配列を整理してから　配列の最後にidを格納
         }
-        //whileイメージよりも左側にドロップした場合
-        console.log(while_x);
+        //whileイメージよりも左側にドロップした場合 images配列にendWhileを挿入
+        console.log("while_x:" + while_x);
         if (wCnt > 0 && x <= while_x && images[images.length - 2]) {
             // 一つ前のドロップがwhileの場合繰り返し終了マークを挿入しない
             if (document.getElementById(images[images.length - 1]).getAttribute("data-d") != "w") {
