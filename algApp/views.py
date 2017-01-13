@@ -47,8 +47,6 @@ def ddpulsmove(request):
     # ブロックがキャンバス上にそれぞれ何個入るかを調べる
     w_blocks = int(int(cvs_width) / int(block_size))
     h_blocks = int(int(cvs_height) / int(block_size))
-    print("h_blocks : " + str(h_blocks) + " =  cvs_height :" + str(cvs_height) + " / blocksize : " + str(block_size))
-
     # 空の二次元配列を作成
     mapArray = [[0 for x in range(w_blocks)] for y in range(h_blocks)]
 

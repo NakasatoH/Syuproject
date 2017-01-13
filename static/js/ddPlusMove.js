@@ -7,7 +7,7 @@ var dy = 0;
 var old_dx = 0; // canvas内 キャラクターの今までの位置を保持しておくための変数old_...
 var old_dy = 0;
 var indentPoint = 0;
-var hMax = 32;
+var hMax = 33;
 var wCnt = 0; // エディター内にある終了していないwhileの数を数える変数
 var while_x = 0;// 最も後にドロップされたwhileイメージの位置情報
 var shadowFlg = 0;// 影の表示に使うフラグ
@@ -15,8 +15,12 @@ var checkFlg = 0;// 影を表示後に座標が変更された際その都度一
 var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
 var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
+var codeNums = [];// images配列に合わせてコード番号を保管する配列
+var bkCodeNums = [];// codeNumsのバックアップ用配列
 const moveNum = block_size;
-const indent = 83;
+const indent = 84;
+const wWidthSize = 142;
+const codeSize = 37.5;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -47,6 +51,7 @@ image1.onload = (function () {
 var dragSound = new Audio();
 dragSound.src = dragSoundSrc;
 
+// キャラクターを変更用メソッド
 function changeCharacter() {
     var charElm = document.getElementById("characters");
     ImageToCanvas(image1);// 画像を表示してからイメージ画像のsrcを変更することで不自然な挙動を解消
@@ -96,10 +101,20 @@ function f_dragstart(event) {
 // ドラッグ要素がドロップ要素に重なっている間の処理
 function f_dragover(event) {
     var btm_elm = document.getElementById("bottom");
+    var side_elm = document.getElementById("sidePoint");
     var id;
+    var lastCodeRect;
+    var lastCodePosition = 0;// 最後に挿入したコードのy座標 + elmのheight
     var t_wCnt = wCnt;
-    x = event.clientX - rect.left;
-    y = event.clientY - rect.top;
+    x = window.scrollX + event.clientX - rect.left;
+    y = window.pageYOffset + event.clientY - rect.top;
+    console.log("winSc : " + window.pageYOffset);
+    //console.log("y :" + y + " x :" + x);
+    if (images[images.length - 1]) {
+        lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
+        lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height;
+    }
+
     /**
      * 処理概要:
      *  ドラッグ中にドラッグエレメントから座標を取得し、
@@ -108,7 +123,7 @@ function f_dragover(event) {
      */
     if (!shadowFlg) {
         shadowView();
-    } else if (x / indent != indentPoint) {
+    } else if (x / indent != indentPoint) {// y / codeSize == lineNumber を追加予定
         deleteShadow();
         shadowView();
     }
@@ -120,34 +135,48 @@ function f_dragover(event) {
         bottomDiv.style.backgroundRepeat = "no-repeat";
         bottomDiv.style.backgroundPositionX = "0";
         bottomDiv.style.backgroundPositionY = hMax + "px";
+
         if (target_elm.localName === "img") {
             bottomDiv.style.backgroundSize = target_elm.width + "px " + target_elm.height + "px";
-            while_x = Math.floor((t_wCnt - 1) * indent + target_elm.width);
         } else {
             bottomDiv.style.backgroundSize = "200px 30px";
-            while_x = Math.floor((t_wCnt - 1) * indent + 200);
         }
+        while_x = t_wCnt * indent;
 
-        // x座標、前回挿入したコードを確認
-        if (images[images.length - 1] && document.getElementById(images[images.length - 1]).getAttribute("data-d") == "w") {
-            bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
-            indentPoint = t_wCnt;
-        } else {
-            while (t_wCnt > 0) {
-                if (x >= 0 && x < t_wCnt * indent) {
-                    t_wCnt -= 1;
-                } else {
-                    break;
+
+        /** x座標、前回挿入したコード（画像）を確認
+         *  前回挿入したコードがwhileの場合backgroundPXの位置を固定で決定
+         *  whileではない場合 x座標が indent 何個分かを while(t_wCnt > 0){}の中で求めて　位置調整、indentPointを保存
+         */
+        if (lastCodePosition = 0 || lastCodePosition < y) {
+            if (images[images.length - 1] && document.getElementById(images[images.length - 1]).getAttribute("data-d") == "w") {
+                bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
+                indentPoint = t_wCnt;
+            } else {
+                while (t_wCnt > 0) {
+                    if (x >= 0 && x < t_wCnt * indent) {
+                        t_wCnt -= 1;
+                    } else {
+                        break;
+                    }
                 }
+                // ドラッグ時に移動した際影を動かすために、ポジションを保持する
+                indentPoint = t_wCnt;
+                bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
             }
-            // ドラッグ時に移動した際影を動かすために、ポジションを保持する
-            indentPoint = t_wCnt;
-            bottomDiv.style.backgroundPositionX = t_wCnt * indent + "px";
+        } else {
+            // プログラムの途中にコードを挿入する場合
+            bottomDiv.style.backgroundImage = "none";
+            side_elm.style.backgroundImage = "none";
+            side_elm.style.backgroundImage = 'url(' + midDropSrc + ')';
+            // 最後のコードでサイドバーの目印を停止させる場合
+            // side_elm.style.backgroundPositionY = y - 10 + "px";
         }
         shadowFlg = true;
-
     }
 
+    // 最後のコードでサイドバーの目印を止めない
+    side_elm.style.backgroundPositionY = y - 10 + "px";
     // dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
     event.preventDefault();
 }
@@ -160,7 +189,11 @@ function deleteShadow() {
     }
 }
 
-// ドロップ時の処理
+/**
+ * ドロップ時の処理
+ * 概要：
+ * @param event
+ */
 function f_drop(event) {
     var id_name = event.dataTransfer.getData("text");// ドラッグされたデータのid名をDataTransferオブジェクトから取得
     var drag_elm = document.getElementById(id_name);// id名からドラッグされた要素を取得
@@ -170,31 +203,26 @@ function f_drop(event) {
 
     var bwFlg = false;// div bottom から bottom へwhile画像を繰り返しドロップすることで起こる不正な挙動を防ぐフラグ
 
-    var x = event.clientX - rect.left;// ドロップ位置情報
-    var y = event.clientY - rect.top;
+    var x = window.scrollX + event.clientX - rect.left;// ドロップ位置情報
+
+    var y = window.pageYOffset + event.clientY - rect.top;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
     y = Math.floor(y);
-    console.log("x : " + x + " y : " + y);
 
+    console.log("x : " + x + " y : " + y);
     /**
      * window.setTimeoutは並行処理であるため、currentTarget.appendChild()もpreventDefaultもsetTimeout内に入れる必要がある
      * また、更にその中でもevent.preventDefault()の方が処理順が速いため、currentTargetを見失ってしまう。
      * その対策として、変数に値を代入して保持しておく必要がある。
      */
-
     var currentTarget = event.currentTarget;// ドロップ先
     deleteShadow();
+
     // コード画像をドロップしたとき不自然な挙動にならないよう遅延を作る
     window.setTimeout(function () {
         // ドロップ先がエディットボックス(id = "bottom")の場合
-        if (currentTarget.id == "bottom") {/*
-            for (var i = 1; i < images.length; i++) {
-                // bottomからbottomへドロップした場合処理を実行しない
-                if (images[i] == drag_elm.id) {
-                    bwFlg = true;
-                }
-            }*/
-            if(drag_elm.parentNode.id == "bottom"){
+        if (currentTarget.id == "bottom") {
+            if (drag_elm.parentNode.id == "bottom") {
                 bwFlg = true;
                 alert("エディターの中からのドラッグアンドドロップは出来ません。")
             }
@@ -204,23 +232,18 @@ function f_drop(event) {
                 if (data_d == "w") {
                     wCnt++;
                     var rect = drag_elm.getBoundingClientRect();// 一番最後にドロップしたwhileイメージの座標を保持
-                    while_x = Math.floor((wCnt - 1) * indent + drag_elm.width);
-                    wWidthSize = drag_elm.width;
+                    while_x = Math.floor((wCnt - 1) * indent + wWidthSize);
                 }
                 dragSound.play();// ドロップ時に効果音を再生
-                currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
+                // currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
             }
             bwFlg = false;
             // while画像よりもx座標が +か -か判定して -の場合 whileのエンドマークをimages配列に挿入する
+            /*
             console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
-            console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
-            // ドロップ先がコードボックス(id = "upper")の場合
+            console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);*/
         }
-        /* else if (currentTarget.id == "upper") {
-         outputArray(id_name);// 画像を元のボックスに戻した場合、配列をソートして詰める
-         currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
-         }*/
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
     }, 40);
@@ -232,6 +255,15 @@ function f_drop(event) {
     // div#bottomにドロップされたとき、idを配列に格納する関数
     function inputArray(id) {
         var arrayFlg = false;
+        var lastCodePosition = 0;
+        var lastCodeRect;
+        var elmHeight;
+        var bkImages = images;
+        if (images[images.length - 1]) {
+            lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
+            lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height + window.pageYOffset;
+        }
+
         for (var i = 0; i < images.length; i++) {
             if (images[i] == id) {
                 arrayFlg = true;
@@ -240,45 +272,137 @@ function f_drop(event) {
         if (arrayFlg == true) {
             outputArray(id);// 同じbottomからbottomにD and Dされた場合一度配列を整理してから　配列の最後にidを格納
         }
-        //whileイメージよりも左側にドロップした場合
-        console.log(while_x);
-        if (wCnt > 0 && x <= while_x && images[images.length - 2]) {
-            // 一つ前のドロップがwhileの場合繰り返し終了マークを挿入しない
-            if (document.getElementById(images[images.length - 1]).getAttribute("data-d") != "w") {
-                whileRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
+        //whileイメージよりも左側にドロップした場合 images配列にendWhileを挿入
 
-                // エディター上にエンドマークの無いwhileが複数ある場合 ドロップ位置によりエンドマーク挿入量調整
-                while (wCnt > 1 && x <= (wCnt - 1) * indent && x >= 0) {
-                    images[images.length] = "endWhile";
+        /**
+         * 処理概要
+         * ドロップ時のy座標を判別して、
+         * その値に応じてコードを挿入する
+         * whileは今回は途中挿入させない
+         */
+        if (lastCodePosition == 0 || lastCodePosition < y || document.getElementById(id).getAttribute("data-d") == "w") {
+
+            console.log("lastCP : " + lastCodePosition);
+            // wCnt = 終了していないwhileの数  , images[images.length -2] が存在する = whileを終了するか選べる状態にある
+            if (wCnt > 0 && x <= while_x && images[images.length - 2]) {
+                // 一つ前のドロップがwhileの場合繰り返し終了マークを挿入しない
+                if (document.getElementById(images[images.length - 1]).getAttribute("data-d") != "w") {
+                    whileRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
+                    // エディター上にエンドマークの無いwhileが複数ある場合 ドロップ位置によりエンドマーク挿入量調整
+                    while (wCnt > 1 && x <= (wCnt - 1) * indent && x >= 0) {
+                        images[images.length] = "endWhile";
+                        wCnt -= 1;
+                    }
                     wCnt -= 1;
+                    images[images.length] = "endWhile";
                 }
-                wCnt -= 1;
-                console.log("エンドマーク挿入2");
-                images[images.length] = "endWhile";
             }
-        }
-        console.log("wCnt" + wCnt);
+            if (wCnt >= 0) {
+                var l_margin = wCnt * indent;
+                drag_elm.style.marginLeft = l_margin + 'px';
+            }
+            document.getElementById(id).setAttribute("data-m", wCnt);//indent dataを挿入
+            console.log("data-m : " + document.getElementById(id).getAttribute("data-m"));
+            if (drag_elm.localName === "img") {
+                elmHeight = drag_elm.height;
+            } else {
+                elmHeight = 30;
+            }
+            hMax = hMax + elmHeight + 4;
 
-        if (wCnt >= 0) {
-            var l_margin = wCnt * indent;
-            drag_elm.style.marginLeft = l_margin + 'px';
-        }
-        document.getElementById(id).setAttribute("data-m", wCnt);//indent dataを挿入
+            images[images.length] = id;// idを挿入
+            currentTarget.appendChild(document.getElementById(id));// エレメントをbottomに挿入
+        } else {// 最初のコード、または最後のコードではない && whileではない
+            var initVal = y - 10.6;
+            console.log("-------- pointS --------" + initVal);
+            if (initVal < 0) {
+                // images[0]に挿入
+                for (i = images.length - 1; i >= 0; i--) {
+                    images[i + 1] = images[i];
+                }
+                images[0] = id;
 
-        var elmHeight;
-        if (drag_elm.localName === "img") {
-            elmHeight = drag_elm.height;
-        } else {
-            elmHeight = 30;
+                // 再配置
+                hMax = 32;
+                relocation(0);// upperに戻す処理 引数は最初にupperに戻すimages配列のindex
+                for (i = 0; i < images.length; i++) {
+                    if (images[i] != "endWhile") {
+                        currentTarget.appendChild(document.getElementById(images[i]));
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+                        hMax = hMax + elmHeight + 4;
+                    }
+                }
+            } else {// コード間に挿入された場合
+                var midWCnt = 0;
+                var yPoint = Math.floor(initVal / 37.22);
+                // images[yPoint]に挿入
+
+                // endWhile対策
+                while (images[yPoint - 1] == "endWhile") {
+                    yPoint = yPoint - 1;
+                }
+                for (i = images.length - 1; i >= yPoint; i--) {
+                    images[i + 1] = images[i];
+                    if (images[i] != "endWhile") {
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+
+                        hMax = hMax - elmHeight - 4;
+                    }
+                }
+                images[yPoint] = id;
+
+                for (i = 0; i < yPoint; i++) {
+                    if (document.getElementById(images[i]).hasAttribute("data-d") &&
+                        document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                        midWCnt = midWCnt + 1;
+                    } else if (images[i] == "endWhile") {
+                        midWCnt = midWCnt - 1;
+                    }
+                }
+                relocation(yPoint);
+                wCnt = midWCnt;
+                /**
+                 * 実装予定
+                 * ここに　wCntが1以上の場合 x軸ごとに
+                 */
+                
+
+                // 再配置
+                for (i = yPoint; i < images.length; i++) {
+                    if (images[i] != "endWhile") {
+                        document.getElementById(images[i]).style.marginLeft = wCnt * indent + "px";
+                        currentTarget.appendChild(document.getElementById(images[i]));
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+                        hMax = hMax + elmHeight + 4;
+                        if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                            wCnt++;
+                            console.log(wCnt);
+                        }
+                    }else{
+                        wCnt--;
+                        console.log(wCnt);
+                    }
+                }
+            }
+
         }
-        hMax = hMax + elmHeight + 2;
-        images[images.length] = id;// idを挿入
-        console.log("data-m : " + document.getElementById(id).getAttribute("data-m"));
+        //途中挿入の場合（while以外）
     }
 
     // div#bottom から div#upperに戻したときに配列を詰める関数
     function outputArray(id) {
-
         var e_index;
         for (var i = 0; i < images.length; i++) {
             if (images[i] == id) {
@@ -331,10 +455,21 @@ function f_drop(event) {
     }
 }// function f_drop(event) End
 
-// 表示用関数
+// 表示用メソッド
 function imagesLog() {
     for (var i = 0; i < images.length; i++) {
         console.log("images配列[" + i + "] : " + images[i]);
+    }
+}
+
+// 全ての値の初期化は行わずにエレメントだけupperに戻す　再配置用メソッド
+function relocation(firstIndex) {
+    for (var i = firstIndex; i < images.length; i++) {
+        if (document.getElementById(images[i]) != "endWhile") {
+            document.getElementById(images[i]).style.marginTop = 0 + "px";
+            document.getElementById(images[i]).style.marginLeft = 0 + "px";
+            document.getElementById("upper").appendChild(document.getElementById(images[i]));
+        }
     }
 }
 
@@ -396,8 +531,11 @@ function resetImages() {
     var upper_elm = document.getElementById("upper");
     for (var i = 0; i < images.length; i++) {
         var drag_elm = document.getElementById(images[i]);
-        // 画像に付与された余白を除去
+        // 画像に付与された余白を除去,初期化
         drag_elm.style.marginLeft = 0 + "px";
+        drag_elm.style.paddingTop = 1 + "px";
+        drag_elm.style.paddingRight = 4 + "px";
+        drag_elm.style.paddingBottom = 1 + "px";
         // コードボックス内に移動
         upper_elm.appendChild(drag_elm);
     }
@@ -426,7 +564,7 @@ function actionBtnOnClick() {
         if (!runFlg && images.length > 0) {
             action();
         }
-    })
+    });
 }
 
 /**
@@ -434,6 +572,7 @@ function actionBtnOnClick() {
  * resetImages() = div #bottom上すべてのエレメントを#upperに戻す
  * resetImage() = クリックされたエレメントのみ#upperに戻す
  */
+
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
@@ -449,48 +588,53 @@ function resetImage() {
 
 
 function outputArray2(id) {
-    var e_index;
+    var e_index = 0;
     for (var i = 0; i < images.length; i++) {
         if (images[i] == id) {
-
             //取得した画像がwhileなら
             if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
-                for (var j = i; j < images.length; j++) {
-                    if (images[j] == "endWhile") {
-                        //endWhileの要素番号を保持
-                        e_index = j;
-                        break;
-                    } else {
-                        // 既についているインデントを減らす
-                        var w_elm = document.getElementById(images[j]);
-                        w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
-                        console.log("wCnt: " + wCnt + " indent: " + indent);
-                    }
-                }
-                if (images[e_index]) {
-                    images.splice(e_index, 1);// endWhileを削除
-                    if (images[e_index]) {
-                        var workArray = [];
-                        for (var k = images.length - 1; k > e_index; k--) {
-                            // 未実装
-
-                        }
-                        for (k = e_index; k < images.length; k++) {
-                            w_elm = document.getElementById(images[k]);
-                            if (w_elm.getAttribute("data-m") > 0) {
-                                w_elm.style.marginLeft = (w_elm.getAttribute("data-m") - 1) * indent + "px";
+                if (document.getElementById(images[i + 1])) {
+                    var t_wCnt = 1;
+                    while (t_wCnt > 0) {// このwhileの終了ポイントを探す
+                        for (var j = i + 1; j < images.length; j++) {
+                            if (images[j] == "endWhile") {
+                                t_wCnt--;
+                            } else if (document.getElementById(images[j]).getAttribute("data-d") == "w") {
+                                t_wCnt++;
+                            }
+                            //while内のコードを全てインデント除去
+                            if (document.getElementById(images[j]) != "endWhile") {
+                                document.getElementById(images[j]).style.marginLeft = 0 + "px";
+                                hMax = hMax - document.getElementById(images[i]).height - 4;
+                            }
+                            // whileの終了地点を発見した場合　終了地点を e_indexに補完
+                            if (t_wCnt <= 0) {
+                                e_index = j;
+                                break;
                             }
                         }
+                        // for文終了時、e_index == 0 の場合 e_indexに images.length - 1を代入する
+                        if (e_index == 0) {
+                            e_index = images.length - 1;
+                            wCnt = wCnt - t_wCnt;
+                            hMax = hMax - document.getElementById(images[i]).height - 4;
+                            t_wCnt = 0;
+                        }
                     }
-                } else {
-                    // endWhileがimages内に存在する場合、wCntを減らしてはいけない
-                    wCnt--;
+                    for (j = i; j < e_index + 1; j++) {
+                        if (document.getElementById(images[j]) != "endWhile") {
+                            console.log("images[" + j + "] : " + images[j]);
+                            document.getElementById("upper").appendChild(document.getElementById(images[j]));
+                        }
+                    }
+                    images.splice(i, e_index - i + 1);
+                    console.log("images[i-1]" + hMax);
+                } else {//最後に挿入したコードがWhileの場合
+                    document.getElementById("upper").appendChild(document.getElementById(images[i]));
+                    images.splice(i, 1);
+                    wCnt = wCnt - 1;
+                    hMax = hMax - document.getElementById(images[i]).height - 4;
                 }
-                hMax = hMax - document.getElementById(images[i]).height - 2;
-                images.splice(i, 1);
-                console.log(wCnt);
-
-                // 選択したコードがwhileではない場合
             } else {
                 if (images[i - 1]) {
                     if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
@@ -502,22 +646,22 @@ function outputArray2(id) {
                             images.splice(i - 1, 3);
                         } else {
                             console.log("ここ１" + hMax + "documentByIDImage[i].height : " + document.getElementById(images[i]).height);
-                            hMax = hMax - document.getElementById(images[i]).height - 2;
+                            hMax = hMax - document.getElementById(images[i]).height - 4;
                             console.log("ここ２" + hMax);
                             images.splice(i, 1)
                         }
                         console.log("前がwhile後がendWhile インデントは " + indent + " : wcnt : " + wCnt);
                     } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
                         //一つ前がendWhile　かつ １つ後が存在しないなら
-                        hMax = hMax - document.getElementById(images[i]).height - 2;
+                        hMax = hMax - document.getElementById(images[i]).height - 4;
                         images.splice(i - 1, 2);
                         wCnt++;
                     } else {
-                        hMax = hMax - document.getElementById(images[i]).height - 2;
+                        hMax = hMax - document.getElementById(images[i]).height - 4;
                         images.splice(i, 1);
                     }
                 } else {
-                    hMax = hMax - document.getElementById(images[i]).height - 2;
+                    hMax = hMax - document.getElementById(images[i]).height - 4;
                     images.splice(i, 1);
                 }
             }
@@ -533,9 +677,6 @@ function outputArray2(id) {
  * ドロップされている画像群に従い、一斉に動作
  * --------------------------------------------------------
  */
-
-
-
 function action() {
     var blockFlg = false;
     var cnt = 0;
@@ -581,6 +722,7 @@ function action() {
          */
         // whileマークが検出された場合配列を解体し、作り直す
         images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
+        // debug();
     }
 
     imagesLog();
@@ -599,9 +741,11 @@ function action() {
     function action2() {
         //console.log("----------SecondAction--------------");
         // 移動量データが存在するなら
-        console.log("i : " + i);
+        //console.log("i : " + i);
         id = images[i];
         drop_elm = document.getElementById(id);
+        // 実行中コード可視化用関数sidePoint
+        sidePoint(i);
         if (drop_elm.hasAttribute("data-n")) {
             // ドロップされている画像群の個数と内容を把握する
             if (i < images.length) {
@@ -664,6 +808,7 @@ function action() {
             }//if (i < images.length) End
 
             cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
+
             var itc = setInterval(function () {
                 if (cnt < moveNum) {// ブロックサイズ  = moveNUM
                     if (!blockFlg) {//前に壁が無い場合
@@ -684,7 +829,9 @@ function action() {
                          */
                         // 処理終了後　images配列を画面上の見た目通りに戻す
                         images = bkImages;
+                        codeNums = bkCodeNums;
                         wCnt = bkWCnt;
+                        document.getElementById("sidePoint").style.backgroundPositionY = 35;
                         if (goalFlg) {
                             alert("ゴール！");
                         }
@@ -696,14 +843,19 @@ function action() {
                 cnt++;
             }, 10);
         } else {
-            // 移動量データが存在しないなら 方向データを保存
-            old_d = drop_elm.getAttribute("data-d");
-            console.log(old_d);
-            i++;
-            if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
-                blockFlg = false;
-                action2();// 再帰
-            }
+            // 遅延実行
+            (function () {
+                setTimeout(function () {
+                    // 移動量データが存在しないなら 方向データを保存
+                    old_d = drop_elm.getAttribute("data-d");
+                    // console.log(old_d);
+                    i++;
+                    if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                        blockFlg = false;
+                        action2();// 再帰
+                    }
+                }, 180);
+            })();
         }
     }// action2() END
 
@@ -712,23 +864,31 @@ function action() {
      * hiddenのデータを呼び出し"e"マークを持ったidを格納する
      * whileの数に対応したendWhileをimages配列の最後に挿入する
      * endWhileの数を数える
+     * codeNums配列にコード番号を挿入する
      */
     function firstAction() {
         var endCnt = 0;
+        var codeCnt = 0;
         for (i = 0; i < images.length; i++) {
             if (images[i] == "endWhile") {
                 endCnt++;
+                codeCnt--;
+                codeNums[i] = codeCnt;
+            } else {
+                codeNums[i] = codeCnt;
             }
+            codeCnt++;
         }
         if (wCnt - endCnt > 0) {
             for (i = wCnt; i < endCnt; i++) {
                 console.log("wCnt , endCnt; エンドマーク挿入" + wCnt + "" + endCnt);
                 images[images.length] = "endWhile";
+                codeNums[codeNums.length] = codeNums[codeNums.length - 1];
             }
         }
-
         imagesLog();
         firstFlg = false;
+        bkCodeNums = codeNums;
     }
 }
 
@@ -765,12 +925,18 @@ function action() {
  *   初期化したimages配列に 結合済みfrontIsolateArrayを代入する
  */
 function wBreakDown(index, wIdx, wNum) {
+    // images配列用
     var cnt = 0;
     var workNum = 0;
     var workNum2 = 0;
     var workArray = [];// 繰り返し処理部分を格納する配列
     var frontIsolateArray = [];// 隔離用配列(前)
     var backIsolateArray = [];// 隔離用配列(後)
+
+    // 可視化用
+    var wa2 = [];
+    var fia2 = [];
+    var bia2 = [];
     // 繰り返される処理をworkArray配列に格納
     for (var i = index + 1; i < images.length; i++) {
         if (images[i] == "endWhile") {
@@ -782,6 +948,7 @@ function wBreakDown(index, wIdx, wNum) {
         } else {
             //console.log("i : " + i);
             workArray[workNum] = images[i];// images配列の要素を格納
+            wa2[workNum] = codeNums[i];// images配列と同様にコード番号を挿入
             //console.log(workArray[workNum] + " : workArray[" + workNum + "]");
             workNum++;// workArrayの要素番号を進める
         }
@@ -790,6 +957,7 @@ function wBreakDown(index, wIdx, wNum) {
     // "w"マークより前のデータをfrontIsolateArrayに格納
     for (i = index - 1; i > -1; i--) {
         frontIsolateArray[i] = images[i];
+        fia2[i] = codeNums[i];
         //console.log("frontIsolateArray[" + frontIsolateArray[i] + "]")
     }
 
@@ -797,6 +965,7 @@ function wBreakDown(index, wIdx, wNum) {
     if (images[index + workNum + 2]) {
         for (i = index + workNum + 2; i < images.length; i++) {// index + workNum + 1 は多分 "e"の次の要素番号
             backIsolateArray[workNum2] = images[i];
+            bia2[workNum2] = codeNums[i];
             console.log(backIsolateArray[workNum2]);
             workNum2++;
         }
@@ -805,12 +974,14 @@ function wBreakDown(index, wIdx, wNum) {
     for (var j = 0; j < wNum; j++) {
         for (var k = 0; k < workArray.length; k++) {
             frontIsolateArray[index + cnt] = workArray[k];
+            fia2[index + cnt] = wa2[k];
             cnt++;
         }
     }
     // frontIsolateArray配列とbackIsolateArray配列を結合
     for (i = 0; i < backIsolateArray.length; i++) {
         frontIsolateArray[index + cnt + i] = backIsolateArray[i];
+        fia2[index + cnt + i] = bia2[i];
         console.log(frontIsolateArray[index + cnt + i]);
     }
 
@@ -819,8 +990,10 @@ function wBreakDown(index, wIdx, wNum) {
     for (var x = 0; x < images.length; x++) {
         console.log(x + "images[" + x + "] : " + images[x]);
     }
+    codeNums = fia2;
     return frontIsolateArray;
 }
+
 function debug() {
     console.table(map);
     console.log("wCnt:" + wCnt);
@@ -829,4 +1002,22 @@ function debug() {
     }
     console.log("backgroundPositionY: " + bottomDiv.style.backgroundPositionY);
     console.log("hMax : " + hMax);
+    for (i = 0; i < codeNums.length; i++) {
+        console.log("codeNums[" + i + "] : " + codeNums[i]);
+    }
+    console.log("PositionY : " + bottomDiv.style.backgroundPositionY);
+}
+
+/**
+ * 疑似プログラム実行中にリアルタイムでどのコードを実行しているか認識できるようにするための
+ * 背景画像の位置を変更するメソッド
+ * 処理概要：
+ *              DIV sidePoint の背景画像の位置調整、及び表示
+ *
+ *              Action() , Action2() wBreakDown() メソッド内で同時に別の配列に、プログラムのコード番号を挿入
+ *              以下のメソッドでは挿入済み配列の値に合わせて背景画像のPositionYを調整する
+ */
+function sidePoint(index) {
+    var sideElm = document.getElementById("sidePoint");
+    sideElm.style.backgroundPositionY = 35 + codeNums[index] * codeSize + "px";
 }
