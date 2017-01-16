@@ -21,6 +21,7 @@ const moveNum = block_size;
 const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
+const elmAllSize = 37.22;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -308,7 +309,7 @@ function f_drop(event) {
             } else {
                 elmHeight = 30;
             }
-            hMax = hMax + elmHeight + 4;
+            hMax = hMax + elmAllSize;
 
             images[images.length] = id;// idを挿入
             currentTarget.appendChild(document.getElementById(id));// エレメントをbottomに挿入
@@ -333,7 +334,7 @@ function f_drop(event) {
                         } else {
                             elmHeight = 25;
                         }
-                        hMax = hMax + elmHeight + 4;
+                        hMax = hMax + elmAllSize;
                     }
                 }
             } else {// コード間に挿入された場合
@@ -354,7 +355,7 @@ function f_drop(event) {
                             elmHeight = 25;
                         }
 
-                        hMax = hMax - elmHeight - 4;
+                        hMax = hMax - elmAllSize;
                     }
                 }
                 images[yPoint] = id;
@@ -373,7 +374,7 @@ function f_drop(event) {
                  * 実装予定
                  * ここに　wCntが1以上の場合 x軸ごとに
                  */
-                
+
 
                 // 再配置
                 for (i = yPoint; i < images.length; i++) {
@@ -385,7 +386,7 @@ function f_drop(event) {
                         } else {
                             elmHeight = 25;
                         }
-                        hMax = hMax + elmHeight + 4;
+                        hMax = hMax + elmAllSize;
                         if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
                             wCnt++;
                             console.log(wCnt);
@@ -582,6 +583,10 @@ function resetImage() {
         if (target.localName !== ("img") && target.className != ("divCode"))
             return;
         outputArray2(target.id);
+        target.style.marginLeft = 0 + "px";
+        target.style.paddingTop = 1 + "px";
+        target.style.paddingRight = 4 + "px";
+        target.style.paddingBottom = 1 + "px";
         upper_elm.appendChild(target);
     })
 }
@@ -605,7 +610,7 @@ function outputArray2(id) {
                             //while内のコードを全てインデント除去
                             if (document.getElementById(images[j]) != "endWhile") {
                                 document.getElementById(images[j]).style.marginLeft = 0 + "px";
-                                hMax = hMax - document.getElementById(images[i]).height - 4;
+                                hMax = hMax - elmAllSize;
                             }
                             // whileの終了地点を発見した場合　終了地点を e_indexに補完
                             if (t_wCnt <= 0) {
@@ -617,51 +622,51 @@ function outputArray2(id) {
                         if (e_index == 0) {
                             e_index = images.length - 1;
                             wCnt = wCnt - t_wCnt;
-                            hMax = hMax - document.getElementById(images[i]).height - 4;
+                            hMax = hMax - elmAllSize;
                             t_wCnt = 0;
                         }
                     }
                     for (j = i; j < e_index + 1; j++) {
                         if (document.getElementById(images[j]) != "endWhile") {
-                            console.log("images[" + j + "] : " + images[j]);
                             document.getElementById("upper").appendChild(document.getElementById(images[j]));
                         }
                     }
                     images.splice(i, e_index - i + 1);
-                    console.log("images[i-1]" + hMax);
                 } else {//最後に挿入したコードがWhileの場合
+                    document.getElementById(images[i]).style.marginTop = 0 + "px";
+                    document.getElementById(images[i]).style.marginLeft = 0 + "px";
+                    document.getElementById(images[i]).style.paddingTop = 1 + "px";
+                    document.getElementById(images[i]).style.paddingRight = 4 + "px";
+                    document.getElementById(images[i]).style.paddingBottom = 1 + "px";
                     document.getElementById("upper").appendChild(document.getElementById(images[i]));
                     images.splice(i, 1);
                     wCnt = wCnt - 1;
-                    hMax = hMax - document.getElementById(images[i]).height - 4;
+                    hMax = hMax - elmAllSize;
                 }
             } else {
                 if (images[i - 1]) {
                     if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
-                        // iの一つ後が存在していて かつWhileであるなら
+                        // iの一つ後ろが存在していて かつWhileであるなら
                         if (images[i + 1] && images[i + 1] == "endWhile") {
                             // images[i-1]のエレメント(while画像)をupperに表示
                             document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
-                            hMax = hMax - (document.getElementById(images[i - 1]).height + document.getElementById(images[i]).height + 4);// images配列内のエレメントの合計heightから減算
+                            hMax = hMax - elmAllSize * 2;// images配列内のエレメントの合計heightから減算
                             images.splice(i - 1, 3);
                         } else {
-                            console.log("ここ１" + hMax + "documentByIDImage[i].height : " + document.getElementById(images[i]).height);
-                            hMax = hMax - document.getElementById(images[i]).height - 4;
-                            console.log("ここ２" + hMax);
+                            hMax = hMax - elmAllSize;
                             images.splice(i, 1)
                         }
-                        console.log("前がwhile後がendWhile インデントは " + indent + " : wcnt : " + wCnt);
                     } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
                         //一つ前がendWhile　かつ １つ後が存在しないなら
-                        hMax = hMax - document.getElementById(images[i]).height - 4;
+                        hMax = hMax - elmAllSize;
                         images.splice(i - 1, 2);
                         wCnt++;
                     } else {
-                        hMax = hMax - document.getElementById(images[i]).height - 4;
+                        hMax = hMax - elmAllSize;
                         images.splice(i, 1);
                     }
                 } else {
-                    hMax = hMax - document.getElementById(images[i]).height - 4;
+                    hMax = hMax - elmAllSize;
                     images.splice(i, 1);
                 }
             }
@@ -831,7 +836,7 @@ function action() {
                         images = bkImages;
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
-                        document.getElementById("sidePoint").style.backgroundPositionY = 35;
+                        document.getElementById("sidePoint").style.backgroundPositionY = 33;
                         if (goalFlg) {
                             alert("ゴール！");
                         }
@@ -1019,5 +1024,5 @@ function debug() {
  */
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
-    sideElm.style.backgroundPositionY = 35 + codeNums[index] * codeSize + "px";
+    sideElm.style.backgroundPositionY = 33 + codeNums[index] * codeSize + "px";
 }
