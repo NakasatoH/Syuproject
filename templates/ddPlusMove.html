@@ -71,28 +71,32 @@
         }
 
         #wrapper {
-            width: 1400px;
+            width: 700px;
             margin: 0 0%;
-        }
-
-        #actionSpace {
-            float: right;
-            position: absolute;
-            top: 86px;
-            left: 732px;
         }
 
         #codeSpace {
             position: absolute;
-            top: 50px;
+            top: 150px;
+            left: 50px;
+            z-index: 0;
+        }
+
+        #upperTop {
+            position: relative;
+            top: 72px;
             left: 50px;
         }
 
         #upper {
-            width: 600px;
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 586px;
             height: 150px;
             padding-top: 2em;
-            padding-right: 2em;
+            padding-left: 1.5em;
+            padding-right: 1.4em;
             padding-bottom: 3em;
             border: 1px solid #ddd;
             background: #3B3F42;
@@ -103,16 +107,22 @@
 
         .sidePoint {
             width: 49px;
-            position: absolute;
-            top: 320px;
-            left: 0;
             background: #141414;
             height: 580px;
             border-right: solid #dddddd 1px;
             overflow-x: scroll;
         }
 
+        #spBack {
+            position: absolute;
+            top: 285px;
+            left: 0;
+        }
+
         #sidePoint {
+            position: absolute;
+            top: 285px;
+            left: 0;
             background-image: url("{% static  'img/midDrop.png' %}");
             background-position-y: 35px;
             background-repeat: no-repeat;
@@ -125,16 +135,22 @@
             padding-right: 2em;
             padding-bottom: 3em;
             position: absolute;
-            top: 320px;
+            top: 285px;
             left: 50px;
             height: 500px;
             z-index: -10;
             overflow: scroll;
         }
 
+        #buttons {
+            position: absolute;
+            top: 240px;
+            left: 0;
+        }
+
         #bottom {
             position: absolute;
-            top: 320px;
+            top: 285px;
             left: 50px;
             height: 500px;
             width: 552px;
@@ -145,14 +161,8 @@
             overflow: scroll;
         }
 
-        #buttons {
-            position: absolute;
-            top: 275px;
-            left: 0;
-        }
-
         #bottom img, #bottom div {
-            border: dashed 2px rgba(0, 0, 0, 0.8);
+            border: dashed 1px rgba(0, 0, 0, 0.8);
             border-radius: 20px;
             height: auto;
             max-width: 100%;
@@ -197,8 +207,42 @@
             font-size: 20px;
         }
 
-        .helpBtn {
+        #helpWindow {
+            position: absolute;
+            background: #202020;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 70%,
+                    #2c2c2c 100%);
 
+            border-top: solid 2px white;
+            border-left: solid 2px white;
+            border-bottom: solid 2px gray;
+            border-right: solid 2px gray;
+            padding: 25px;
+            top: 20px;
+            left: 150px;
+            z-index: 5;
+            border-radius: 6px;
+            box-shadow: 2px 2px 15px #000;
+        }
+
+        #CloseBtn {
+            position: absolute;
+            top: -25px;
+            left: 420px;
+            z-index: 10;
+            padding: 0 10px;
+            margin: 0;
+            box-shadow: 2px 0 5px #000;
+        }
+
+        .batu {
+            font-size: 40px;
+        }
+
+        .helpBtn {
             width: 116px;
             font-size: 14px;
             font-weight: bold;
@@ -207,8 +251,7 @@
             text-align: center;
             padding: 8px 0 10px;
             color: #e8e8e8;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
+            border-radius: 6px;
             text-shadow: 0 -1px rgba(206, 207, 211, 0.12);
             background: #202020;
             background: linear-gradient(
@@ -230,8 +273,40 @@
                     #525252 0%,
                     #272727 70%,
                     #1c1c1c 100%);
-
             box-shadow: 2px 2px 5px #000;
+        }
+
+        .resetBtn {
+            padding: 10px 30px;
+        }
+
+        #actionSide {
+            position: relative;
+            top: 100px;
+            left: 694px;
+        }
+
+        .actionBtn {
+            padding: 40px 8px;
+            margin-top: 104px;
+        }
+
+        #actionSpace {
+            float: right;
+            position: absolute;
+            top: 130px;
+            left: 750px;
+        }
+
+        .saisei {
+            font-size: 30px;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #actionUnder {
+            position: relative;
+            top: 232px;
+            left: 750px;
         }
     </style>
     <script type="text/javascript">
@@ -251,6 +326,9 @@
         var dragSoundSrc = "{% static 'audio/switch01.mp3' %}";
         var ifBreakSrc = "{% static 'img/if_brake.png' %}";
         var midDropSrc = "{% static 'img/midDrop.png' %}";
+        var whileStr2Src = "{% static 'img/whileStr2.png' %}";
+        var whileStr3Src = "{% static 'img/whileStr3.png' %}";
+        var whileStr4Src = "{% static 'img/whileStr4.png' %}";
 
         /**
          * サーバー側から送信されるデータを取得
@@ -267,6 +345,22 @@
 <body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
 <div id="wrapper">
     <h1>アルゴリズム学習用Webアプリ</h1>
+    <div id="upperTop">
+        <button id="helpBtn" class="button" onclick="OpenHelp()">操作方法</button>
+        <div id="helpWindow">
+            <h3>操作説明：</h3>
+            <p>コードボックス内のコードをドラッグして</br>エディター内にドロップするとプログラムを組む事ができます。</p>
+            <ul>
+                <li>左クリック：コードの値を変更する（例：繰り返し回数:2 → 3）</li>
+                <li>右クリック：コードボックスにコードを戻す</li>
+            </ul>
+            <button id="CloseBtn" class="button" onclick="CloseHelp()"><span class="batu">×</span></button>
+        </div>
+        <script type="text/javascript">
+            // ヘルプメッセージデフォルト非表示
+            document.getElementById("helpWindow").style.display = "none";
+        </script>
+    </div>
     <!-- codeSpace
     概要 :
             擬似コード,各種ボタン（移動予定）擬似プログラムエディターの配置をするdiv codeSpace
@@ -280,7 +374,6 @@
                  設定されている情報：ドラッグ可能 , 方向：下(Bottom) , 値：1 (条件文ではない)
      -->
     <div id="codeSpace">
-        <button id="helpBtn" class="helpBtn">困ったら</button>
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
             <input type="hidden" id="endWhile" data-d="e" data-n="0">
             <img src="{% static 'img/1foward.png' %}" id="forward_1" draggable="true"
@@ -313,30 +406,26 @@
             <img src="{% static 'img/if_brake.png' %}" class="arrows-wh" id="if_break" draggable="true" data-d="i"
                  data-n="1" ondragstart="f_dragstart(event)">
             -->
-            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While2" draggable="true" data-d="w"
+            <img src="{% static 'img/whileStr2.png' %}" class="arrows-wh" id="While2" onclick="whileImageOnClick(this)"
+                 draggable="true" data-d="w"
                  data-n="2" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/whileStrSample.png' %}" class="arrows-wh" id="While3" draggable="true" data-d="w"
+            <img src="{% static 'img/whileStr2.png' %}" class="arrows-wh" id="While3" onclick="whileImageOnClick(this)"
+                 draggable="true" data-d="w"
                  data-n="2" ondragstart="f_dragstart(event)">
+        </div>
+        <div id="buttons">
+            <button class="button resetBtn" onclick="resetImages()">リセット</button>
+            <button class="button" onclick="debug()">デバッグ表示</button>
         </div>
         <div id="spBack" class="sidePoint"></div>
         <div id="sidePoint" class="sidePoint"></div>
         <div id="bottomBack"></div>
         <div id="bottom" ondragover="f_dragover(event)" ondrop="f_drop(event)"
              onscroll="document.getElementById('bottomBack').scrollTop = this.scrollTop;"></div>
-        <div id="buttons">
-            <button class="button" onclick="resetImages()">リセット</button>
-            <button id="actionBtn" class="button" onclick="actionBtnOnClick()">実行</button>
-            <select id="characters" class="select" name="characters" onchange="changeCharacter()">
-                <option value="">キャラクター選択</option>
-                <option value="">れむりん</option>
-                <option value="">T26E4</option>
-                <option value="">勝君</option>
-                <option value="">茶熊</option>
-                <option value="">須永魚</option>
-                <option value="">若いEBT</option>
-            </select>
-            <button class="button" onclick="debug()">デバッグ表示</button>
-        </div>
+    </div>
+    <div id="actionSide">
+        <button id="actionBtn" class="button actionBtn" onclick="actionBtnOnClick()">実行<br/><span
+                class="saisei">▶</span></button>
     </div>
     <!-- actionSpace
         概要 :
@@ -348,6 +437,18 @@
         <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
         <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
     </div>
+    <div id="actionUnder">
+        <select id="characters" class="select" name="characters" onchange="changeCharacter()">
+            <option value="">キャラクター選択</option>
+            <option value="">れむりん</option>
+            <option value="">T26E4</option>
+            <option value="">勝君</option>
+            <option value="">茶熊</option>
+            <option value="">須永魚</option>
+            <option value="">若いEBT</option>
+        </select>
+    </div>
+    <script type="text/javascript" src="{% static 'js/click.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
 </div>

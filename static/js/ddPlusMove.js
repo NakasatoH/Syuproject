@@ -21,7 +21,7 @@ const moveNum = block_size;
 const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
-const elmAllSize = 37.22;
+const elmAllSize = 37.99;//36.22;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -534,9 +534,7 @@ function resetImages() {
         var drag_elm = document.getElementById(images[i]);
         // 画像に付与された余白を除去,初期化
         drag_elm.style.marginLeft = 0 + "px";
-        drag_elm.style.paddingTop = 1 + "px";
         drag_elm.style.paddingRight = 4 + "px";
-        drag_elm.style.paddingBottom = 1 + "px";
         // コードボックス内に移動
         upper_elm.appendChild(drag_elm);
     }
@@ -547,15 +545,6 @@ function resetImages() {
     console.log("ドロップされた画像、配列を初期化")
 }
 
-/**
- * window.onload
- * エディター上の画像がクリックされた場合コードボックスに画像を戻す
- *
- */
-window.onload = function () {
-    resetImage();
-    actionBtnOnClick();
-};
 /**
  * 複数回同時実行禁止！
  */
@@ -573,24 +562,49 @@ function actionBtnOnClick() {
  * resetImages() = div #bottom上すべてのエレメントを#upperに戻す
  * resetImage() = クリックされたエレメントのみ#upperに戻す
  */
+window.onload = function(){
+    resetImage();
+}();
 
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
-    bottom_elm.addEventListener("click", function (e) {
+    // 右クリック時に画像をupperに戻し、配列からターゲットを排除する
+    bottom_elm.addEventListener("contextmenu", function (e) {
+        // メニュ表示をしない
+        e.preventDefault();
         var target = e.target;
         console.log(target.localName);
-        if (target.localName !== ("img") && target.className != ("divCode"))
+        if (target.localName !== ("img") && target.className != ("divCode")){
             return;
+        }
+        console.log("wCnt: " + wCnt + " hMax : " + hMax);
         outputArray2(target.id);
         target.style.marginLeft = 0 + "px";
-        target.style.paddingTop = 1 + "px";
         target.style.paddingRight = 4 + "px";
-        target.style.paddingBottom = 1 + "px";
         upper_elm.appendChild(target);
-    })
+    },false);
 }
 
+/**
+ * while画像をクリックした際、繰り返し回数と画像を変更する処理
+ */
+function whileImageOnClick(e){
+    switch (e.getAttribute("data-n")){
+        case "2":
+            e.setAttribute("data-n", 3);
+            e.src = whileStr3Src;
+            break;
+        case "3":
+            e.setAttribute("data-n", 4);
+            e.src = whileStr4Src;
+            break;
+        case "4":
+            e.setAttribute("data-n", 2);
+            e.src = whileStr2Src;
+            break;
+    }
+}
 
 function outputArray2(id) {
     var e_index = 0;
@@ -635,9 +649,7 @@ function outputArray2(id) {
                 } else {//最後に挿入したコードがWhileの場合
                     document.getElementById(images[i]).style.marginTop = 0 + "px";
                     document.getElementById(images[i]).style.marginLeft = 0 + "px";
-                    document.getElementById(images[i]).style.paddingTop = 1 + "px";
                     document.getElementById(images[i]).style.paddingRight = 4 + "px";
-                    document.getElementById(images[i]).style.paddingBottom = 1 + "px";
                     document.getElementById("upper").appendChild(document.getElementById(images[i]));
                     images.splice(i, 1);
                     wCnt = wCnt - 1;
