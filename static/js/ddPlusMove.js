@@ -52,34 +52,6 @@ image1.onload = (function () {
 var dragSound = new Audio();
 dragSound.src = dragSoundSrc;
 
-// キャラクターを変更用メソッド
-function changeCharacter() {
-    var charElm = document.getElementById("characters");
-    ImageToCanvas(image1);// 画像を表示してからイメージ画像のsrcを変更することで不自然な挙動を解消
-    switch (charElm.selectedIndex) {
-        case 0:
-            break;
-        case 1:
-            this.image1.src = lemSrc;
-            break;
-        case 2:
-            this.image1.src = t26e5Src;
-            break;
-        case 3:
-            this.image1.src = masaruSrc;
-            break;
-        case 4:
-            this.image1.src = tyagumaSrc;
-            break;
-        case 5:
-            this.image1.src = sunagauoSrc;
-            break;
-        case 6:
-            this.image1.src = ebataSrc;
-            break;
-    }
-}
-
 /**---------------------------------------------------------------------
  * D＆D関係
  * ----------------------------------------------------------------------
@@ -241,9 +213,9 @@ function f_drop(event) {
             bwFlg = false;
             // while画像よりもx座標が +か -か判定して -の場合 whileのエンドマークをimages配列に挿入する
             /*
-            console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
-            console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
-            console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);*/
+             console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
+             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
+             console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);*/
         }
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
@@ -391,7 +363,7 @@ function f_drop(event) {
                             wCnt++;
                             console.log(wCnt);
                         }
-                    }else{
+                    } else {
                         wCnt--;
                         console.log(wCnt);
                     }
@@ -487,6 +459,7 @@ function ImageToCanvas(im, direction, num) {
         num = 1;
     }
     var n = parseInt(num);
+    n = 1;
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -550,11 +523,9 @@ function resetImages() {
  */
 function actionBtnOnClick() {
     var aBtn = document.getElementById("actionBtn");
-    aBtn.addEventListener("click", function () {
-        if (!runFlg && images.length > 0) {
-            action();
-        }
-    });
+    if (!runFlg && images.length > 0) {
+        action();
+    }
 }
 
 /**
@@ -562,7 +533,7 @@ function actionBtnOnClick() {
  * resetImages() = div #bottom上すべてのエレメントを#upperに戻す
  * resetImage() = クリックされたエレメントのみ#upperに戻す
  */
-window.onload = function(){
+window.onload = function () {
     resetImage();
 }();
 
@@ -575,7 +546,7 @@ function resetImage() {
         e.preventDefault();
         var target = e.target;
         console.log(target.localName);
-        if (target.localName !== ("img") && target.className != ("divCode")){
+        if (target.localName !== ("img") && target.className != ("divCode")) {
             return;
         }
         console.log("wCnt: " + wCnt + " hMax : " + hMax);
@@ -583,14 +554,14 @@ function resetImage() {
         target.style.marginLeft = 0 + "px";
         target.style.paddingRight = 4 + "px";
         upper_elm.appendChild(target);
-    },false);
+    }, false);
 }
 
 /**
  * while画像をクリックした際、繰り返し回数と画像を変更する処理
  */
-function whileImageOnClick(e){
-    switch (e.getAttribute("data-n")){
+function whileImageOnClick(e) {
+    switch (e.getAttribute("data-n")) {
         case "2":
             e.setAttribute("data-n", 3);
             e.src = whileStr3Src;
@@ -742,6 +713,8 @@ function action() {
         // debug();
     }
 
+    images = dNumControl(images);
+
     imagesLog();
     i = 0;// 初期化
     // 内側で宣言したactionを呼び出す
@@ -829,6 +802,7 @@ function action() {
             var itc = setInterval(function () {
                 if (cnt < moveNum) {// ブロックサイズ  = moveNUM
                     if (!blockFlg) {//前に壁が無い場合
+                        // 第三引数を強制的に 1に変更
                         ImageToCanvas(image1, data_d, data_n);
                     }
                 } else {
@@ -1009,6 +983,26 @@ function wBreakDown(index, wIdx, wNum) {
     }
     codeNums = fia2;
     return frontIsolateArray;
+}
+/**
+ * dNumControl()
+ * 処理概要：wBreakDownで解体されたwhileが格納されたimages配列内のdata-nに合わせて
+ * images配列を拡張
+ */
+function dNumControl(array) {
+    var num = 0;
+    var workArray = [];
+    debug();
+    for (var i = 0; i < array.length; i++) {
+        if (document.getElementById(array[i]).hasAttribute("data-n")) {
+            num = document.getElementById(array[i]).getAttribute("data-n");
+            for (var j = 0; j < num; j++) {
+                workArray[workArray.length] = array[i];
+            }
+        }
+    }
+    debug();
+    return workArray;
 }
 
 function debug() {
