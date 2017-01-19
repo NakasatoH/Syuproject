@@ -541,8 +541,8 @@ function outputArray2(id) {
     var e_index = 0;
     var old_len = images.length;
     var endWhileCnt = 0;
-    for(var i = 0;i < images.length; i++){
-        if(images[i] == "endWhile"){
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] == "endWhile") {
             endWhileCnt++;
         }
     }
@@ -562,7 +562,7 @@ function outputArray2(id) {
                             //while内のコードを全てインデント除去
                             if (images[j] != "endWhile") {
                                 document.getElementById(images[j]).style.marginLeft = 0 + "px";
-                               // hMax = hMax - elmAllSize;
+                                // hMax = hMax - elmAllSize;
                             }
                             // whileの終了地点を発見した場合　終了地点を e_indexに補完
                             if (t_wCnt <= 0) {
@@ -600,7 +600,7 @@ function outputArray2(id) {
                         if (images[i + 1] && images[i + 1] == "endWhile") {
                             // images[i-1]のエレメント(while画像)をupperに表示
                             document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
-                           // hMax = hMax - elmAllSize * 2;// images配列内のエレメントの合計heightから減算
+                            // hMax = hMax - elmAllSize * 2;// images配列内のエレメントの合計heightから減算
                             images.splice(i - 1, 3);
                         } else {
                             //hMax = hMax - elmAllSize;
@@ -666,20 +666,6 @@ function action() {
     if (firstFlg) {
         firstAction();
     }
-    for (i = 0; i < whileIndex.length; i++) {
-        /**
-         * 引数説明：　
-         *       引数１＝ while画像の要素番号を格納した配列のi番目
-         *       引数２は images配列のより後ろにあるwhileから見ていくため、今見ているWhileよりも後ろの位置にあるwhileの数を送る  例： w1 w2 w3 で　w2を解体している場合 whileは w3 一個のため 引数2 = 1になる
-         *       引数３は引数１に対応したwhileのエレメントが持つ繰り返し回数のデータ
-         */
-        // whileマークが検出された場合配列を解体し、作り直す
-        console.log(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
-        images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i]);
-    }
-    images = dNumControl(images);
-    imagesLog();
-    i = 0;// 初期化
     // 内側で宣言したactionを呼び出す
     action2();
     /**
@@ -693,6 +679,7 @@ function action() {
      */
     function action2() {
         // 移動量データが存在するなら
+        console.log("なにこれ i : " + i);
         id = images[i];
         drop_elm = document.getElementById(id);
         // 実行中コード可視化用関数sidePoint
@@ -786,6 +773,9 @@ function action() {
                          * 処理終了後　images配列を画面上の見た目通りに戻す
                          */
                         images = bkImages;
+                        for (i = 0; i < bkCodeNums.length; i++) {
+                            console.log("bkCN : " + bkCodeNums[i]);
+                        }
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
                         document.getElementById("sidePoint").style.backgroundPositionY = 33;
@@ -794,9 +784,9 @@ function action() {
                         }
                         goalFlg = false;
                         runFlg = false;
+                        sidePoint(0);
                     }
                     clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
-                    sidePoint(0);
                 }
                 cnt++;
             }, 10);
@@ -823,7 +813,6 @@ function action() {
                         runFlg = false;
                     }
                 }, 280);
-
                 i++;
             })();
         }
@@ -837,30 +826,44 @@ function action() {
      * codeNums配列にコード番号を挿入する
      */
     function firstAction() {
+
+        /**
+         * 見た目上の行番号をimages配列と同じ大きさのcodeNums配列に格納
+         * 例： f1 w2 east f1 end f1   →        images: f1 east f1 east f1 f1
+         *         0  1   2     3    3   4    →  codeNums : 0    2    3    2   3  4
+         */
+        var eCnt = 0;
+        for (i = 0; i < images.length; i++) {
+            if (images[i] == "endWhile") {
+                eCnt++;
+            }
+            codeNums[codeNums.length] = i - eCnt;
+        }
         // 最後に見た目通りの配列に戻すためのバックアップを生成;
         bkImages = images;
         bkWCnt = wCnt;
+        bkCodeNums = codeNums;
         var endCnt = 0;
         var codeCnt = 0;
-        for (i = 0; i < images.length; i++) {
-            if (images[i] == "endWhile") {
-                endCnt++;
-                codeCnt--;
-                codeNums[i] = codeCnt;
-            } else {
-                codeNums[i] = codeCnt;
-            }
-            codeCnt++;
-        }
-        if (wCnt - endCnt > 0) {
-            for (i = wCnt; i < endCnt; i++) {
-                console.log("wCnt , endCnt; エンドマーク挿入" + wCnt + "" + endCnt);
-                images[images.length] = "endWhile";
-                codeNums[codeNums.length] = codeNums[codeNums.length - 1];
-            }
-        }
         firstFlg = false;
-        bkCodeNums = codeNums;
+        console.log(codeNums);
+        for (i = 0; i < whileIndex.length; i++) {
+            /**
+             * 引数説明：　
+             *       引数１＝ while画像の要素番号を格納した配列のi番目
+             *       引数２は images配列のより後ろにあるwhileから見ていくため、今見ているWhileよりも後ろの位置にあるwhileの数を送る  例： w1 w2 w3 で　w2を解体している場合 whileは w3 一個のため 引数2 = 1になる
+             *       引数３は引数１に対応したwhileのエレメントが持つ繰り返し回数のデータ
+             */
+            // whileマークが検出された場合配列を解体し、作り直す
+            images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i]);
+        }
+        for (i = 0; i < codeNums.length; i++) {
+            console.log("codeNums[" + i + "] : " + codeNums[i]);
+
+        }
+        images = dNumControl(images);
+        imagesLog();
+        i = 0;// 初期化
     }
 }
 
@@ -1007,6 +1010,7 @@ function debug() {
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
     sideElm.style.backgroundPositionY = 33 + codeNums[index] * codeSize + "px";
+    console.log("codeNum[" + index + "]" + codeNums[index] + " , posiY : " + sideElm.style.backgroundPositionY);
 }
 
 /**
