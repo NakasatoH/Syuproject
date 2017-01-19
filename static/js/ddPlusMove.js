@@ -21,6 +21,7 @@ const moveNum = block_size;
 const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
+const elmAllSize = 37.99;//36.22;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -106,9 +107,10 @@ function f_dragover(event) {
     var lastCodeRect;
     var lastCodePosition = 0;// 最後に挿入したコードのy座標 + elmのheight
     var t_wCnt = wCnt;
-    x = event.clientX - rect.left;
-    y = event.clientY - rect.top;
-    console.log("y :" + y);
+    x = window.scrollX + event.clientX - rect.left;
+    y = window.pageYOffset + event.clientY - rect.top;
+    console.log("winSc : " + window.pageYOffset);
+    //console.log("y :" + y + " x :" + x);
     if (images[images.length - 1]) {
         lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
         lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height;
@@ -169,13 +171,13 @@ function f_dragover(event) {
             side_elm.style.backgroundImage = "none";
             side_elm.style.backgroundImage = 'url(' + midDropSrc + ')';
             // 最後のコードでサイドバーの目印を停止させる場合
-            side_elm.style.backgroundPositionY = y - 10 + "px";
+            // side_elm.style.backgroundPositionY = y - 10 + "px";
         }
         shadowFlg = true;
     }
 
     // 最後のコードでサイドバーの目印を止めない
-    // side_elm.style.backgroundPositionY = y - 10 + "px";
+    side_elm.style.backgroundPositionY = y - 10 + "px";
     // dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
     event.preventDefault();
 }
@@ -202,8 +204,9 @@ function f_drop(event) {
 
     var bwFlg = false;// div bottom から bottom へwhile画像を繰り返しドロップすることで起こる不正な挙動を防ぐフラグ
 
-    var x = event.clientX - rect.left;// ドロップ位置情報
-    var y = event.clientY - rect.top;
+    var x = window.scrollX + event.clientX - rect.left;// ドロップ位置情報
+
+    var y = window.pageYOffset + event.clientY - rect.top;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
     y = Math.floor(y);
 
@@ -233,13 +236,14 @@ function f_drop(event) {
                     while_x = Math.floor((wCnt - 1) * indent + wWidthSize);
                 }
                 dragSound.play();// ドロップ時に効果音を再生
-                currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
+                // currentTarget.appendChild(drag_elm);// ドロップ先にドラッグされた要素を追加をする
             }
             bwFlg = false;
             // while画像よりもx座標が +か -か判定して -の場合 whileのエンドマークをimages配列に挿入する
+            /*
             console.log("画像ファイル : " + image1.src + ", 方向 : " + data_d + ", 数値 : " + data_n);
             console.log("ドロップ先     タグ名 : " + currentTarget.tagName + ", ID名 : " + currentTarget.id);
-            console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);
+            console.log("追加する要素   タグ名 : " + drag_elm.tagName + ", ID名 : " + drag_elm.id);*/
         }
         //imagesLog();
         event.preventDefault();// エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
@@ -258,7 +262,7 @@ function f_drop(event) {
         var bkImages = images;
         if (images[images.length - 1]) {
             lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
-            lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height;
+            lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height + window.pageYOffset;
         }
 
         for (var i = 0; i < images.length; i++) {
@@ -275,8 +279,11 @@ function f_drop(event) {
          * 処理概要
          * ドロップ時のy座標を判別して、
          * その値に応じてコードを挿入する
+         * whileは今回は途中挿入させない
          */
-        if (lastCodePosition == 0 || lastCodePosition < y) {
+        if (lastCodePosition == 0 || lastCodePosition < y || document.getElementById(id).getAttribute("data-d") == "w") {
+
+            console.log("lastCP : " + lastCodePosition);
             // wCnt = 終了していないwhileの数  , images[images.length -2] が存在する = whileを終了するか選べる状態にある
             if (wCnt > 0 && x <= while_x && images[images.length - 2]) {
                 // 一つ前のドロップがwhileの場合繰り返し終了マークを挿入しない
@@ -296,37 +303,103 @@ function f_drop(event) {
                 drag_elm.style.marginLeft = l_margin + 'px';
             }
             document.getElementById(id).setAttribute("data-m", wCnt);//indent dataを挿入
-            images[images.length] = id;// idを挿入
             console.log("data-m : " + document.getElementById(id).getAttribute("data-m"));
             if (drag_elm.localName === "img") {
                 elmHeight = drag_elm.height;
             } else {
                 elmHeight = 30;
             }
-            hMax = hMax + elmHeight + 4;
-        } else {// 最初のコード、または最後のコードではない場合
-            var initVal = y - 52;
+            hMax = hMax + elmAllSize;
+
+            images[images.length] = id;// idを挿入
+            currentTarget.appendChild(document.getElementById(id));// エレメントをbottomに挿入
+        } else {// 最初のコード、または最後のコードではない && whileではない
+            var initVal = y - 10.6;
+            console.log("-------- pointS --------" + initVal);
             if (initVal < 0) {
                 // images[0]に挿入
-                for (i = images.length - 1; i > 0; i--) {
+                for (i = images.length - 1; i >= 0; i--) {
                     images[i + 1] = images[i];
                 }
                 images[0] = id;
-            } else {
-                // ドロップ地点のコードまでのwCntを数える必要がある
+
+                // 再配置
+                hMax = 32;
+                relocation(0);// upperに戻す処理 引数は最初にupperに戻すimages配列のindex
+                for (i = 0; i < images.length; i++) {
+                    if (images[i] != "endWhile") {
+                        currentTarget.appendChild(document.getElementById(images[i]));
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+                        hMax = hMax + elmAllSize;
+                    }
+                }
+            } else {// コード間に挿入された場合
                 var midWCnt = 0;
-                var yPoint = Math.floor(initVal / 38);
+                var yPoint = Math.floor(initVal / 37.22);
+                // images[yPoint]に挿入
+
+                // endWhile対策
+                while (images[yPoint - 1] == "endWhile") {
+                    yPoint = yPoint - 1;
+                }
+                for (i = images.length - 1; i >= yPoint; i--) {
+                    images[i + 1] = images[i];
+                    if (images[i] != "endWhile") {
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+
+                        hMax = hMax - elmAllSize;
+                    }
+                }
+                images[yPoint] = id;
+
                 for (i = 0; i < yPoint; i++) {
-                    if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
-                        midWCnt++;
-                    } else if (document.getElementById(images[i]) == "endWhile") {
-                        midWCnt--;
+                    if (document.getElementById(images[i]).hasAttribute("data-d") &&
+                        document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                        midWCnt = midWCnt + 1;
+                    } else if (images[i] == "endWhile") {
+                        midWCnt = midWCnt - 1;
+                    }
+                }
+                relocation(yPoint);
+                wCnt = midWCnt;
+                /**
+                 * 実装予定
+                 * ここに　wCntが1以上の場合 x軸ごとに
+                 */
+
+
+                // 再配置
+                for (i = yPoint; i < images.length; i++) {
+                    if (images[i] != "endWhile") {
+                        document.getElementById(images[i]).style.marginLeft = wCnt * indent + "px";
+                        currentTarget.appendChild(document.getElementById(images[i]));
+                        if (document.getElementById(images[i]).localName === "img") {
+                            elmHeight = drag_elm.height;
+                        } else {
+                            elmHeight = 25;
+                        }
+                        hMax = hMax + elmAllSize;
+                        if (document.getElementById(images[i]).getAttribute("data-d") == "w") {
+                            wCnt++;
+                            console.log(wCnt);
+                        }
+                    }else{
+                        wCnt--;
+                        console.log(wCnt);
                     }
                 }
             }
-        }
 
-        //途中挿入の場合
+        }
+        //途中挿入の場合（while以外）
     }
 
     // div#bottom から div#upperに戻したときに配列を詰める関数
@@ -383,10 +456,21 @@ function f_drop(event) {
     }
 }// function f_drop(event) End
 
-// 表示用関数
+// 表示用メソッド
 function imagesLog() {
     for (var i = 0; i < images.length; i++) {
         console.log("images配列[" + i + "] : " + images[i]);
+    }
+}
+
+// 全ての値の初期化は行わずにエレメントだけupperに戻す　再配置用メソッド
+function relocation(firstIndex) {
+    for (var i = firstIndex; i < images.length; i++) {
+        if (document.getElementById(images[i]) != "endWhile") {
+            document.getElementById(images[i]).style.marginTop = 0 + "px";
+            document.getElementById(images[i]).style.marginLeft = 0 + "px";
+            document.getElementById("upper").appendChild(document.getElementById(images[i]));
+        }
     }
 }
 
@@ -448,8 +532,9 @@ function resetImages() {
     var upper_elm = document.getElementById("upper");
     for (var i = 0; i < images.length; i++) {
         var drag_elm = document.getElementById(images[i]);
-        // 画像に付与された余白を除去
+        // 画像に付与された余白を除去,初期化
         drag_elm.style.marginLeft = 0 + "px";
+        drag_elm.style.paddingRight = 4 + "px";
         // コードボックス内に移動
         upper_elm.appendChild(drag_elm);
     }
@@ -461,15 +546,6 @@ function resetImages() {
 }
 
 /**
- * window.onload
- * エディター上の画像がクリックされた場合コードボックスに画像を戻す
- *
- */
-window.onload = function () {
-    resetImage();
-    actionBtnOnClick();
-};
-/**
  * 複数回同時実行禁止！
  */
 function actionBtnOnClick() {
@@ -478,7 +554,7 @@ function actionBtnOnClick() {
         if (!runFlg && images.length > 0) {
             action();
         }
-    })
+    });
 }
 
 /**
@@ -486,19 +562,49 @@ function actionBtnOnClick() {
  * resetImages() = div #bottom上すべてのエレメントを#upperに戻す
  * resetImage() = クリックされたエレメントのみ#upperに戻す
  */
+window.onload = function(){
+    resetImage();
+}();
+
 function resetImage() {
     var upper_elm = document.getElementById("upper");
     var bottom_elm = document.getElementById("bottom");
-    bottom_elm.addEventListener("click", function (e) {
+    // 右クリック時に画像をupperに戻し、配列からターゲットを排除する
+    bottom_elm.addEventListener("contextmenu", function (e) {
+        // メニュ表示をしない
+        e.preventDefault();
         var target = e.target;
         console.log(target.localName);
-        if (target.localName !== ("img") && target.className != ("divCode"))
+        if (target.localName !== ("img") && target.className != ("divCode")){
             return;
+        }
+        console.log("wCnt: " + wCnt + " hMax : " + hMax);
         outputArray2(target.id);
+        target.style.marginLeft = 0 + "px";
+        target.style.paddingRight = 4 + "px";
         upper_elm.appendChild(target);
-    })
+    },false);
 }
 
+/**
+ * while画像をクリックした際、繰り返し回数と画像を変更する処理
+ */
+function whileImageOnClick(e){
+    switch (e.getAttribute("data-n")){
+        case "2":
+            e.setAttribute("data-n", 3);
+            e.src = whileStr3Src;
+            break;
+        case "3":
+            e.setAttribute("data-n", 4);
+            e.src = whileStr4Src;
+            break;
+        case "4":
+            e.setAttribute("data-n", 2);
+            e.src = whileStr2Src;
+            break;
+    }
+}
 
 function outputArray2(id) {
     var e_index = 0;
@@ -518,7 +624,7 @@ function outputArray2(id) {
                             //while内のコードを全てインデント除去
                             if (document.getElementById(images[j]) != "endWhile") {
                                 document.getElementById(images[j]).style.marginLeft = 0 + "px";
-                                hMax = hMax - document.getElementById(images[i]).height - 4;
+                                hMax = hMax - elmAllSize;
                             }
                             // whileの終了地点を発見した場合　終了地点を e_indexに補完
                             if (t_wCnt <= 0) {
@@ -530,51 +636,49 @@ function outputArray2(id) {
                         if (e_index == 0) {
                             e_index = images.length - 1;
                             wCnt = wCnt - t_wCnt;
-                            hMax = hMax - document.getElementById(images[i]).height - 4;
+                            hMax = hMax - elmAllSize;
                             t_wCnt = 0;
                         }
                     }
                     for (j = i; j < e_index + 1; j++) {
                         if (document.getElementById(images[j]) != "endWhile") {
-                            console.log("images[" + j + "] : " + images[j]);
                             document.getElementById("upper").appendChild(document.getElementById(images[j]));
                         }
                     }
                     images.splice(i, e_index - i + 1);
-                    console.log("images[i-1]" + hMax);
                 } else {//最後に挿入したコードがWhileの場合
+                    document.getElementById(images[i]).style.marginTop = 0 + "px";
+                    document.getElementById(images[i]).style.marginLeft = 0 + "px";
+                    document.getElementById(images[i]).style.paddingRight = 4 + "px";
                     document.getElementById("upper").appendChild(document.getElementById(images[i]));
                     images.splice(i, 1);
                     wCnt = wCnt - 1;
-                    hMax = hMax - document.getElementById(images[i]).height - 4;
+                    hMax = hMax - elmAllSize;
                 }
             } else {
                 if (images[i - 1]) {
                     if (document.getElementById(images[i - 1]).getAttribute("data-d") == "w") {
-                        // iの一つ後が存在していて かつWhileであるなら
+                        // iの一つ後ろが存在していて かつWhileであるなら
                         if (images[i + 1] && images[i + 1] == "endWhile") {
                             // images[i-1]のエレメント(while画像)をupperに表示
                             document.getElementById("upper").appendChild(document.getElementById(images[i - 1]));
-                            hMax = hMax - (document.getElementById(images[i - 1]).height + document.getElementById(images[i]).height + 4);// images配列内のエレメントの合計heightから減算
+                            hMax = hMax - elmAllSize * 2;// images配列内のエレメントの合計heightから減算
                             images.splice(i - 1, 3);
                         } else {
-                            console.log("ここ１" + hMax + "documentByIDImage[i].height : " + document.getElementById(images[i]).height);
-                            hMax = hMax - document.getElementById(images[i]).height - 4;
-                            console.log("ここ２" + hMax);
+                            hMax = hMax - elmAllSize;
                             images.splice(i, 1)
                         }
-                        console.log("前がwhile後がendWhile インデントは " + indent + " : wcnt : " + wCnt);
                     } else if (images[i - 1] == "endWhile" && !images[i + 1]) {
                         //一つ前がendWhile　かつ １つ後が存在しないなら
-                        hMax = hMax - document.getElementById(images[i]).height - 4;
+                        hMax = hMax - elmAllSize;
                         images.splice(i - 1, 2);
                         wCnt++;
                     } else {
-                        hMax = hMax - document.getElementById(images[i]).height - 4;
+                        hMax = hMax - elmAllSize;
                         images.splice(i, 1);
                     }
                 } else {
-                    hMax = hMax - document.getElementById(images[i]).height - 4;
+                    hMax = hMax - elmAllSize;
                     images.splice(i, 1);
                 }
             }
@@ -744,7 +848,7 @@ function action() {
                         images = bkImages;
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
-                        document.getElementById("sidePoint").style.backgroundPositionY = 35;
+                        document.getElementById("sidePoint").style.backgroundPositionY = 33;
                         if (goalFlg) {
                             alert("ゴール！");
                         }
@@ -906,6 +1010,7 @@ function wBreakDown(index, wIdx, wNum) {
     codeNums = fia2;
     return frontIsolateArray;
 }
+
 function debug() {
     console.table(map);
     console.log("wCnt:" + wCnt);
@@ -931,5 +1036,5 @@ function debug() {
  */
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
-    sideElm.style.backgroundPositionY = 35 + codeNums[index] * codeSize + "px";
+    sideElm.style.backgroundPositionY = 33 + codeNums[index] * codeSize + "px";
 }
