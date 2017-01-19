@@ -330,6 +330,12 @@
         var whileStr2Src = "{% static 'img/whileStr2.png' %}";
         var whileStr3Src = "{% static 'img/whileStr3.png' %}";
         var whileStr4Src = "{% static 'img/whileStr4.png' %}";
+        var forward1Src = "{% static 'img/forward1.png' %}";
+        var forward2Src = "{% static 'img/forward2.png' %}";
+        var forward3Src = "{% static 'img/forward3.png' %}";
+        var forward4Src = "{% static 'img/forward4.png' %}";
+
+
 
         /**
          * サーバー側から送信されるデータを取得
@@ -377,11 +383,11 @@
     <div id="codeSpace">
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
             <input type="hidden" id="endWhile" data-d="e" data-n="0">
-            <img src="{% static 'img/1foward.png' %}" id="forward_1" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_1" onclick="forwardImageOnClick(this)" draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/1foward.png' %}" id="forward_2" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_2" onclick="forwardImageOnClick(this)" draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/1foward.png' %}" id="forward_3" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_3" onclick="forwardImageOnClick(this)" draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/turnNorth.png' %}" id="turn_n" draggable="true" data-d="t"
                  ondragstart="f_dragstart(event)">
@@ -450,8 +456,8 @@
         </select>
     </div>
     <script type="text/javascript" src="{% static 'js/click.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
 </div>
 </body>
 </html>

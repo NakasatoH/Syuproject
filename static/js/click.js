@@ -77,3 +77,27 @@ function whileImageOnClick(e) {
             break;
     }
 }
+
+/**
+ * 前に進む画像をクリックした際、移動距離と画像を変更する処理
+ */
+function forwardImageOnClick(e) {
+    switch (e.getAttribute("data-n")) {
+        case "1":
+            e.setAttribute("data-n", 2);
+            e.src = forward2Src;
+            break;
+        case "2":
+            e.setAttribute("data-n", 3);
+            e.src = forward3Src;
+            break;
+        case "3":
+            e.setAttribute("data-n", 4);
+            e.src = forward4Src;
+            break;
+        case "4":
+            e.setAttribute("data-n", 1);
+            e.src = forward1Src;
+            break;
+    }
+}

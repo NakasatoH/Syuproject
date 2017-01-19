@@ -21,12 +21,11 @@ const moveNum = block_size;
 const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
-const elmAllSize = 37.99;//36.22;
+const elmAllSize = 37;//36.22;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
 bottomDiv.style.zIndex = 1;
-
 
 // 画像オブジェクト生成
 var image1 = new Image();
@@ -201,6 +200,7 @@ function f_drop(event) {
             }
             if (!bwFlg) {
                 inputArray(id_name);// bottomにドロップした画像のIDをimages配列に格納
+                imagesCheck();
                 // while画像がドロップされた場合 while回数を数える変数 wCnt を加算する
                 if (data_d == "w") {
                     wCnt++;
@@ -653,10 +653,6 @@ function action() {
             //console.log("data-d : w 検出 : while開始");
         }
     }
-
-    // 最後に見た目通りの配列に戻すためのバックアップを生成;
-    bkImages = images;
-    bkWCnt = wCnt;
     // whileを解体して"w"と"e"マークの無い配列を生成、代入
     if (firstFlg) {
         firstAction();
@@ -669,12 +665,10 @@ function action() {
          *       引数３は引数１に対応したwhileのエレメントが持つ繰り返し回数のデータ
          */
         // whileマークが検出された場合配列を解体し、作り直す
-        images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
-        // debug();
+        console.log(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i], whileIndex.length);
+        images = wBreakDown(whileIndex[i], whileIndex.length - (whileIndex.length - i), wNum[i]);
     }
-
     images = dNumControl(images);
-
     imagesLog();
     i = 0;// 初期化
     // 内側で宣言したactionを呼び出す
@@ -689,9 +683,8 @@ function action() {
      *   　　　 全ての画像を順番に動かす。
      */
     function action2() {
-        //console.log("----------SecondAction--------------");
         // 移動量データが存在するなら
-        //console.log("i : " + i);
+        console.log("i : " + i);
         id = images[i];
         drop_elm = document.getElementById(id);
         // 実行中コード可視化用関数sidePoint
@@ -764,6 +757,8 @@ function action() {
                     if (!blockFlg) {//前に壁が無い場合
                         // 第三引数を強制的に 1に変更
                         ImageToCanvas(image1, data_d, data_n);
+                    }else{
+                        //音でも鳴らす？
                     }
                 } else {
                     i++;
@@ -778,7 +773,10 @@ function action() {
                          *  また、else内ではなく、clearInterval()の上に 配列のバックアップbkImagesをimagesに上書きする処理を書いた場合も
                          *  不自然な動作になる。
                          */
-                        // 処理終了後　images配列を画面上の見た目通りに戻す
+                        /**
+                         * Action2();終了地点②
+                         * 処理終了後　images配列を画面上の見た目通りに戻す
+                         */
                         images = bkImages;
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
@@ -790,6 +788,7 @@ function action() {
                         runFlg = false;
                     }
                     clearInterval(itc);// images配列内の全ての画像データを処理し終えた場合interval停止
+                    sidePoint(0);
                 }
                 cnt++;
             }, 10);
@@ -800,12 +799,24 @@ function action() {
                     // 移動量データが存在しないなら 方向データを保存
                     old_d = drop_elm.getAttribute("data-d");
                     // console.log(old_d);
-                    i++;
                     if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
                         blockFlg = false;
                         action2();// 再帰
+                    } else {
+                        /**
+                         * Action2();終了地点②
+                         * 処理終了後　images配列を画面上の見た目通りに戻す
+                         */
+                        images = bkImages;
+                        codeNums = bkCodeNums;
+                        wCnt = bkWCnt;
+                        document.getElementById("sidePoint").style.backgroundPositionY = 33;
+                        goalFlg = false;
+                        runFlg = false;
                     }
-                }, 180);
+                }, 280);
+
+                i++;
             })();
         }
     }// action2() END
@@ -818,6 +829,9 @@ function action() {
      * codeNums配列にコード番号を挿入する
      */
     function firstAction() {
+        // 最後に見た目通りの配列に戻すためのバックアップを生成;
+        bkImages = images;
+        bkWCnt = wCnt;
         var endCnt = 0;
         var codeCnt = 0;
         for (i = 0; i < images.length; i++) {
@@ -837,7 +851,6 @@ function action() {
                 codeNums[codeNums.length] = codeNums[codeNums.length - 1];
             }
         }
-        imagesLog();
         firstFlg = false;
         bkCodeNums = codeNums;
     }
@@ -888,6 +901,7 @@ function wBreakDown(index, wIdx, wNum) {
     var wa2 = [];
     var fia2 = [];
     var bia2 = [];
+
     // 繰り返される処理をworkArray配列に格納
     for (var i = index + 1; i < images.length; i++) {
         if (images[i] == "endWhile") {
@@ -933,13 +947,7 @@ function wBreakDown(index, wIdx, wNum) {
     for (i = 0; i < backIsolateArray.length; i++) {
         frontIsolateArray[index + cnt + i] = backIsolateArray[i];
         fia2[index + cnt + i] = bia2[i];
-        console.log(frontIsolateArray[index + cnt + i]);
-    }
-
-    // images配列中身確認
-    //console.log("-------------");
-    for (var x = 0; x < images.length; x++) {
-        console.log(x + "images[" + x + "] : " + images[x]);
+        console.log("frondIso :" + frontIsolateArray[index + cnt + i]);
     }
     codeNums = fia2;
     return frontIsolateArray;
@@ -952,16 +960,16 @@ function wBreakDown(index, wIdx, wNum) {
 function dNumControl(array) {
     var num = 0;
     var workArray = [];
-    debug();
     for (var i = 0; i < array.length; i++) {
         if (document.getElementById(array[i]).hasAttribute("data-n")) {
             num = document.getElementById(array[i]).getAttribute("data-n");
             for (var j = 0; j < num; j++) {
                 workArray[workArray.length] = array[i];
             }
+        } else {
+            workArray[workArray.length] = array[i];
         }
     }
-    debug();
     return workArray;
 }
 
@@ -991,4 +999,17 @@ function debug() {
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
     sideElm.style.backgroundPositionY = 33 + codeNums[index] * codeSize + "px";
+}
+
+/**
+ * images配列にundefindが意図せず挿入されてしまう不具合の対策
+ */
+function imagesCheck() {
+    var workArray = [];
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] != undefined) {
+            workArray[workArray.length] = images[i];
+        }
+    }
+    images = workArray;
 }
