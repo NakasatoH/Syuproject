@@ -69,6 +69,7 @@ function f_dragstart(event) {
     }
     console.log(target_src);
     imagesCheck();
+    shadowCheck();
 }
 
 // ドラッグ要素がドロップ要素に重なっている間の処理
@@ -79,8 +80,12 @@ function f_dragover(event) {
     var lastCodeRect;
     var lastCodePosition = 0;// 最後に挿入したコードのy座標 + elmのheight
     var t_wCnt = wCnt;
-    x = window.pageXOffset + event.clientX - rect.left;
-    y = window.pageYOffset + event.clientY - rect.top;
+    // スクロール量どちらかを取得 躓きポイント
+    var root = document.documentElement;
+    var scrollY  = window.pageYOffset || root.scrollTop;
+    var scrollX  = window.pageXOffset || root.scrollLeft;
+    x = scrollX + event.clientX - rect.left;
+    y = scrollY + event.clientY - rect.top;
     console.log("winSc : " + window.pageYOffset);
     //console.log("y :" + y + " x :" + x);
     if (images[images.length - 1]) {
@@ -175,10 +180,13 @@ function f_drop(event) {
     var data_n = drag_elm.getAttribute("data-n");// 移動量
 
     var bwFlg = false;// div bottom から bottom へwhile画像を繰り返しドロップすることで起こる不正な挙動を防ぐフラグ
-
-    var x = window.pageXOffset + event.clientX - rect.left;// ドロップ位置情報
-
-    var y = window.pageYOffset + event.clientY - rect.top;
+    // 読み取り専用　htmlを取得
+    var root = document.documentElement;
+    // スクロール量どちらかtrueの方を取得
+    var scrollY  = window.pageYOffset || root.scrollTop;
+    var scrollX  = window.pageXOffset || root.scrollLeft;
+    var x = scrollX + event.clientX - rect.left;
+    var y = scrollY + event.clientY - rect.top;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
     y = Math.floor(y);
 
@@ -296,7 +304,7 @@ function f_drop(event) {
                 images[0] = id;
 
                 // 再配置
-                hMax = 32;
+                hMax = 33;
                 relocation(0);// upperに戻す処理 引数は最初にupperに戻すimages配列のindex
                 for (i = 0; i < images.length; i++) {
                     if (images[i] != "endWhile") {
@@ -497,26 +505,7 @@ function ImageToCanvas(im, direction, num) {
     ctx.translate(-1 * dx, -1 * dy);
 }
 
-/**-------------------------------------------------------
- * ドロップされたIMG群を全て元の位置に戻す処理
- * -------------------------------------------------------
- */
-function resetImages() {
-    var upper_elm = document.getElementById("upper");
-    for (var i = 0; i < images.length; i++) {
-        var drag_elm = document.getElementById(images[i]);
-        // 画像に付与された余白を除去,初期化
-        drag_elm.style.marginLeft = 0 + "px";
-        drag_elm.style.paddingRight = 4 + "px";
-        // コードボックス内に移動
-        upper_elm.appendChild(drag_elm);
-    }
-    // 配列の長さを0にすることで配列を初期化（全要素を削除）
-    images.length = 0;
-    wCnt = 0;
-    hMax = 32;
-    console.log("ドロップされた画像、配列を初期化")
-}
+
 
 /**
  * 複数回同時実行禁止！
@@ -645,6 +634,7 @@ function action() {
     var bkWCnt = 0;// 処理終了後wCnt を元の数に戻す
     var data_d;// 方向
     var old_d = "t";// 保持している過去のdata_d
+    var bkHMax = hMax; //バグ対策 hMax保持
     var data_n;// 移動量
     var drop_elm;// ドロップ済みエレメント
     var w_elm;// whileデータ持ちエレメント
@@ -773,11 +763,9 @@ function action() {
                          * 処理終了後　images配列を画面上の見た目通りに戻す
                          */
                         images = bkImages;
-                        for (i = 0; i < bkCodeNums.length; i++) {
-                            console.log("bkCN : " + bkCodeNums[i]);
-                        }
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
+                        hMax = bkHMax;
                         document.getElementById("sidePoint").style.backgroundPositionY = 33;
                         if (goalFlg) {
                             alert("ゴール！");
@@ -808,6 +796,7 @@ function action() {
                         images = bkImages;
                         codeNums = bkCodeNums;
                         wCnt = bkWCnt;
+                        hMax = bkHMax;
                         document.getElementById("sidePoint").style.backgroundPositionY = 33;
                         goalFlg = false;
                         runFlg = false;
@@ -832,6 +821,8 @@ function action() {
          * 例： f1 w2 east f1 end f1   →        images: f1 east f1 east f1 f1
          *         0  1   2     3    3   4    →  codeNums : 0    2    3    2   3  4
          */
+        codeNums = [];//初期化
+        console.log("codeNums初期化");
         var eCnt = 0;
         for (i = 0; i < images.length; i++) {
             if (images[i] == "endWhile") {
@@ -845,7 +836,6 @@ function action() {
         bkCodeNums = codeNums;
         var endCnt = 0;
         var codeCnt = 0;
-        firstFlg = false;
         console.log(codeNums);
         for (i = 0; i < whileIndex.length; i++) {
             /**
@@ -864,6 +854,7 @@ function action() {
         images = dNumControl(images);
         imagesLog();
         i = 0;// 初期化
+        firstFlg = false;
     }
 }
 
@@ -1024,4 +1015,14 @@ function imagesCheck() {
         }
     }
     images = workArray;
+}
+
+/**
+ * whileを複数使用時hMAXの値が不正になってしまう不具合の対策
+ */
+function  shadowCheck() {
+    var num = (hMax - 33) / elmAllSize;
+    if(images.length < num ){
+        hMax = 33 + images.length * elmAllSize;
+    }
 }

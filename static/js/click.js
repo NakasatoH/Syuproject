@@ -52,7 +52,8 @@ function resetImage() {
         console.log("wCnt: " + wCnt + " hMax : " + hMax);
         outputArray2(target.id);
         target.style.marginLeft = 0 + "px";
-        target.style.paddingRight = 4 + "px";
+        target.style.paddingRight = 0 + "px";
+        target.style.width = 280 + "px";
         upper_elm.appendChild(target);
     }, false);
 }
@@ -100,4 +101,26 @@ function forwardImageOnClick(e) {
             e.src = forward1Src;
             break;
     }
+}
+
+/**-------------------------------------------------------
+ * ドロップされたIMG群を全て元の位置に戻す処理
+ * -------------------------------------------------------
+ */
+function resetImages() {
+    var upper_elm = document.getElementById("upper");
+    for (var i = 0; i < images.length; i++) {
+        var drag_elm = document.getElementById(images[i]);
+        // 画像に付与された余白を除去,初期化
+        drag_elm.style.marginLeft = 0 + "px";
+        drag_elm.style.paddingRight = 0 + "px";
+        drag_elm.style.width = 280 + "px";
+        // コードボックス内に移動
+        upper_elm.appendChild(drag_elm);
+    }
+    // 配列の長さを0にすることで配列を初期化（全要素を削除）
+    images.length = 0;
+    wCnt = 0;
+    hMax = 32;
+    console.log("ドロップされた画像、配列を初期化")
 }
