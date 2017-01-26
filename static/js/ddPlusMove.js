@@ -22,6 +22,9 @@ const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
 const elmAllSize = 37;//36.22;
+var root = document.documentElement;
+const startScrollY = window.pageYOffset || root.scrollTop;
+const startScrollX = window.pageXOffset || root.scrollLeft;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
 // 影バグ対策　コメント調整
@@ -81,11 +84,11 @@ function f_dragover(event) {
     var lastCodePosition = 0;// 最後に挿入したコードのy座標 + elmのheight
     var t_wCnt = wCnt;
     // スクロール量どちらかを取得 躓きポイント
-    var root = document.documentElement;
-    var scrollY  = window.pageYOffset || root.scrollTop;
-    var scrollX  = window.pageXOffset || root.scrollLeft;
-    x = scrollX + event.clientX - rect.left;
-    y = scrollY + event.clientY - rect.top;
+    root = document.documentElement;
+    var scrollX = window.pageXOffset || root.scrollLeft;
+    var scrollY = window.pageYOffset || root.scrollTop;
+    x = scrollX + event.clientX - rect.left - startScrollX;
+    y = scrollY + event.clientY - rect.top - startScrollY;
     console.log("winSc : " + window.pageYOffset);
     //console.log("y :" + y + " x :" + x);
     if (images[images.length - 1]) {
@@ -183,8 +186,8 @@ function f_drop(event) {
     // 読み取り専用　htmlを取得
     var root = document.documentElement;
     // スクロール量どちらかtrueの方を取得
-    var scrollY  = window.pageYOffset || root.scrollTop;
-    var scrollX  = window.pageXOffset || root.scrollLeft;
+    var scrollY = window.pageYOffset || root.scrollTop;
+    var scrollX = window.pageXOffset || root.scrollLeft;
     var x = scrollX + event.clientX - rect.left;
     var y = scrollY + event.clientY - rect.top;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
@@ -506,7 +509,6 @@ function ImageToCanvas(im, direction, num) {
 }
 
 
-
 /**
  * 複数回同時実行禁止！
  */
@@ -669,7 +671,6 @@ function action() {
      */
     function action2() {
         // 移動量データが存在するなら
-        console.log("なにこれ i : " + i);
         id = images[i];
         drop_elm = document.getElementById(id);
         // 実行中コード可視化用関数sidePoint
@@ -736,7 +737,6 @@ function action() {
             }//if (i < images.length) End
 
             cnt = 0;// ブロックサイズ回繰り返し1pxずつずらして表示するためのカウント変数
-
             var itc = setInterval(function () {
                 if (cnt < moveNum) {// ブロックサイズ  = moveNUM
                     if (!blockFlg) {//前に壁が無い場合
@@ -851,6 +851,7 @@ function action() {
             console.log("codeNums[" + i + "] : " + codeNums[i]);
 
         }
+        // images配列とsidePointのpositionYを管理する配列codeNumsをdata-n回追加挿入
         images = dNumControl(images);
         imagesLog();
         i = 0;// 初期化
@@ -962,16 +963,22 @@ function wBreakDown(index, wIdx, wNum) {
 function dNumControl(array) {
     var num = 0;
     var workArray = [];
+    var workArray2 = [];
+    console.log("dNumControl開始-------------------->");
+    imagesLog();
     for (var i = 0; i < array.length; i++) {
         if (document.getElementById(array[i]).hasAttribute("data-n")) {
             num = document.getElementById(array[i]).getAttribute("data-n");
             for (var j = 0; j < num; j++) {
                 workArray[workArray.length] = array[i];
+                workArray2[workArray2.length] = codeNums[i];
             }
         } else {
             workArray[workArray.length] = array[i];
+            workArray2[workArray2.length] = codeNums[i];
         }
     }
+    codeNums = workArray2;
     return workArray;
 }
 
@@ -1001,7 +1008,6 @@ function debug() {
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
     sideElm.style.backgroundPositionY = 33 + codeNums[index] * codeSize + "px";
-    console.log("codeNum[" + index + "]" + codeNums[index] + " , posiY : " + sideElm.style.backgroundPositionY);
 }
 
 /**
@@ -1020,9 +1026,15 @@ function imagesCheck() {
 /**
  * whileを複数使用時hMAXの値が不正になってしまう不具合の対策
  */
-function  shadowCheck() {
+function shadowCheck() {
     var num = (hMax - 33) / elmAllSize;
-    if(images.length < num ){
-        hMax = 33 + images.length * elmAllSize;
+    var eCnt = 0;
+    for(var i = 0;i < images.length; i++){
+        if(images[i] == "endWhile"){
+            eCnt++;
+        }
+    }
+    if (images.length < num) {
+        hMax = 33 + (images.length - eCnt) * elmAllSize;
     }
 }
