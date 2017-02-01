@@ -3,7 +3,7 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
-    <title>DD and move</title>
+    <title>プログラム学習システム</title>
     <style>
         * {
             margin: 0;
@@ -27,6 +27,27 @@
 
         div {
             display: block;
+        }
+
+        #headline {
+            width: 100%;
+            height: 10px;
+            background-color: rgb(79, 79, 79);
+            border-bottom: solid 1px gray;
+        }
+
+        #title {
+            margin: 1px;
+            padding: 20px;
+            border-top: double 2px darkgray;
+            border-bottom: double 2px darkgray;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 50%,
+                    #1c1c1c 90%);
+            box-shadow: 2px 2px 5px #000;
+            font-family: "メイリオ";
         }
 
         .select {
@@ -77,14 +98,14 @@
 
         #codeSpace {
             position: absolute;
-            top: 150px;
+            top: 158px;
             left: 50px;
             z-index: 0;
         }
 
         #upperTop {
             position: relative;
-            top: 72px;
+            top: 0;
             left: 50px;
         }
 
@@ -194,6 +215,14 @@
             background: rgba(0, 255, 255, 0.2);
         }
 
+        #news {
+            position: relative;
+            top:6px;
+            left:326px;
+            width: 70px;
+            height:70px;
+        }
+
         #upper > .divCode {
             border: solid 1px black;
         }
@@ -242,10 +271,12 @@
             font-size: 40px;
         }
 
-        .helpBtn {
+        #helpBtn {
+            position: relative;
+            top: 10px;
+            left: 50px;
             width: 116px;
             font-size: 14px;
-            font-weight: bold;
             text-decoration: none;
             display: block;
             text-align: center;
@@ -305,7 +336,7 @@
 
         #actionUnder {
             position: relative;
-            top: 232px;
+            top: 168px;
             left: 750px;
         }
     </style>
@@ -316,7 +347,7 @@
         var lemSrc = "{% static 'img/lemmini.png' %}";
         var akitoSrc = "{% static 'img/akito.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
-        var mainImageSrc = "{% static 'img/lemmini.png' %}";
+        var mainImageSrc = "{% static 'img/akito.png' %}";
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
         var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
@@ -334,9 +365,6 @@
         var forward2Src = "{% static 'img/forward2.png' %}";
         var forward3Src = "{% static 'img/forward3.png' %}";
         var forward4Src = "{% static 'img/forward4.png' %}";
-
-
-
         /**
          * サーバー側から送信されるデータを取得
          */
@@ -349,14 +377,15 @@
     </script>
     {% csrf_token %}
 </head>
-<body><!-- http://hiroyky.blogspot.jp/2014/05/django-pythonjavascript.html -->
+<body>
+<div id="headline"></div>
+<h1 id="title">プログラム学習用Webアプリ</h1>
 <div id="wrapper">
-    <h1>アルゴリズム学習用Webアプリ</h1>
+    <button id="helpBtn" class="button" onclick="OpenHelp()">操作方法</button>
     <div id="upperTop">
-        <button id="helpBtn" class="button" onclick="OpenHelp()">操作方法</button>
         <div id="helpWindow">
-            <h3>操作説明：</h3>
-            <p>コードボックス内のコードをドラッグして</br>エディター内にドロップするとプログラムを組む事ができます。</p>
+            <h3>操作説明：</h3><br/>
+            <p>コードボックス内のコードをドラッグして</br>エディター内にドロップするとプログラムを組む事ができます。</p><br/>
             <ul>
                 <li>左クリック：コードの値を変更する（例：繰り返し回数:2 → 3）</li>
                 <li>右クリック：コードボックスにコードを戻す</li>
@@ -383,11 +412,17 @@
     <div id="codeSpace">
         <div id="upper" ondragover="f_dragover(event)" ondrop="f_drop(event)">
             <input type="hidden" id="endWhile" data-d="e" data-n="0">
-            <img src="{% static 'img/forward1.png' %}" id="forward_1" onclick="forwardImageOnClick(this)" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_1" onclick="forwardImageOnClick(this)"
+                 draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/forward1.png' %}" id="forward_2" onclick="forwardImageOnClick(this)" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_2" onclick="forwardImageOnClick(this)"
+                 draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/forward1.png' %}" id="forward_3" onclick="forwardImageOnClick(this)" draggable="true"
+            <img src="{% static 'img/forward1.png' %}" id="forward_3" onclick="forwardImageOnClick(this)"
+                 draggable="true"
+                 data-n="1" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/forward1.png' %}" id="forward_4" onclick="forwardImageOnClick(this)"
+                 draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/turnNorth.png' %}" id="turn_n" draggable="true" data-d="t"
                  ondragstart="f_dragstart(event)">
@@ -396,6 +431,14 @@
             <img src="{% static 'img/turnSouth.png' %}" id="turn-s" draggable="true" data-d="b"
                  ondragstart="f_dragstart(event)">
             <img src="{% static 'img/turnWest.png' %}" id="turn-w" draggable="true" data-d="l"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnNorth.png' %}" id="turn_n2" draggable="true" data-d="t"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnEast.png' %}" id="turn_e2" draggable="true" data-d="r"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnSouth.png' %}" id="turn-s2" draggable="true" data-d="b"
+                 ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/turnWest.png' %}" id="turn-w2" draggable="true" data-d="l"
                  ondragstart="f_dragstart(event)">
             <!--
             <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t"
@@ -419,10 +462,14 @@
             <img src="{% static 'img/whileStr2.png' %}" class="arrows-wh" id="While3" onclick="whileImageOnClick(this)"
                  draggable="true" data-d="w"
                  data-n="2" ondragstart="f_dragstart(event)">
+            <img src="{% static 'img/whileStr2.png' %}" class="arrows-wh" id="While4" onclick="whileImageOnClick(this)"
+                 draggable="true" data-d="w"
+                 data-n="2" ondragstart="f_dragstart(event)">
         </div>
         <div id="buttons">
             <button class="button" onclick="debug()">デバッグ表示</button>
-            <button class="button resetBtn" onclick="resetImages()">リセット</button>
+            <button class="button resetBtn" onclick="resetImages();">コードボックスのリセット</button>
+            <button class="button resetBtn" onclick="allReset();">全部リセット</button>
         </div>
         <div id="spBack" class="sidePoint"></div>
         <div id="sidePoint" class="sidePoint"></div>
@@ -443,6 +490,7 @@
     <div id="actionSpace">
         <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
         <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
+        <img id="news" src="{% static 'img/news.png' %}" />
     </div>
     <div id="actionUnder">
         <select id="characters" class="select" name="characters" onchange="changeCharacter()">
@@ -454,6 +502,7 @@
             <option value="">須永魚</option>
             <option value="">若いEBT</option>
         </select>
+        <button class="button resetBtn" onclick="cvsReset();">動作画面のリセット</button>
     </div>
     <script type="text/javascript" src="{% static 'js/click.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>

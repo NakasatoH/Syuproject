@@ -17,12 +17,14 @@ var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
 var codeNums = [];// images配列に合わせてコード番号を保管する配列
 var bkCodeNums = [];// codeNumsのバックアップ用配列
+var bkPPositionY = pPositionY;
+var bkPPositionX = pPositionX;
 const moveNum = block_size;
 const indent = 84;
 const wWidthSize = 142;
 const codeSize = 37.5;
 const elmAllSize = 37;//36.22;
-var root = document.documentElement;
+var root = document.documentElement;// htmlを取得
 const startScrollY = window.pageYOffset || root.scrollTop;
 const startScrollX = window.pageXOffset || root.scrollLeft;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
@@ -38,18 +40,20 @@ image1.src = mainImageSrc;
 
 // 画像の初回ロード時に画像を表示する
 image1.onload = (function () {
+    characterLoad();
+});
+function characterLoad() {
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    dx = pPositionX * block_size;
-    dy = ( pPositionY + 1 ) * block_size - image1.height;
+    dx = bkPPositionX * block_size;
+    dy = ( bkPPositionY + 1 ) * block_size - image1.height;
     old_dx = dx;
     old_dy = dy;
     ctx.translate(dx, dy);
     ctx.drawImage(image1, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
-});
-
+}
 // 音声オブジェクト生成
 var dragSound = new Audio();
 dragSound.src = dragSoundSrc;
@@ -89,7 +93,8 @@ function f_dragover(event) {
     var scrollY = window.pageYOffset || root.scrollTop;
     x = scrollX + event.clientX - rect.left - startScrollX;
     y = scrollY + event.clientY - rect.top - startScrollY;
-    console.log("winSc : " + window.pageYOffset);
+    console.log("winSc : " + scrollY + "startScrollY :" + startScrollY);
+    console.log("x : " + x + "y : " + y);
     //console.log("y :" + y + " x :" + x);
     if (images[images.length - 1]) {
         lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
@@ -188,8 +193,8 @@ function f_drop(event) {
     // スクロール量どちらかtrueの方を取得
     var scrollY = window.pageYOffset || root.scrollTop;
     var scrollX = window.pageXOffset || root.scrollLeft;
-    var x = scrollX + event.clientX - rect.left;
-    var y = scrollY + event.clientY - rect.top;
+    x = scrollX + event.clientX - rect.left - startScrollX;
+    y = scrollY + event.clientY - rect.top - startScrollY;
     x = Math.floor(x);// 四捨五入　整数型にキャスト
     y = Math.floor(y);
 
@@ -1029,8 +1034,8 @@ function imagesCheck() {
 function shadowCheck() {
     var num = (hMax - 33) / elmAllSize;
     var eCnt = 0;
-    for(var i = 0;i < images.length; i++){
-        if(images[i] == "endWhile"){
+    for (var i = 0; i < images.length; i++) {
+        if (images[i] == "endWhile") {
             eCnt++;
         }
     }

@@ -31,6 +31,7 @@ haikei.onload = (function () {
 });
 
 var map = mapData;
+var map2 = mapData;
 var blockWidth = imageB.width;//ブロックの横幅
 var blockHeight = imageB.height;
 
@@ -64,4 +65,22 @@ function ITC2(imgB, imgG) {
             ctx2.translate(-1 * dx, -1 * dy);
         }
     }
+}
+
+function cvsReset() {
+    /**
+     * mapのbackupがとれないので対策としてプレイヤーのポジションを強制的に変更
+     * backup用変数に何故かmapが上書きされている模様
+     */
+    map[pPositionY][pPositionX] = "0";
+    pPositionX = bkPPositionX;
+    pPositionY = bkPPositionY;
+    map[pPositionY][pPositionX] = "p";
+    ITC2(imageB, imageG);
+    characterLoad();
+}
+
+function allReset() {
+    cvsReset();
+    resetImages();
 }
