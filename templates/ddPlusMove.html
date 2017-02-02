@@ -217,10 +217,10 @@
 
         #news {
             position: relative;
-            top:6px;
-            left:326px;
+            top: 6px;
+            left: 326px;
             width: 70px;
-            height:70px;
+            height: 70px;
         }
 
         #upper > .divCode {
@@ -377,7 +377,7 @@
     </script>
     {% csrf_token %}
 </head>
-<body>
+<body onselectstart="return false">
 <div id="headline"></div>
 <h1 id="title">プログラム学習用Webアプリ</h1>
 <div id="wrapper">
@@ -467,7 +467,7 @@
                  data-n="2" ondragstart="f_dragstart(event)">
         </div>
         <div id="buttons">
-            <button class="button" onclick="debug()">デバッグ表示</button>
+            <button class="button" onclick="debug()" >デバッグ表示</button>
             <button class="button resetBtn" onclick="resetImages();">コードボックスのリセット</button>
             <button class="button resetBtn" onclick="allReset();">全部リセット</button>
         </div>
@@ -490,7 +490,7 @@
     <div id="actionSpace">
         <canvas id="backCvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
         <canvas id="cvs" width="{{ cvs_width }}px" height="{{ cvs_height }}px"></canvas>
-        <img id="news" src="{% static 'img/news.png' %}" />
+        <img id="news" src="{% static 'img/news.png' %}"/>
     </div>
     <div id="actionUnder">
         <select id="characters" class="select" name="characters" onchange="changeCharacter()">

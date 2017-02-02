@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>CreateMapSample</title>
+    <style type="text/css">
+        #cvs {
+            border: solid chartreuse 1px;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+{% csrf_token %}
+<body>
+<h1>はろわ</h1>
+<canvas id="cvs"></canvas>
+エレメント:<br>
+<div style="height:200px; margin:0px 0px 10px 0px; border:10px #0a0 solid; background:#4f4;" id="element_06"></div>
+
+<div style="margin:0px 0px 5px 0px;">
+    左ボタン:<input id="edit_06_left" style="width:60px; margin:0px 20px 0px 5px;">
+    右ボタン:<input id="edit_06_right" style="width:60px; margin:0px 20px 0px 5px;">
+    中央ボタン:<input id="edit_06_center" style="width:60px; margin:0px 20px 0px 5px;">
+</div>
+
+<input id="edit_06_result" style="width:100%;">
+<script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>
+</body>
+</html>

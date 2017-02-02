@@ -25,8 +25,10 @@ def imagemove(request):
 def movesample(request):
     return render(request, 'moveSample.html')
 
+
 w_blocks = 0
 h_blocks = 0
+
 
 def ddpulsmove(request):
     # mapという変数名を生成してエラーを確認。
@@ -58,8 +60,8 @@ def ddpulsmove(request):
     else:
         print("settings正常")
 
-    pPositionX = "" # プレイヤーのx座標
-    pPositionY = "" # 　〃        y座標
+    pPositionX = ""  # プレイヤーのx座標
+    pPositionY = ""  # 〃        y座標
     cnt = 0
 
     print(str2)
@@ -81,3 +83,7 @@ def ddpulsmove(request):
         'cvs_height': cvs_height,
     }
     return render(request, 'ddPlusMove.html', data)
+
+
+def createmap(request):
+    return render(request, 'createMap.html')

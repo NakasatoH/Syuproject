@@ -444,14 +444,14 @@ function f_drop(event) {
     }
 }// function f_drop(event) End
 
-// 表示用メソッド
+// 表示用関数
 function imagesLog() {
     for (var i = 0; i < images.length; i++) {
         console.log("images配列[" + i + "] : " + images[i]);
     }
 }
 
-// 全ての値の初期化は行わずにエレメントだけupperに戻す　再配置用メソッド
+// 全ての値の初期化は行わずにエレメントだけupperに戻す　再配置用関数
 function relocation(firstIndex) {
     for (var i = firstIndex; i < images.length; i++) {
         if (document.getElementById(images[i]) != "endWhile") {
@@ -666,7 +666,7 @@ function action() {
     // 内側で宣言したactionを呼び出す
     action2();
     /**
-     * action2()メソッド
+     * action2()関数
      * 処理概要：
      *  　　　　進行方向に壁があるか確認
      *          壁がなければ動かす
@@ -1003,12 +1003,12 @@ function debug() {
 
 /**
  * 疑似プログラム実行中にリアルタイムでどのコードを実行しているか認識できるようにするための
- * 背景画像の位置を変更するメソッド
+ * 背景画像の位置を変更する関数
  * 処理概要：
  *              DIV sidePoint の背景画像の位置調整、及び表示
  *
- *              Action() , Action2() wBreakDown() メソッド内で同時に別の配列に、プログラムのコード番号を挿入
- *              以下のメソッドでは挿入済み配列の値に合わせて背景画像のPositionYを調整する
+ *              Action() , Action2() wBreakDown() 関数内で同時に別の配列に、プログラムのコード番号を挿入
+ *              以下の関数では挿入済み配列の値に合わせて背景画像のPositionYを調整する
  */
 function sidePoint(index) {
     var sideElm = document.getElementById("sidePoint");
