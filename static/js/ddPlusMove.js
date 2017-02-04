@@ -29,6 +29,7 @@ const startScrollY = window.pageYOffset || root.scrollTop;
 const startScrollX = window.pageXOffset || root.scrollLeft;
 var goalFlg = false;// ゴールしたときに一度だけメッセージを表示するためのフラグ
 var runFlg = false;// プログラム実行中に同時に2回目以降の実行を行わせないためのフラグ
+
 // 影バグ対策　コメント調整
 bottomDiv.style.zIndex = 1;
 
@@ -474,8 +475,7 @@ function ImageToCanvas(im, direction, num) {
     if (!num) {
         num = 1;
     }
-    var n = parseInt(num);
-    n = 1;
+    var n = 1;
     var canvas = document.getElementById('cvs');
     var ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -511,6 +511,10 @@ function ImageToCanvas(im, direction, num) {
     ctx.translate(dx, dy);
     ctx.drawImage(im, 0, 0);
     ctx.translate(-1 * dx, -1 * dy);
+
+    if (goalFlg) {
+        blockFlg = true;//ゴールしたあと壁を突き抜けるバグ対策
+    }
 }
 
 
@@ -752,7 +756,8 @@ function action() {
                     }
                 } else {
                     i++;
-                    if (i < images.length) {// まだbottomに処理されていない画像が残っている場合
+                    // ゴールした後に壁を突き抜ける不具合対策
+                    if (i < images.length && !goalFlg) {// まだbottomに処理されていない画像が残っている場合
                         blockFlg = false;
                         action2();// 再帰
                     } else {

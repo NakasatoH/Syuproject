@@ -351,7 +351,8 @@
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
         var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
-        var block_bSrc = "{% static 'img/block_b.png' %}";
+        var block_b2Src = "{% static 'img/block_b.png' %}";
+        var block_bSrc = "{% static 'img/block_b2.png' %}";
         var umiSrc = "{% static 'img/umi.jpg' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var ebataSrc = "{% static 'img/ebata.jpg' %}";
@@ -365,6 +366,10 @@
         var forward2Src = "{% static 'img/forward2.png' %}";
         var forward3Src = "{% static 'img/forward3.png' %}";
         var forward4Src = "{% static 'img/forward4.png' %}";
+        var turnEastSrc = "{% static 'img/turnEast.png' %}";
+        var turnWestSrc = "{% static 'img/turnWest.png' %}";
+        var turnSouthSrc = "{% static 'img/turnSouth.png' %}";
+        var turnNorthSrc = "{% static 'img/turnNorth.png' %}";
         /**
          * サーバー側から送信されるデータを取得
          */
@@ -425,21 +430,13 @@
                  draggable="true"
                  data-n="1" ondragstart="f_dragstart(event)">
             <img src="{% static 'img/turnNorth.png' %}" id="turn_n" draggable="true" data-d="t"
-                 ondragstart="f_dragstart(event)">
+                 ondragstart="f_dragstart(event)" onclick="directionImageOnClick(this)">
             <img src="{% static 'img/turnEast.png' %}" id="turn_e" draggable="true" data-d="r"
-                 ondragstart="f_dragstart(event)">
+                 ondragstart="f_dragstart(event)" onclick="directionImageOnClick(this)">
             <img src="{% static 'img/turnSouth.png' %}" id="turn-s" draggable="true" data-d="b"
-                 ondragstart="f_dragstart(event)">
+                 ondragstart="f_dragstart(event)" onclick="directionImageOnClick(this)">
             <img src="{% static 'img/turnWest.png' %}" id="turn-w" draggable="true" data-d="l"
-                 ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/turnNorth.png' %}" id="turn_n2" draggable="true" data-d="t"
-                 ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/turnEast.png' %}" id="turn_e2" draggable="true" data-d="r"
-                 ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/turnSouth.png' %}" id="turn-s2" draggable="true" data-d="b"
-                 ondragstart="f_dragstart(event)">
-            <img src="{% static 'img/turnWest.png' %}" id="turn-w2" draggable="true" data-d="l"
-                 ondragstart="f_dragstart(event)">
+                 ondragstart="f_dragstart(event)" onclick="directionImageOnClick(this)">
             <!--
             <img src="{% static 'img/arrowT.png' %}" class="arrows-tb" id="arTop" draggable="true" data-d="t"
                  data-n="1" ondragstart="f_dragstart(event)">

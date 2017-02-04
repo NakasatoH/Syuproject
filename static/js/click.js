@@ -103,6 +103,29 @@ function forwardImageOnClick(e) {
     }
 }
 
+/**
+ * 方向画像をクリックした際、方向と画像を変更する処理
+ */
+function directionImageOnClick(e) {
+    switch (e.getAttribute("data-d")) {
+        case "l":
+            e.setAttribute("data-d", "r");
+            e.src = turnWestSrc;
+            break;
+        case "r":
+            e.setAttribute("data-d", "b");
+            e.src = turnSouthSrc;
+            break;
+        case "b":
+            e.setAttribute("data-d", "t");
+            e.src = turnNorthSrc;
+            break;
+        case "t":
+            e.setAttribute("data-d", "l");
+            e.src = turnEastSrc;
+            break;
+    }
+}
 /**-------------------------------------------------------
  * ドロップされたIMG群を全て元の位置に戻す処理
  * -------------------------------------------------------

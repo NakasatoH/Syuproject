@@ -5,27 +5,62 @@
     <meta charset="UTF-8">
     <title>CreateMapSample</title>
     <style type="text/css">
-        #cvs {
-            border: solid chartreuse 1px;
-            width: 200px;
-            height: 200px;
+        body{
+        }
+        #createCvs,#backCreateCvs{
+            position: absolute;
+            top:20px;
+            left:20px;
+            width: {{ cvs_width }}px;
+            height: {{ cvs_height }}px;
         }
     </style>
+    <script type="text/javascript">
+        /**
+         * 外部jsファイルではsrcを取得することが出来ないため、html内で取得
+         */
+        var lemSrc = "{% static 'img/lemmini.png' %}";
+        var akitoSrc = "{% static 'img/akito.png' %}";
+        var t26e5Src = "{% static 'img/t26e5mini.png' %}";
+        var mainImageSrc = "{% static 'img/akito.png' %}";
+        var masaruSrc = "{% static 'img/masaru.png' %}";
+        var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
+        var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
+        var block_bSrc = "{% static 'img/block_b.png' %}";
+        var umiSrc = "{% static 'img/umi.jpg' %}";
+        var goalSrc = "{% static 'img/goalFlag.png' %}";
+        var ebataSrc = "{% static 'img/ebata.jpg' %}";
+        var dragSoundSrc = "{% static 'audio/switch01.mp3' %}";
+        var ifBreakSrc = "{% static 'img/if_brake.png' %}";
+        var midDropSrc = "{% static 'img/midDrop.png' %}";
+        var whileStr2Src = "{% static 'img/whileStr2.png' %}";
+        var whileStr3Src = "{% static 'img/whileStr3.png' %}";
+        var whileStr4Src = "{% static 'img/whileStr4.png' %}";
+        var forward1Src = "{% static 'img/forward1.png' %}";
+        var forward2Src = "{% static 'img/forward2.png' %}";
+        var forward3Src = "{% static 'img/forward3.png' %}";
+        var forward4Src = "{% static 'img/forward4.png' %}";
+        var cBGImageSrc = "{% static 'img/createBG1px.png' %}";
+        var c_selectSrc = "{% static 'img/c_select.png' %}";
+        /**
+         * サーバー側から送信されるデータを取得
+         */
+        var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
+        var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
+        var cvs_width = {{ cvs_width }};
+        var cvs_height = {{ cvs_height }};
+        var pPositionX = {{ pPositionX }};// プレイヤー初期X座標
+        var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
+    </script>
 </head>
 {% csrf_token %}
 <body>
 <h1>はろわ</h1>
-<canvas id="cvs"></canvas>
-エレメント:<br>
-<div style="height:200px; margin:0px 0px 10px 0px; border:10px #0a0 solid; background:#4f4;" id="element_06"></div>
-
-<div style="margin:0px 0px 5px 0px;">
-    左ボタン:<input id="edit_06_left" style="width:60px; margin:0px 20px 0px 5px;">
-    右ボタン:<input id="edit_06_right" style="width:60px; margin:0px 20px 0px 5px;">
-    中央ボタン:<input id="edit_06_center" style="width:60px; margin:0px 20px 0px 5px;">
+<div id="create">
+    <canvas id="backCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
+    <canvas id="middleCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
+    <canvas id="createCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px" oncontextmenu="{return false;}"></canvas>
 </div>
-
-<input id="edit_06_result" style="width:100%;">
 <script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>
 </body>
 </html>
