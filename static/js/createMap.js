@@ -138,13 +138,6 @@ function InputMouseButton(window_obj) {
     }
 
     // ------------------------------------------------------------
-    // buttons 形式で取得
-    // ------------------------------------------------------------
-    this.getButtons = function () {
-        return (this.buttons);
-    };
-
-    // ------------------------------------------------------------
     // マウス左ボタンの押下状態を調べる
     // ------------------------------------------------------------
     this.isDownLeft = function () {
@@ -196,30 +189,49 @@ function InputMouseButton(window_obj) {
         if (map_x >= 0 && map_x <= 9 && map_y >= 0 && map_y <= 9) {
             //　マウス左ボタンを押されている場合
             if (this.isDownLeft() && !this.isDownRight()) {
+                // 選択画像がキャラクターの場合
                 if (select_i == 1 && !charBlockFlg) {
+                    itemClear();
+                    c_mid_ctx.drawImage(drawItemImage[select_i], x, y);
                     mapData[map_y][map_x] = "p";
-                    drawBlockImage();
                     charBlockFlg = true;
+                    // 選択画像がゴールの場合
                 } else if (select_i == 2 && !goalBlockFlg) {
+                    itemClear();
+                    c_mid_ctx.drawImage(drawItemImage[select_i], x, y);
                     mapData[map_y][map_x] = "g";
-                    drawBlockImage();
                     goalBlockFlg = true;
+                    // 選択画像がブロックの場合
                 } else if (select_i == 0) {
+                    itemClear();
+                    c_mid_ctx.drawImage(drawItemImage[select_i], x, y);
                     mapData[map_y][map_x] = "*";
-                    drawBlockImage();
                 }
-            }
-            else if (this.isDownRight()) {
+
+            } else if (this.isDownRight()) {
+                itemClear();
                 mapData[map_y][map_x] = "0";
-                c_mid_ctx.clearRect(x, y, 40, 40);
                 // 中間キャンバスのブロックを削除 同じくmapも変
             }
         }
-        function drawBlockImage() {
+        /**
+         * itemClear関数
+         * 仕様：1, 上書きする場所のmapDataをチェック、それぞれキャラクター、ゴールの場合はフラグを切り替える
+         *           2, 上書きする場所を一度clearRectしてから選択されている画像をドローする
+         */
+        function itemClear() {
+            switch (mapData[map_y][map_x]) {
+                case "p":
+                    charBlockFlg = false;
+                    break;
+                case "g":
+                    goalBlockFlg = false;
+                    break;
+                default:
+                    break;
+            }
             // 画像の重複を防ぐため一度clear
             c_mid_ctx.clearRect(x, y, 40, 40);
-            // 中間キャンバスにブロックを表示　mapも変更
-            c_mid_ctx.drawImage(drawItemImage[select_i], x, y);
         }
     };
 }
