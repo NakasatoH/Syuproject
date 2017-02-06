@@ -1,17 +1,53 @@
 /**
  * Created by varuma on 2017/02/02.
  */
+// map初期化
+mapData = [
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+];
+
 // html取得
 var root = document.documentElement;
 
-// 各Canvasをインスタンス化
+// 各Canvasをインスタンス化, コンテキストを取得
 var cBackCvs = document.getElementById("backCreateCvs");
 var c_bk_ctx = cBackCvs.getContext('2d');
 var cCvs = document.getElementById("createCvs");
 var c_ctx = cCvs.getContext('2d');
+var cMiddleCvs = document.getElementById("middleCreateCvs");
+var c_mid_ctx = cMiddleCvs.getContext('2d');
 
+// 各ボタンをインスタンス化
+var blockBtn = document.getElementById("blockBtn");
+var characterBtn = document.getElementById("characterBtn");
+var goalBtn = document.getElementById("goalBtn");
+
+// 一度だけ描画するためのフラグ
+var charBlockFlg = false;
+var goalBlockFlg = false;
+
+// 現在のdrawItemImageを指定する変数
+var select_i = 0;
+
+// 前回のカーソルのポジションを保存するための変数
 var c_old_x = undefined;
 var c_old_y = undefined;
+
+// mapData用　x, yそれぞれ 40分の1
+var map_x = 0;
+var map_y = 0;
+
+// キャンバスの位置情報を取得
+var rect = cCvs.getBoundingClientRect();
 
 // 背景用イメージの作成
 var c_haikei_img = new Image();
@@ -28,37 +64,18 @@ c_haikei_img.onload = (function () {
     c_bk_ctx.drawImage(c_haikei_img, 0, 0);
 });
 
-var rect = cCvs.getBoundingClientRect();
-var mouseEvent = function (e) {
 
-    // デフォルト動作を停止
-    e.preventDefault();
+var drawItemImage = [];
 
-    // マウス位置を取得する
-    var scrollX = window.pageXOffset || root.left;
-    var scrollY = window.pageYOffset || root.top;
+// 描画するブロック画像を配列で管理
+drawItemImage[0] = new Image();
+drawItemImage[0].src = block_bSrc + "?" + new Date().getTime();
+drawItemImage[1] = new Image();
+drawItemImage[1].src = akitoSrc + "?" + new Date().getTime();
+drawItemImage[2] = new Image();
+drawItemImage[2].src = goalSrc + "?" + new Date().getTime();
 
-    // スクロールが無い場合 0を代入
-    if (scrollX == undefined) {
-        scrollX = 0;
-    }
-    if (scrollY == undefined) {
-        scrollY = 0;
-    }
-    var x = scrollX + e.pageX - rect.left;
-    var y = scrollY + e.pageY - rect.top;
-    x = Math.floor(x / 40) * 40;
-    y = Math.floor(y / 40) * 40;
 
-    if (c_old_x || c_old_x == 0) {
-        c_ctx.clearRect(c_old_x, c_old_y, 40, 40)
-    }
-    c_old_x = x;
-    c_old_y = y;
-    console.log("x : " + x + " y : " + y);
-    // c_ctx.drawImage(c_select_img, x, y);
-    c_ctx.drawImage(block_img, x, y);
-};
 // ------------------------------------------------------------
 // マウスボタンの入力状態を調べるコンストラクタ
 // ------------------------------------------------------------
@@ -141,52 +158,106 @@ function InputMouseButton(window_obj) {
         return (this.buttons & (0x2)) ? true : false;
     };
 
-    // ------------------------------------------------------------
-    // 解放する
-    // ------------------------------------------------------------
-    this.release = function () {
-        if (window_obj.removeEventListener) {
-            window_obj.removeEventListener("mousedown", mouse_handler, true);
-            window_obj.removeEventListener("mouseup", mouse_handler, false);
-            window_obj.removeEventListener("mousemove", mouse_handler, true);
-            window_obj.removeEventListener("dragstart", mouse_handler, true);
-            window_obj.removeEventListener("dragend", mouse_handler, false);
-            window_obj.removeEventListener("drag", mouse_handler, true);
-            window_obj.removeEventListener("blur", blur_handler);
-        } else if (window_obj.detachEvent) {
-            document_obj.detachEvent("onmousedown", mouse_handler);
-            document_obj.detachEvent("onmouseup", mouse_handler);
-            document_obj.detachEvent("onmousemove", mouse_handler);
-            document_obj.detachEvent("ondragstart", mouse_handler);
-            document_obj.detachEvent("ondragend", mouse_handler);
-            document_obj.detachEvent("ondrag", mouse_handler);
-            window_obj.detachEvent("onblur", blur_handler);
+    /***
+     * キャンバス内でカーソルを移動した際選択中のブロックに強調画像を表示する
+     * 「　丁　←こんなの
+     *  L　」
+     * @param e
+     */
+    this.selectEvent = function (e) {
+
+        // マウス位置を取得する
+        var scrollX = window.pageXOffset || root.left;
+        var scrollY = window.pageYOffset || root.top;
+
+        // スクロールが無い場合 0を代入
+        if (scrollX == undefined) {
+            scrollX = 0;
+        }
+        if (scrollY == undefined) {
+            scrollY = 0;
+        }
+        var x = scrollX + e.pageX - rect.left;
+        var y = scrollY + e.pageY - rect.top;
+        x = Math.floor(x / 40) * 40;
+        y = Math.floor(y / 40) * 40;
+
+        if (c_old_x || c_old_x == 0) {
+            c_ctx.clearRect(c_old_x, c_old_y, 40, 40)
+        }
+        c_old_x = x;
+        c_old_y = y;
+        map_x = Math.floor(x / 40);
+        map_y = Math.floor(y / 40);
+        console.log("x : " + x + " y : " + y);
+        c_ctx.drawImage(c_select_img, x, y);
+
+        // cvs上にカーソルがある場合動作
+        if (map_x >= 0 && map_x <= 9 && map_y >= 0 && map_y <= 9) {
+            //　マウス左ボタンを押されている場合
+            if (this.isDownLeft() && !this.isDownRight()) {
+                if (select_i == 1 && !charBlockFlg) {
+                    mapData[map_y][map_x] = "p";
+                    drawBlockImage();
+                    charBlockFlg = true;
+                } else if (select_i == 2 && !goalBlockFlg) {
+                    mapData[map_y][map_x] = "g";
+                    drawBlockImage();
+                    goalBlockFlg = true;
+                } else if (select_i == 0) {
+                    mapData[map_y][map_x] = "*";
+                    drawBlockImage();
+                }
+            }
+            else if (this.isDownRight()) {
+                mapData[map_y][map_x] = "0";
+                c_mid_ctx.clearRect(x, y, 40, 40);
+                // 中間キャンバスのブロックを削除 同じくmapも変
+            }
+        }
+        function drawBlockImage() {
+            // 画像の重複を防ぐため一度clear
+            c_mid_ctx.clearRect(x, y, 40, 40);
+            // 中間キャンバスにブロックを表示　mapも変更
+            c_mid_ctx.drawImage(drawItemImage[select_i], x, y);
         }
     };
-
 }
 
 var input_mouse_button = new InputMouseButton(window);
 
+
 function MouseEventFunc(e) {
 
+    // ここで無名関数のメソッド呼び出し
     if (document.addEventListener) {
-        console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight());
+        //console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight());
     } else if (document.attachEvent) {
-        setTimeout(
-            console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight()), 1);
+        /*setTimeout(
+         console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight()), 1);
+         */
     }
-
-    console.log("buttons:" + e.buttons + " button:" + e.button + " which:" + e.which + " type:\"" + e.type + "\"");
+    input_mouse_button.selectEvent(e);
+    //console.log("buttons:" + e.buttons + " button:" + e.button + " which:" + e.which + " type:\"" + e.type + "\"");
 }
 
-//
-cCvs.addEventListener("click", mouseEvent);
 
-cCvs.addEventListener("mousemove", mouseEvent);
 // マウスボタンを押すと実行
 window.addEventListener("mousedown", MouseEventFunc);
 // マウスカーソルを移動するときに実行
 window.addEventListener("mousemove", MouseEventFunc);
 // マウスボタンを離すと実行
 window.addEventListener("mouseup", MouseEventFunc);
+
+blockBtn.addEventListener("click", function () {
+    select_i = 0;
+});
+
+characterBtn.addEventListener("click", function () {
+    select_i = 1;
+});
+
+goalBtn.addEventListener("click", function () {
+    select_i = 2;
+    console.table(mapData);
+});

@@ -5,14 +5,58 @@
     <meta charset="UTF-8">
     <title>CreateMapSample</title>
     <style type="text/css">
-        body{
+        body {
         }
-        #createCvs,#backCreateCvs{
+
+        #createCvs, #backCreateCvs, #middleCreateCvs {
             position: absolute;
-            top:20px;
-            left:20px;
+            top: 20px;
+            left: 20px;
             width: {{ cvs_width }}px;
             height: {{ cvs_height }}px;
+        }
+
+        #paletBtns {
+            position: absolute;
+            top: 420px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+        }
+
+        #paletBtns > button {
+            padding: 20px 20px;
+        }
+
+        .paletBtn {
+            padding: 10px;
+            color: #e8e8e8;
+            border-radius: 6px;
+            box-shadow: 2px 2px 5px #000;
+        }
+
+        .paletBtn:focus {
+            outline: 1px;
+            border-color: white;
+        }
+
+        #blockBtn {
+            background-image: url("{% static 'img/block_b.png' %}");
+        }
+
+        #characterBtn {
+            background: #eee;
+            background-image: url("{% static 'img/akito40.png' %}");
+
+        }
+
+        #goalBtn {
+            background: #ddd;
+            background-image: url("{% static 'img/goalFlag.png' %}");
+        }
+        
+        #createCvs{
+            cursor: none;
         }
     </style>
     <script type="text/javascript">
@@ -20,9 +64,9 @@
          * 外部jsファイルではsrcを取得することが出来ないため、html内で取得
          */
         var lemSrc = "{% static 'img/lemmini.png' %}";
-        var akitoSrc = "{% static 'img/akito.png' %}";
+        var akitoSrc = "{% static 'img/akito40.png' %}";
         var t26e5Src = "{% static 'img/t26e5mini.png' %}";
-        var mainImageSrc = "{% static 'img/akito.png' %}";
+        var mainImageSrc = "{% static 'img/akito40.png' %}";
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
         var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
@@ -59,7 +103,13 @@
 <div id="create">
     <canvas id="backCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
     <canvas id="middleCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
-    <canvas id="createCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px" oncontextmenu="{return false;}"></canvas>
+    <canvas id="createCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"
+            oncontextmenu="{return false;}"></canvas>
+</div>
+<div id="paletBtns">
+    <button id="blockBtn" class="paletBtn"></button>
+    <button id="characterBtn" class="paletBtn"></button>
+    <button id="goalBtn" class="paletBtn"></button>
 </div>
 <script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>
 </body>
