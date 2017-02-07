@@ -97,7 +97,6 @@
         var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
     </script>
 </head>
-{% csrf_token %}
 <body>
 <h1>はろわ</h1>
 <div id="create">
@@ -110,6 +109,10 @@
     <button id="blockBtn" class="paletBtn"></button>
     <button id="characterBtn" class="paletBtn"></button>
     <button id="goalBtn" class="paletBtn"></button>
+    <form action="" method="post">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
+        <input type="hidden" name="map" value="mapData">
+        <input type="submit" value="送信" />
+    </form>
 </div>
 <script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>
 </body>

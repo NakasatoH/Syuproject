@@ -97,7 +97,7 @@ function InputMouseButton(window_obj) {
     // ------------------------------------------------------------
     // イベント
     // ------------------------------------------------------------
-    blur_handler = function (e) {
+    blur_handler = function () {
         self.buttons = 0;
     };
     if (window_obj.addEventListener) {

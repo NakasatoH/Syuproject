@@ -99,7 +99,7 @@ def createmap(request):
     mapStrRep = mapString.replace('\n', '')
     mapStrRep = mapStrRep.replace(' ', '')
     str2 = mapStrRep.replace(',', '')
-
+    
     # ブロックがキャンバス上にそれぞれ何個入るかを調べる
     w_blocks = int(int(cvs_width) / int(block_size))
     h_blocks = int(int(cvs_height) / int(block_size))
