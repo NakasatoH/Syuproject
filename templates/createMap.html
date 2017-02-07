@@ -89,12 +89,10 @@
         /**
          * サーバー側から送信されるデータを取得
          */
-        var mapData = {{ mapData|safe }};// mapデータ（二次元配列） 文字化け対策で |safe
+        var mapData;
         var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
         var cvs_width = {{ cvs_width }};
         var cvs_height = {{ cvs_height }};
-        var pPositionX = {{ pPositionX }};// プレイヤー初期X座標
-        var pPositionY = {{ pPositionY }};// プレイヤー初期Y座標
     </script>
 </head>
 <body>
@@ -109,8 +107,7 @@
     <button id="blockBtn" class="paletBtn"></button>
     <button id="characterBtn" class="paletBtn"></button>
     <button id="goalBtn" class="paletBtn"></button>
-    <form action="" method="post">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
-        <input type="hidden" name="map" value="mapData">
+    <form name="mapTrans" action="" method="post" onsubmit="checkSubmit()">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
         <input type="submit" value="送信" />
     </form>
 </div>

@@ -30,6 +30,7 @@ var c_mid_ctx = cMiddleCvs.getContext('2d');
 var blockBtn = document.getElementById("blockBtn");
 var characterBtn = document.getElementById("characterBtn");
 var goalBtn = document.getElementById("goalBtn");
+var submitBtn = document.getElementById("submitBtn");
 
 // 一度だけ描画するためのフラグ
 var charBlockFlg = false;
@@ -254,6 +255,36 @@ function MouseEventFunc(e) {
 }
 
 
+function checkSubmit() {
+    // for (var i = 0; i < 10; i++) {
+    //     for (var j = 0; j < 10; j++) {
+    //         makeHidden("c_map[" + i + "][" + j + "]",  mapData[i][j], "mapTrans");
+    //     }
+    // }
+    makeHidden("c_map[" + 0 + "][" + 0 + "]",  mapData[0][0], "mapTrans");
+    return true;
+}
+/**
+ * makeHiddenメソッド
+ * 処理概要:
+ *      作成した二次元配列の中の１つ１つのデータを<input type="hidden">に格納して
+ *      html側にあるformに挿入する
+ * @param name // 配列名[][] 例: c_map[0][1]
+ * @param value
+ * @param formname // 挿入先formのname
+ */
+
+function makeHidden(name, value, formname) {
+    var q = document.createElement('input');
+
+    q.setAttribute("type","hidden");
+    q.setAttribute("name", name);
+    q.setAttribute("value", value);
+    if (formname) {
+        document.forms[formname].appendChild(q);
+    }
+}
+
 // マウスボタンを押すと実行
 window.addEventListener("mousedown", MouseEventFunc);
 // マウスカーソルを移動するときに実行
@@ -273,3 +304,4 @@ goalBtn.addEventListener("click", function () {
     select_i = 2;
     console.table(mapData);
 });
+
