@@ -256,12 +256,11 @@ function MouseEventFunc(e) {
 
 
 function checkSubmit() {
-    // for (var i = 0; i < 10; i++) {
-    //     for (var j = 0; j < 10; j++) {
-    //         makeHidden("c_map[" + i + "][" + j + "]",  mapData[i][j], "mapTrans");
-    //     }
-    // }
-    makeHidden("c_map[" + 0 + "][" + 0 + "]",  mapData[0][0], "mapTrans");
+    for (var i = 0; i < 10; i++) {
+        for (var j = 0; j < 10; j++) {
+            makeHidden("c_map[" + i + "][" + j + "]", mapData[i][j], "mapTrans");
+        }
+    }
     return true;
 }
 /**
@@ -276,8 +275,7 @@ function checkSubmit() {
 
 function makeHidden(name, value, formname) {
     var q = document.createElement('input');
-
-    q.setAttribute("type","hidden");
+    q.setAttribute("type", "hidden");
     q.setAttribute("name", name);
     q.setAttribute("value", value);
     if (formname) {

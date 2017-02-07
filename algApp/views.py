@@ -93,14 +93,13 @@ def createmap(request):
         for i in range(0, 10):
             for j in range(0, 10):
                 c_map[i][j] = request.POST['c_map[' + str(i) + '][' + str(j) + ']']
-                print("i : " + str(i) + " j : " + str(j) + " c_map[][] : " + str(c_map[i][j]))
         cnt = 0
         for y in range(0, 10):
             for x in range(0, 10):
                 mes = str(mes) + str(c_map[y][x])
     except:
         print("取得できず")
-    print(mes)
+    print("取得" + str(mes))
 
     # mapという変数名を生成してエラーを確認。
 
