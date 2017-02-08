@@ -86,34 +86,49 @@ def ddpulsmove(request):
 
 
 def createmap(request):
-    mes = ""
-    # 送信されたmapデータを取得
-    c_map = [[0 for i in range(10)] for j in range(10)]
-    try:
-        for i in range(0, 10):
-            for j in range(0, 10):
-                c_map[i][j] = request.POST['c_map[' + str(i) + '][' + str(j) + ']']
-        cnt = 0
-        for y in range(0, 10):
-            for x in range(0, 10):
-                mes = str(mes) + str(c_map[y][x])
-    except:
-        print("取得できず")
-    print("取得" + str(mes))
+    # result.htmlへ
+    if request.method == "POST":
+        mes = ""
+        uid = ""
+        # 送信されたmapデータを取得
+        c_map = [[0 for i in range(10)] for j in range(10)]
+        try:
+            for i in range(0, 10):
+                for j in range(0, 10):
+                    c_map[i][j] = request.POST['c_map[' + str(i) + '][' + str(j) + ']']
+            cnt = 0
+            for y in range(0, 10):
+                for x in range(0, 10):
+                    mes = str(mes) + str(c_map[y][x])
+            uid = request.POST['uniqueId']
+            print('uniqueID : ' + str(uid) + ' c_map: ' + str(mes))
+        except:
+            print("取得できず")
 
-    # mapという変数名を生成してエラーを確認。
+        data = {
+            'uid' : uid,
+            'mapData' : c_map
+        }
+        return render(request, 'createResult.html', data)
+        # createMap.htmlへ
+    elif request.method == "GET":  # mapという変数名を生成してエラーを確認。
 
-    inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
-    inifile.read('static/config/stageSample01.ini', encoding='utf-8')
+        inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
+        inifile.read('static/config/stageSample01.ini', encoding='utf-8')
 
-    # Configファイルから設定情報を取得
-    block_size = inifile.get('settings', 'block_size')
-    cvs_width = inifile.get('settings', 'canvas_width')
-    cvs_height = inifile.get('settings', 'canvas_height')
-
-    data = {
-        'block_size': block_size,
-        'cvs_width': cvs_width,
-        'cvs_height': cvs_height,
-    }
-    return render(request, 'createMap.html', data)
+        # Configファイルから設定情報を取得
+        block_size = inifile.get('settings', 'block_size')
+        cvs_width = inifile.get('settings', 'canvas_width')
+        cvs_height = inifile.get('settings', 'canvas_height')
+        old_map = ""
+        try:
+            old_map = request.GET['old_map']
+        except:
+            print("map未生成")
+        data = {
+            'block_size': block_size,
+            'cvs_width': cvs_width,
+            'cvs_height': cvs_height,
+            'old_map': old_map,
+        }
+        return render(request, 'createMap.html', data)

@@ -256,12 +256,24 @@ function MouseEventFunc(e) {
 
 
 function checkSubmit() {
+    var mapStr = "";
+    var uniqueId = uid();
     for (var i = 0; i < 10; i++) {
         for (var j = 0; j < 10; j++) {
             makeHidden("c_map[" + i + "][" + j + "]", mapData[i][j], "mapTrans");
+            mapStr = mapStr + mapData[i][j];
         }
     }
-    return true;
+    // ユニークIDも生成
+    console.log(uniqueId);
+    makeHidden('uniqueId', uniqueId, "mapTrans");
+    // 再送信防止
+    makeHidden('old_map', mapStr, "mapTrans");
+    if(old_map == mapStr){
+        return false;
+    }else{
+        return true;
+    }
 }
 /**
  * makeHiddenメソッド
@@ -303,3 +315,17 @@ goalBtn.addEventListener("click", function () {
     console.table(mapData);
 });
 
+/**
+ * ランダムな文字列を返す簡易パスワード生成メソッド
+ * // UUIDに似たいわゆる復活の呪文
+ * @returns {string}
+ */
+function uid() {
+    var uid = "";
+    var str = 'abcdefghijklmnopqrstuvwxyz' +
+        '0123456789';
+    for (var i = 0; i < 4; i++) {
+        uid = uid + str[Math.floor(Math.random() * str.length)];
+    }
+    return uid;
+}

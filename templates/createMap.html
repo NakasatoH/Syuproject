@@ -5,8 +5,17 @@
     <meta charset="UTF-8">
     <title>CreateMapSample</title>
     <style type="text/css">
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            color: #CECFD3;
         }
+
+        body {
+            background-size: cover;
+            background: #3B3F42;
+        }
+
 
         #createCvs, #backCreateCvs, #middleCreateCvs {
             position: absolute;
@@ -93,6 +102,7 @@
         var block_size = {{ block_size }};// 1つあたりのブロックの大きさ(正方形想定)
         var cvs_width = {{ cvs_width }};
         var cvs_height = {{ cvs_height }};
+        var old_map = "{{ old_map }}";
     </script>
 </head>
 <body>

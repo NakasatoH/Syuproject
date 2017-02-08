@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>{% load static %}
+    <meta charset="UTF-8">
+    <title>result</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            color: #CECFD3;
+        }
+
+        body {
+            background-size: cover;
+            background: #3B3F42;
+        }
+
+        #backCvs, #cvs {
+            border: solid 1px black;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        #backCvs {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        #cvs {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        #mainMes{
+            position: absolute;
+            top:20px;
+            left:440px;
+        }
+    </style>
+    <script type="text/javascript">
+        var uid = "{{ uid }}";
+        var mapData = {{ mapData|safe }};
+        var block_bSrc = "{% static 'img/block_b.png' %}";
+        var goalSrc = "{% static 'img/goalFlag.png' %}";
+        var umiSrc = "{% static 'img/umi.jpg' %}";
+    </script>
+</head>
+<body>
+    <canvas id="cvs" width="400px" height="400px"></canvas>
+    <p>ユニークID : {{ uid }}</p>
+    <canvas id="backCvs" width="400px" height="400px"></canvas>
+    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
+    <form action="" method="get" onsubmit="{return false}">
+        {% csrf_token %}
+    </form>
+    <div id="mainMes">
+        <p>コピーして友達と共有してね</p>
+        <input type="text" value="{{ uid }}">
+        <form action="" method="post" onsubmit="">{% csrf_token %}
+            <input type="submit" value="作成したMAPをプレイする">
+            <input type="hidden" id="hiddenRoot" name="root" value="">
+        </form>
+        作成したMAPをプレイする
+    </div>
+    <script type="text/javascript">
+        function createMapPlay() {
+            document.getElementById("hiddenRoot").setAttribute("value", "next");
+        }
+    </script>
+</body>
+</html>
