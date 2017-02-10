@@ -42,6 +42,17 @@
         var block_bSrc = "{% static 'img/block_b.png' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var umiSrc = "{% static 'img/umi.jpg' %}";
+
+        var pX = 0;
+        var pY = 0;
+        for(var i = 0; i < 10; i++){
+            for(var j = 0; j < 10; j++){
+                if(mapData[i][j] == "p"){
+                    pX = j;
+                    pY = i;
+                }
+            }
+        }
     </script>
 </head>
 <body>
@@ -55,15 +66,21 @@
     <div id="mainMes">
         <p>コピーして友達と共有してね</p>
         <input type="text" value="{{ uid }}">
-        <form action="" method="post" onsubmit="">{% csrf_token %}
+        <form action="" method="post" onsubmit="createMapPlay()">{% csrf_token %}
             <input type="submit" value="作成したMAPをプレイする">
             <input type="hidden" id="hiddenRoot" name="root" value="">
+            <input type="hidden" id="hiddenMap" name="mapData" value="{{ mapData|safe }}">
+            <input type="hidden" id="hiddenPX" name="pX" value="">
+            <input type="hidden" id="hiddenPY" name="pY" value="">
         </form>
         作成したMAPをプレイする
+        <a href="{% url 'algApp:ddplusmove' %}">TOP</a>
     </div>
     <script type="text/javascript">
         function createMapPlay() {
             document.getElementById("hiddenRoot").setAttribute("value", "next");
+            document.getElementById("hiddenPX").setAttribute("value", pX);
+            document.getElementById("hiddenPY").setAttribute("value", pY);
         }
     </script>
 </body>

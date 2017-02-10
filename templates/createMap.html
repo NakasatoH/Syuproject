@@ -14,20 +14,42 @@
         body {
             background-size: cover;
             background: #3B3F42;
+            -webkit-user-select: none;
         }
 
+        #headline {
+            width: 100%;
+            height: 10px;
+            background-color: rgb(79, 79, 79);
+            border-bottom: solid 1px gray;
+        }
+
+        #title {
+            margin: 1px;
+            padding: 20px;
+            border-top: double 2px darkgray;
+            border-bottom: double 2px darkgray;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 50%,
+                    #1c1c1c 90%);
+            box-shadow: 2px 2px 5px #000;
+            font-family: "メイリオ";
+        }
 
         #createCvs, #backCreateCvs, #middleCreateCvs {
             position: absolute;
-            top: 20px;
+            top: 120px;
             left: 20px;
             width: {{ cvs_width }}px;
             height: {{ cvs_height }}px;
+            -webkit-user-select: none;
         }
 
         #paletBtns {
             position: absolute;
-            top: 420px;
+            top: 526px;
             left: 20px;
             width: 200px;
             height: 200px;
@@ -63,8 +85,8 @@
             background: #ddd;
             background-image: url("{% static 'img/goalFlag.png' %}");
         }
-        
-        #createCvs{
+
+        #createCvs {
             cursor: none;
         }
     </style>
@@ -93,7 +115,7 @@
         var forward2Src = "{% static 'img/forward2.png' %}";
         var forward3Src = "{% static 'img/forward3.png' %}";
         var forward4Src = "{% static 'img/forward4.png' %}";
-        var cBGImageSrc = "{% static 'img/createBG1px.png' %}";
+        var cBGImageSrc = "{% static 'img/createBG1px.jpg' %}";
         var c_selectSrc = "{% static 'img/c_select.png' %}";
         /**
          * サーバー側から送信されるデータを取得
@@ -105,8 +127,9 @@
         var old_map = "{{ old_map }}";
     </script>
 </head>
-<body>
-<h1>はろわ</h1>
+<body onselectstart="return false">
+<div id="headline"></div>
+<h1 id="title">クリエイトモード</h1>
 <div id="create">
     <canvas id="backCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
     <canvas id="middleCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
@@ -117,8 +140,9 @@
     <button id="blockBtn" class="paletBtn"></button>
     <button id="characterBtn" class="paletBtn"></button>
     <button id="goalBtn" class="paletBtn"></button>
-    <form name="mapTrans" action="" method="post" onsubmit="checkSubmit()">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
-        <input type="submit" value="送信" />
+    <form name="mapTrans" action="" method="post" onsubmit="checkSubmit()">
+        {% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
+        <input type="submit" value="送信"/>
     </form>
 </div>
 <script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>

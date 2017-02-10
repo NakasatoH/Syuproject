@@ -14,6 +14,7 @@
         body {
             background-size: cover;
             background: #3B3F42;
+            -webkit-user-select: none;
         }
 
         select:focus, button:focus {
@@ -51,7 +52,7 @@
         }
 
         .select {
-            padding: 10px;
+            padding:10px 10px 12px 10px;
             border-top: solid 2px white;
             border-left: solid 2px white;
             border-bottom: solid 2px gray;
@@ -165,7 +166,7 @@
 
         #buttons {
             position: absolute;
-            top: 240px;
+            top: 236px;
             left: 0;
         }
 
@@ -260,7 +261,7 @@
         #CloseBtn {
             position: absolute;
             top: -25px;
-            left: 420px;
+            left: 460px;
             z-index: 10;
             padding: 0 10px;
             margin: 0;
@@ -273,7 +274,7 @@
 
         #helpBtn {
             position: relative;
-            top: 10px;
+            top: 6px;
             left: 50px;
             width: 116px;
             font-size: 14px;
@@ -336,8 +337,19 @@
 
         #actionUnder {
             position: relative;
-            top: 168px;
+            top: 136px;
             left: 750px;
+        }
+        #characters{
+            position: relative;
+            top:0;
+            left:0;
+        }
+
+        #cvsReset{
+            position: relative;
+            top:-1px;
+            left:0
         }
     </style>
     <script type="text/javascript">
@@ -351,8 +363,8 @@
         var masaruSrc = "{% static 'img/masaru.png' %}";
         var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
         var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
-        var block_b2Src = "{% static 'img/block_b.png' %}";
-        var block_bSrc = "{% static 'img/block_b2.png' %}";
+        var block_b2Src = "{% static 'img/block_b2.png' %}";
+        var block_bSrc = "{% static 'img/block_b.png' %}";
         var umiSrc = "{% static 'img/umi.jpg' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var ebataSrc = "{% static 'img/ebata.jpg' %}";
@@ -499,11 +511,11 @@
             <option value="">須永魚</option>
             <option value="">若いEBT</option>
         </select>
-        <button class="button resetBtn" onclick="cvsReset();">動作画面のリセット</button>
+        <button id="cvsReset" class="button resetBtn" onclick="cvsReset();">動作画面のリセット</button>
     </div>
+    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/click.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/ddPlusMove.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
 </div>
 </body>
 </html>

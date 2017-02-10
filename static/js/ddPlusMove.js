@@ -94,9 +94,9 @@ function f_dragover(event) {
     var scrollY = window.pageYOffset || root.scrollTop;
     x = scrollX + event.clientX - rect.left - startScrollX;
     y = scrollY + event.clientY - rect.top - startScrollY;
-    console.log("winSc : " + scrollY + "startScrollY :" + startScrollY);
-    console.log("x : " + x + "y : " + y);
-    //console.log("y :" + y + " x :" + x);
+    // console.log("winSc : " + scrollY + "startScrollY :" + startScrollY);
+    // console.log("x : " + x + "y : " + y);
+    // console.log("y :" + y + " x :" + x);
     if (images[images.length - 1]) {
         lastCodeRect = document.getElementById(images[images.length - 1]).getBoundingClientRect();
         lastCodePosition = lastCodeRect.top - rect.top + lastCodeRect.height;
@@ -199,7 +199,7 @@ function f_drop(event) {
     x = Math.floor(x);// 四捨五入　整数型にキャスト
     y = Math.floor(y);
 
-    console.log("x : " + x + " y : " + y);
+    // console.log("x : " + x + " y : " + y);
     /**
      * window.setTimeoutは並行処理であるため、currentTarget.appendChild()もpreventDefaultもsetTimeout内に入れる必要がある
      * また、更にその中でもevent.preventDefault()の方が処理順が速いため、currentTargetを見失ってしまう。
@@ -304,7 +304,7 @@ function f_drop(event) {
             currentTarget.appendChild(document.getElementById(id));// エレメントをbottomに挿入
         } else {// 最初のコード、または最後のコードではない && whileではない
             var initVal = y - 10.6;
-            console.log("-------- pointS --------" + initVal);
+            // console.log("-------- pointS --------" + initVal);
             if (initVal < 0) {
                 // images[0]に挿入
                 for (i = images.length - 1; i >= 0; i--) {
@@ -703,10 +703,12 @@ function action() {
                         } else if (map[pPositionY - 1][pPositionX] == "g") {
                             // ゴール時の処理
                             goalFlg = true;
-                        } else {
+                        } else if(map[pPositionY - 1][pPositionX] == "0"){
                             map[pPositionY][pPositionX] = "0";
                             pPositionY -= 1;
                             map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }else{
+                            blockFlg = true;
                         }
                         break;
                     case "r":
@@ -714,10 +716,12 @@ function action() {
                             blockFlg = true;
                         } else if (map[pPositionY][pPositionX + 1] == "g") {
                             goalFlg = true;
-                        } else {
+                        } else if(map[pPositionY][pPositionX + 1] == "0"){
                             map[pPositionY][pPositionX] = "0";
                             pPositionX += 1;
                             map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }else{
+                            blockFlg = true;
                         }
                         break;
                     case "b":
@@ -725,10 +729,12 @@ function action() {
                             blockFlg = true;
                         } else if (map[pPositionY + 1][pPositionX] == "g") {
                             goalFlg = true;
-                        } else {
+                        } else if(map[pPositionY + 1][pPositionX] == "0"){
                             map[pPositionY][pPositionX] = "0";
                             pPositionY += 1;
                             map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }else{
+                            blockFlg = true;
                         }
                         break;
                     case "l":
@@ -736,10 +742,12 @@ function action() {
                             blockFlg = true;
                         } else if (map[pPositionY][pPositionX - 1] == "g") {
                             goalFlg = true;
-                        } else {
+                        } else if(map[pPositionY][pPositionX - 1] == "0"){
                             map[pPositionY][pPositionX] = "0";
                             pPositionX -= 1;
                             map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                        }else{
+                            blockFlg = true;
                         }
                         break;
                 }// switch (data_d) End

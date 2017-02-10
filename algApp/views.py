@@ -88,8 +88,18 @@ def ddpulsmove(request):
 def createmap(request):
     # result.htmlへ
     if request.method == "POST":
+        mapData = ""
         mes = ""
         uid = ""
+        root = ""
+        pPositionX = ""  # プレイヤーのx座標
+        pPositionY = ""  # 〃        y座標
+        try:
+            root = request.POST['root']
+        except:
+            print("createMAPへ")
+
+        print('ルート：' + str(root))
         # 送信されたmapデータを取得
         c_map = [[0 for i in range(10)] for j in range(10)]
         try:
@@ -105,12 +115,44 @@ def createmap(request):
         except:
             print("取得できず")
 
-        data = {
-            'uid' : uid,
-            'mapData' : c_map
-        }
-        return render(request, 'createResult.html', data)
-        # createMap.htmlへ
+        if root == 'next':
+            try:
+                mapData = request.POST['mapData']
+                pPositionX = request.POST['pX']
+                pPositionY = request.POST['pY']
+            except:
+                print("ないわけないやん")
+            print(mapData)
+            inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
+            inifile.read('static/config/stageSample01.ini', encoding='utf-8')
+
+            # Configファイルから設定情報を取得
+            block_size = inifile.get('settings', 'block_size')
+            cvs_width = inifile.get('settings', 'canvas_width')
+            cvs_height = inifile.get('settings', 'canvas_height')
+
+            # ブロックがキャンバス上にそれぞれ何個入るかを調べる
+            w_blocks = int(int(cvs_width) / int(block_size))
+            h_blocks = int(int(cvs_height) / int(block_size))
+
+            cnt = 0
+
+            data = {
+                'mapData': mapData,
+                'block_size': block_size,
+                'pPositionX': pPositionX,
+                'pPositionY': pPositionY,
+                'cvs_width': cvs_width,
+                'cvs_height': cvs_height,
+            }
+            return render(request, 'ddPlusMove.html', data)
+        else:
+            data = {
+                'uid': uid,
+                'mapData': c_map
+            }
+            return render(request, 'createResult.html', data)
+            # createMap.htmlへ
     elif request.method == "GET":  # mapという変数名を生成してエラーを確認。
 
         inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
