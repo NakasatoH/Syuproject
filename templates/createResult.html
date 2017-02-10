@@ -42,6 +42,7 @@
         var block_bSrc = "{% static 'img/block_b.png' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var umiSrc = "{% static 'img/umi.jpg' %}";
+        var akitoSrc = "{% static 'img/akito40.png' %}";
 
         var pX = 0;
         var pY = 0;
@@ -59,7 +60,10 @@
     <canvas id="cvs" width="400px" height="400px"></canvas>
     <p>ユニークID : {{ uid }}</p>
     <canvas id="backCvs" width="400px" height="400px"></canvas>
-    <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
+
+    <!-- Javascriptファイル読み込み -->
+    <script type="text/javascript" src="{% static 'js/result.js' %}"></script>
+
     <form action="" method="get" onsubmit="{return false}">
         {% csrf_token %}
     </form>

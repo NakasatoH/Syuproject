@@ -698,55 +698,67 @@ function action() {
                 data_n = drop_elm.getAttribute("data-n");// 移動量
                 switch (data_d) {
                     case "t":
-                        if (map[pPositionY - 1][pPositionX] == "*") {
-                            blockFlg = true;
-                        } else if (map[pPositionY - 1][pPositionX] == "g") {
-                            // ゴール時の処理
-                            goalFlg = true;
-                        } else if(map[pPositionY - 1][pPositionX] == "0"){
-                            map[pPositionY][pPositionX] = "0";
-                            pPositionY -= 1;
-                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                        }else{
+                        if (pPositionY != 0) {
+                            if (map[pPositionY - 1][pPositionX] == "*") {
+                                blockFlg = true;
+                            } else if (map[pPositionY - 1][pPositionX] == "g") {
+                                // ゴール時の処理
+                                goalFlg = true;
+                            } else if (map[pPositionY - 1][pPositionX] == "0") {
+                                map[pPositionY][pPositionX] = "0";
+                                pPositionY -= 1;
+                                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                            } else {
+                                blockFlg = true;
+                            }
+                        } else {
                             blockFlg = true;
                         }
                         break;
                     case "r":
-                        if (map[pPositionY][pPositionX + 1] == "*") {
-                            blockFlg = true;
-                        } else if (map[pPositionY][pPositionX + 1] == "g") {
-                            goalFlg = true;
-                        } else if(map[pPositionY][pPositionX + 1] == "0"){
-                            map[pPositionY][pPositionX] = "0";
-                            pPositionX += 1;
-                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                        }else{
+                        if (pPositionX != 9) {
+                            if (map[pPositionY][pPositionX + 1] == "*") {
+                                blockFlg = true;
+                            } else if (map[pPositionY][pPositionX + 1] == "g") {
+                                goalFlg = true;
+                            } else if (map[pPositionY][pPositionX + 1] == "0") {
+                                map[pPositionY][pPositionX] = "0";
+                                pPositionX += 1;
+                                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                            }
+                        } else {
                             blockFlg = true;
                         }
                         break;
                     case "b":
-                        if (map[pPositionY + 1][pPositionX] == "*") {
-                            blockFlg = true;
-                        } else if (map[pPositionY + 1][pPositionX] == "g") {
-                            goalFlg = true;
-                        } else if(map[pPositionY + 1][pPositionX] == "0"){
-                            map[pPositionY][pPositionX] = "0";
-                            pPositionY += 1;
-                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                        }else{
+                        if (pPositionY != 9) {
+                            if (map[pPositionY + 1][pPositionX] == "*") {
+                                blockFlg = true;
+                            } else if (map[pPositionY + 1][pPositionX] == "g") {
+                                goalFlg = true;
+                            } else if (map[pPositionY + 1][pPositionX] == "0") {
+                                map[pPositionY][pPositionX] = "0";
+                                pPositionY += 1;
+                                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                            }
+                        } else {
                             blockFlg = true;
                         }
                         break;
                     case "l":
-                        if (map[pPositionY][pPositionX - 1] == "*") {
-                            blockFlg = true;
-                        } else if (map[pPositionY][pPositionX - 1] == "g") {
-                            goalFlg = true;
-                        } else if(map[pPositionY][pPositionX - 1] == "0"){
-                            map[pPositionY][pPositionX] = "0";
-                            pPositionX -= 1;
-                            map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
-                        }else{
+                        if (pPositionX != 0) {
+                            if (map[pPositionY][pPositionX - 1] == "*") {
+                                blockFlg = true;
+                            } else if (map[pPositionY][pPositionX - 1] == "g") {
+                                goalFlg = true;
+                            } else if (map[pPositionY][pPositionX - 1] == "0") {
+                                map[pPositionY][pPositionX] = "0";
+                                pPositionX -= 1;
+                                map[pPositionY][pPositionX] = "p";// mapデータ上のプレイヤーの位置を移動
+                            } else {
+                                blockFlg = true;
+                            }
+                        } else {
                             blockFlg = true;
                         }
                         break;
