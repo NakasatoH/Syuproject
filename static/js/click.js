@@ -108,20 +108,28 @@ function forwardImageOnClick(e) {
  */
 function directionImageOnClick(e) {
     switch (e.getAttribute("data-d")) {
+        // 西だったら → 南
         case "l":
-            e.setAttribute("data-d", "r");
-            e.src = turnWestSrc;
-            break;
-        case "r":
             e.setAttribute("data-d", "b");
+            console.log("b");
             e.src = turnSouthSrc;
             break;
+        // 東だったら → 西
+        case "r":
+            e.setAttribute("data-d", "l");
+            console.log("l");
+            e.src = turnWestSrc;
+            break;
+        // 南だったら → 北
         case "b":
             e.setAttribute("data-d", "t");
+            console.log("t");
             e.src = turnNorthSrc;
             break;
+        // 北だったら → 東
         case "t":
-            e.setAttribute("data-d", "l");
+            e.setAttribute("data-d", "r");
+            console.log("r");
             e.src = turnEastSrc;
             break;
     }
