@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>adminテーブル情報等</title>
+    <style type="TEXT/css">
+        *{
+            font-family: meiryo UI;
+        }
+        table{
+            border: solid 4px #e8e8e8;
+            width: auto;
+            border-spacing: 0;
+            font-size:14px;
+
+        }
+        th,td{
+            font-size:14px;
+            padding: 12px;
+            border-bottom: solid 1px #b4b4b4;
+            border-right: solid 1px #b4b4b4;
+        }
+        th{
+            background: rgba(100,255,100,0.2);
+        }
+        td{
+            background: rgba(100,255,200,0.1    );
+        }
+    </style>
+</head>
+<body>
+    <!-- 作成テーブル情報 -->
+    <h3>作成テーブル情報</h3>
+    <table>
+        <tr>
+            <th colspan="8">alg_appテーブル</th>
+        </tr>
+        <!-- 項目一覧 -->
+        <tr>
+            <th>論理名</th><th>物理名</th><th>データ型</th><th>長さ</th>
+            <th>必須</th><th>キー</th><th>外部キー</th><th>備考</th>
+        </tr>
+        <!-- ID -->
+        <tr>
+            <td>ID</td><td>id</td><td>INT</td><td></td>
+            <td>YES</td><td>PK</td><td>AUTO<br />INCREMENT</td><td></td>
+        </tr>
+        <!-- ユーザー名 -->
+        <tr>
+            <td>ユーザー名</td><td>user</td><td>TEXT</td><td></td>
+            <td>NO</td><td></td><td></td><td></td>
+        </tr>
+        <!-- パスコード -->
+        <tr>
+            <td>コード</td><td>pass_code</td><td>TEXT</td><td>
+        </td><td>YES</td><td></td><td></td><td></td>
+        </tr>
+        <!-- マップデータ -->
+        <tr>
+            <td>マップデータ</td><td>map_data</td><td>TEXT</td><td></td>
+            <td>YES</td><td></td><td></td><td></td>
+        </tr>
+        <!-- 投稿日時  datetime('2017-01-01 11:11:11') as datetime; -->
+        <tr>
+            <td>日時</td><td>ts</td><td></td><td></td>
+            <td>YES</td><td></td><td></td><td>default CURRENT_TIMESTAMP</td>
+        </tr>
+        <!-- Create文-->
+        <tr>
+            <th colspan="8">alg_appテーブル CREATE文</th>
+        </tr>
+        <tr>
+            <td colspan="8">
+                CREATE TABLE alg_app(id INTEGER PRIMARY KEY AUTOINCREMENT,<br />
+                user TEXT, pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts DEFAULT CURRENT_TIMESTAMP)
+            </td>
+        </tr>
+        <tr>
+            <th colspan="8">alg_appテーブル INSERT文</th>
+        </tr>
+        <tr>
+            <td colspan="8">
+                INSERT INTO alg_app (user, pass_code, map_data)
+                VALUES( 'user', 'xxxx', '********00000g00000p00000********')
+            </td>
+        </tr>
+        <tr>
+            <th colspan="8">SQLite3説明</th>
+        </tr>
+        <tr>
+            <td colspan="8">NULL       NULL値<br />
+                INTEGER    符号付整数。1, 2, 3, 4, 6, or 8 バイトで格納<br />
+                REAL       浮動小数点数。8バイトで格納<br />
+                TEXT       テキスト。UTF-8, UTF-16BE or UTF-16-LEのいずれかで格納<br />
+                BLOB       Binary Large Object。入力データをそのまま格納
+            </td>
+        </tr>
+    </table>
+<a href="{% url 'algApp:index' %}">TOP</a>
+</body>
+</html>

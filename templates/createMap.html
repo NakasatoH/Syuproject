@@ -102,7 +102,7 @@
         var tyagumaSrc = "{% static 'img/tyaguma.png' %}";
         var sunagauoSrc = "{% static 'img/sunagafish.png' %}";
         var block_bSrc = "{% static 'img/block_b.png' %}";
-        var umiSrc = "{% static 'img/umi.jpg' %}";
+        var haikeiSrc = "{% static 'img/kusamura.jpg' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
         var ebataSrc = "{% static 'img/ebata.jpg' %}";
         var dragSoundSrc = "{% static 'audio/switch01.mp3' %}";
@@ -140,8 +140,10 @@
     <button id="blockBtn" class="paletBtn"></button>
     <button id="characterBtn" class="paletBtn"></button>
     <button id="goalBtn" class="paletBtn"></button>
-    <form name="mapTrans" action="" method="post" onsubmit="checkSubmit()">
-        {% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
+    <form name="mapTrans" action="" method="post" onsubmit="return checkSubmit();">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
+        <input type="hidden" id="hiddenRoot" name="root" value="">
+        <input type="text" name="user" value="" placeholder="ユーザー名">
+        <input type="hidden" id="passCode" name="passCode" value="">
         <input type="submit" value="送信"/>
     </form>
 </div>

@@ -18,7 +18,7 @@ var haikeiFlg = false;
 // 画像パスを画像obj.srcに設定
 imageB.src = block_bSrc;
 imageG.src = goalSrc;
-haikei.src = umiSrc + "?" + new Date().getTime();
+haikei.src = haikeiSrc + "?" + new Date().getTime();
 // 画像の初回ロード時に画像を表示する
 imageB.onload = (function () {
     iBFlg = true;

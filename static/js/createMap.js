@@ -256,10 +256,18 @@ function MouseEventFunc(e) {
 
 
 function checkSubmit() {
+    var playerExist_b =false;
+    var goalExist_b = false;
     var mapStr = "";
+    var errMes_s = "";
     var uniqueId = uid();
     for (var i = 0; i < 10; i++) {
         for (var j = 0; j < 10; j++) {
+            if(mapData[i][j] == "p"){
+                playerExist_b = true;
+            }else if(mapData[i][j] == "g"){
+                goalExist_b = true;
+            }
             makeHidden("c_map[" + i + "][" + j + "]", mapData[i][j], "mapTrans");
             mapStr = mapStr + mapData[i][j];
         }
@@ -269,9 +277,21 @@ function checkSubmit() {
     makeHidden('uniqueId', uniqueId, "mapTrans");
     // 再送信防止
     makeHidden('old_map', mapStr, "mapTrans");
-    if(old_map == mapStr){
+    if(old_map == mapStr || !playerExist_b || !goalExist_b){
+        if(!playerExist_b && !goalExist_b){
+            errMes_s = "エラー：プレイヤーとゴールの位置が設定されていません。"
+        }else if(!playerExist_b){
+            errMes_s = "エラー：プレイヤーの位置が設定されていません。"
+        }else if(!goalExist_b){
+            errMes_s = "エラー：ゴールの位置が設定されていません。"
+        }else{
+            errMes_s = "エラー：以前と同じMAPを送信しようとしていませんか？"
+        }
+        alert(errMes_s);
+        document.getElementById("hiddenRoot").setAttribute("value", "toCreate");
         return false;
     }else{
+        document.getElementById("hiddenRoot").setAttribute("value", "toResult");
         return true;
     }
 }
@@ -327,5 +347,6 @@ function uid() {
     for (var i = 0; i < 4; i++) {
         uid = uid + str[Math.floor(Math.random() * str.length)];
     }
+    document.getElementById('passCode').setAttribute('value', uid);
     return uid;
 }

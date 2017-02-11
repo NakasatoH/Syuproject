@@ -25,7 +25,7 @@ var haikeiFlg = false;
 imageB.src = block_bSrc;
 imageG.src = goalSrc;
 imageP.src = akitoSrc;
-haikei.src = umiSrc + "?" + new Date().getTime();
+haikei.src = haikeiSrc + "?" + new Date().getTime();
 
 // 画像の初回ロード時に画像を表示する
 imageB.onload = (function () {

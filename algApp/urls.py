@@ -7,5 +7,6 @@ urlpatterns = [
     url(r'^imagemove/', views.imagemove, name='imagemove'),
     url(r'^movesample/', views.movesample, name='movesample'),
     url(r'^ddplusmove/', views.ddpulsmove, name='ddplusmove'),
-    url(r'^createmap/', views.createmap, name='createmap')
+    url(r'^createmap/', views.createmap, name='createmap'),
+    url(r'^tableinfo/', views.tableinfo, name='tableinfo'),
 ]

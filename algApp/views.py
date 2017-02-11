@@ -1,13 +1,10 @@
 # -*- coding:utf-8 -*-
 
 
-from django.shortcuts import render
 import configparser
-import sys
-import io
-import json
 from numpy import *
-from django.http import HttpResponse
+from django.shortcuts import render
+import sqlite3
 
 
 def index(request):
@@ -89,9 +86,9 @@ def createmap(request):
     # result.htmlへ
     if request.method == "POST":
         mapData = ""
-        mes = ""
+        mapStr = ""
         uid = ""
-        root = ""
+        root = "ルートデータ無し　createResult.html　へ"
         pPositionX = ""  # プレイヤーのx座標
         pPositionY = ""  # 〃        y座標
         try:
@@ -109,13 +106,14 @@ def createmap(request):
             cnt = 0
             for y in range(0, 10):
                 for x in range(0, 10):
-                    mes = str(mes) + str(c_map[y][x])
+                    mapStr = str(mapStr) + str(c_map[y][x])
             uid = request.POST['uniqueId']
-            print('uniqueID : ' + str(uid) + ' c_map: ' + str(mes))
+            print('uniqueID : ' + str(uid) + ' c_map: ' + str(mapStr))
         except:
             print("取得できず")
 
-        if root == 'next':
+        # createResult  -> ddPulsMove.html
+        if root == 'toPlay':
             try:
                 mapData = request.POST['mapData']
                 pPositionX = request.POST['pX']
@@ -146,15 +144,74 @@ def createmap(request):
                 'cvs_height': cvs_height,
             }
             return render(request, 'ddPlusMove.html', data)
-        else:
+        elif root == 'toResult':
+            user = ''
+            passCode = ""
+
+            # NULL許可
+            try:
+                user = request.POST['user']
+            except:
+                print("ユーザー名なし")
+            if(user == ''):
+                user = "NoName"
+
+            # パスコード取得　NOTNULL
+            try:
+                passCode = request.POST['passCode']
+            except:
+                print("requestエラー　障害在り")
+
+            # データベース接続
+            connector = sqlite3.connect("sp.sqlite3")
+
+            # SQL文作成 sv_user テーブル作成 sql
+            sql = "CREATE TABLE alg_app(id INTEGER PRIMARY  KEY AUTOINCREMENT, user TEXT, pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts DEFAULT CURRENT_TIMESTAMP )"
+            try:
+                # SQL文実行
+                connector.execute(sql)
+                # SQL文更新
+                connector.commit()
+            except:
+                print("DB作成済み")
+            connector.close()
+
+            connector = sqlite3.connect("sp.sqlite3")
+            try:
+                # 必ずu""でユニコードに変換すること
+                connector.execute(u"INSERT INTO alg_app(user, pass_code, map_data) VALUES( ?,?,? )",
+                                  (user, passCode, mapStr))
+                ins_mes = str("alg_appテーブルに、ユーザー名：【") + str(user) + str("】 パスコード：【") + str(passCode) + str(
+                    "】 mapStr：【") + str(mapStr) + str("】")
+            except:
+                ins_mes = "データベース INSERT エラー"
+            connector.commit()
+            connector.close()
             data = {
                 'uid': uid,
                 'mapData': c_map
             }
             return render(request, 'createResult.html', data)
+        # 条件を満たしていないためResult画面ではなくCreateMap.htmlに戻す
+        elif root == 'toCreate':
+            inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
+            inifile.read('static/config/stageSample01.ini', encoding='utf-8')
+
+            # Configファイルから設定情報を取得
+            block_size = inifile.get('settings', 'block_size')
+            cvs_width = inifile.get('settings', 'canvas_width')
+            cvs_height = inifile.get('settings', 'canvas_height')
+            old_map = ""
+            data = {
+                'block_size': block_size,
+                'cvs_width': cvs_width,
+                'cvs_height': cvs_height,
+                'old_map': old_map,
+            }
+            return render(request, 'createMap.html', data)
             # createMap.htmlへ
     elif request.method == "GET":  # mapという変数名を生成してエラーを確認。
-
+        print("get")
         inifile = configparser.ConfigParser()  # SafeConfigParser()から名称変更
         inifile.read('static/config/stageSample01.ini', encoding='utf-8')
 
@@ -174,3 +231,7 @@ def createmap(request):
             'old_map': old_map,
         }
         return render(request, 'createMap.html', data)
+
+
+def tableinfo(request):
+    return render(request, 'tableInfo.html')

@@ -41,7 +41,7 @@
         var mapData = {{ mapData|safe }};
         var block_bSrc = "{% static 'img/block_b.png' %}";
         var goalSrc = "{% static 'img/goalFlag.png' %}";
-        var umiSrc = "{% static 'img/umi.jpg' %}";
+        var haikeiSrc = "{% static 'img/kusamura.jpg' %}";
         var akitoSrc = "{% static 'img/akito40.png' %}";
 
         var pX = 0;
@@ -82,7 +82,7 @@
     </div>
     <script type="text/javascript">
         function createMapPlay() {
-            document.getElementById("hiddenRoot").setAttribute("value", "next");
+            document.getElementById("hiddenRoot").setAttribute("value", "toPlay");
             document.getElementById("hiddenPX").setAttribute("value", pX);
             document.getElementById("hiddenPY").setAttribute("value", pY);
         }
