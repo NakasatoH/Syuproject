@@ -52,7 +52,7 @@
         }
 
         .select {
-            padding:10px 10px 12px 10px;
+            padding: 10px 10px 12px 10px;
             border-top: solid 2px white;
             border-left: solid 2px white;
             border-bottom: solid 2px gray;
@@ -127,7 +127,7 @@
             -webkit-box-orient: vertical;
         }
 
-        #upper > img{
+        #upper > img {
             margin-right: 1em;
         }
 
@@ -344,16 +344,17 @@
             top: 136px;
             left: 750px;
         }
-        #characters{
+
+        #characters {
             position: relative;
-            top:0;
-            left:0;
+            top: 0;
+            left: 0;
         }
 
-        #cvsReset{
+        #cvsReset {
             position: relative;
-            top:-1px;
-            left:0
+            top: -1px;
+            left: 0
         }
     </style>
     <script type="text/javascript">
@@ -480,7 +481,7 @@
                  data-n="2" ondragstart="f_dragstart(event)">
         </div>
         <div id="buttons">
-            <button class="button" onclick="debug()" >デバッグ表示</button>
+            <button class="button" onclick="debug()">デバッグ表示</button>
             <button class="button resetBtn" onclick="resetImages();">コードボックスのリセット</button>
             <button class="button resetBtn" onclick="allReset();">全部リセット</button>
         </div>
@@ -516,6 +517,11 @@
             <option value="">若いEBT</option>
         </select>
         <button id="cvsReset" class="button resetBtn" onclick="cvsReset();">動作画面のリセット</button>
+        <form action="" method="post">{% csrf_token %}
+            <input type="hidden" id="hiddenRoot" name="root" value="toPlay">
+            <p>復活の呪文：<input type="text" name="passCode"></p>
+            <input type="submit" value="送信">
+        </form>
     </div>
     <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/click.js' %}"></script>
