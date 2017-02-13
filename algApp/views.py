@@ -72,20 +72,21 @@ def createmap(request):
         except:
             print("取得できず")
         print(str('なにこれ：') + str(uid))
-        if uid != '':
-            data = {
-                'uid': uid,
-                'mapData': c_map,
-                'block_size': block_size,
-                'cvs_width': cvs_width,
-                'cvs_height': cvs_height,
-                'pPositionY': pPositionY,
-                'pPositionX': pPositionX,
-            }
-            return render(request, 'ddPlusMove.html', data)
+
         # createResult  -> ddPulsMove.html
         if root == 'toPlay':
             return returnddplus(request)
+        if root == 'resultToMain':
+            data = {
+                'mapData': c_map,
+                'block_size': block_size,
+                'pPositionX': pPositionX,
+                'pPositionY': pPositionY,
+                'cvs_width': cvs_width,
+                'cvs_height': cvs_height,
+                'uid': uid,
+            }
+            return render(request, 'ddPlusMove.html', data)
         elif root == 'toResult':
             user = ''
             passCode = ""
@@ -127,7 +128,6 @@ def createmap(request):
                     "】 mapStr：【") + str(mapStr) + str("】")
             except:
                 ins_mes = "データベース INSERT エラー"
-
 
             connector.commit()
             connector.close()

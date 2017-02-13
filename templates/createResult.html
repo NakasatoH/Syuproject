@@ -72,7 +72,8 @@
         <input type="text" value="{{ uid }}">
         <form action="" method="post" onsubmit="createMapPlay()">{% csrf_token %}
             <input type="submit" value="作成したMAPをプレイする">
-            <input type="hidden" id="hiddenRoot" name="root" value="">
+            <input type="hidden" id="hiddenRoot" name="root" value="reslutToMain">
+            <input type="hidden" id="hiddenPass" name="passCode" value="{{ uid }}">
             <input type="hidden" id="hiddenMap" name="mapData" value="{{ mapData|safe }}">
             <input type="hidden" id="hiddenPX" name="pX" value="">
             <input type="hidden" id="hiddenPY" name="pY" value="">
