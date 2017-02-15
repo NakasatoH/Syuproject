@@ -356,6 +356,48 @@
             top: -1px;
             left: 0
         }
+
+        #submitBtn {
+            padding: 10px;
+            color: #e8e8e8;
+            border-radius: 6px;
+            text-shadow: 0 -1px rgba(206, 207, 211, 0.12);
+            background: #202020;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 70%,
+                    #1c1c1c 100%);
+            box-shadow: 2px 2px 5px #000;
+        }
+
+        #submitBtn:focus {
+            outline: 1px;
+            border-color: white;
+        }
+
+        input[type=text] {
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -o-border-radius: 5px;
+            -ms-border-radius: 5px;
+            border: #a9a9a9 1px solid;
+            -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            width: 200px;
+            height: 25px;
+            padding: 0 3px;
+        }
+
+        input[type=text]:focus {
+            border: solid 1px #20b2aa;
+        }
+
+        input[type=text], select {
+            outline: none;
+        }
     </style>
     <script type="text/javascript">
         /**
@@ -519,8 +561,8 @@
         <button id="cvsReset" class="button resetBtn" onclick="cvsReset();">動作画面のリセット</button>
         <form action="" method="post">{% csrf_token %}
             <input type="hidden" id="hiddenRoot" name="root" value="toPlay">
-            <p>復活の呪文：<input type="text" name="passCode"></p>
-            <input type="submit" value="送信">
+            <p>復活の呪文：<input type="text" id="jumon" name="passCode"></p>
+            <input type="submit" id="submitBtn" value="送信">
         </form>
     </div>
     <script type="text/javascript" src="{% static 'js/ddPlusMoveBack.js' %}"></script>
