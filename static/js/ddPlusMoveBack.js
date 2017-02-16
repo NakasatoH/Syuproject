@@ -9,16 +9,19 @@
 var imageB = new Image();
 var imageG = new Image();
 var haikei = new Image();
+var gridImg = new Image();
 
 // 全ての画像のロードが完了してから描画するためのフラグ
 var iBFlg = false;
 var iGFlg = false;
 var haikeiFlg = false;
+var gridFlg = false;
 
 // 画像パスを画像obj.srcに設定
 imageB.src = block_bSrc;
 imageG.src = goalSrc;
 haikei.src = haikeiSrc + "?" + new Date().getTime();
+gridImg.src = gridSrc + "?" + new Date().getTime();
 // 画像の初回ロード時に画像を表示する
 imageB.onload = (function () {
     iBFlg = true;
@@ -83,4 +86,17 @@ function cvsReset() {
 function allReset() {
     cvsReset();
     resetImages();
+}
+
+// グリッド線を表示する関数
+function gridSwitch() {
+    var midCvs = document.getElementById("midCvs");
+    m_cvs = midCvs.getContext('2d');
+    if(!gridFlg){
+        m_cvs .drawImage(gridImg, 0, 0);
+        gridFlg = true;
+    }else{
+        m_cvs .clearRect(0, 0, midCvs.width, midCvs.height);
+        gridFlg = false;
+    }
 }

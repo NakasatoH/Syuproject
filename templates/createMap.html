@@ -37,22 +37,33 @@
             box-shadow: 2px 2px 5px #000;
             font-family: "メイリオ";
         }
+        #forms{
+            position: absolute;
+            top: 530px;
+            left: 208px;
+        }
 
         #createCvs, #backCreateCvs, #middleCreateCvs {
             position: absolute;
             top: 120px;
-            left: 20px;
+            left: 100px;
             width: {{ cvs_width }}px;
             height: {{ cvs_height }}px;
             -webkit-user-select: none;
         }
 
         #paletBtns {
+            background: #d49a3e;
             position: absolute;
-            top: 526px;
+            top: 120px;
             left: 20px;
-            width: 200px;
-            height: 200px;
+            width: 65px;
+            height: 396px;
+            border-top: solid 1px #ffc76b;
+            border-left: solid 1px #ffc76b;
+            border-right: solid 1px #a97e51;
+            border-bottom: solid 1px #a97e51;
+            box-shadow: 2px 2px 5px #1E1E1E;
         }
 
         #paletBtns > button {
@@ -60,6 +71,8 @@
         }
 
         .paletBtn {
+            margin-left: 10px;
+            margin-top: 10px;
             padding: 10px;
             color: #e8e8e8;
             border-radius: 6px;
@@ -86,8 +99,65 @@
             background-image: url("{% static 'img/goalFlag.png' %}");
         }
 
+        #user{
+            padding:
+        }
         #createCvs {
             cursor: none;
+        }
+
+        input[type=text]:focus {
+            border: solid 1px #20b2aa;
+        }
+
+        input[type=text], select {
+            outline: none;
+        }
+
+        .button {
+            padding: 10px;
+            color: #e8e8e8;
+            border-radius: 6px;
+            text-shadow: 0 -1px rgba(206, 207, 211, 0.12);
+            background: #202020;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 70%,
+                    #1c1c1c 100%);
+            box-shadow: 2px 2px 5px #000;
+        }
+
+       #deleteBtn{
+          margin-top: 180px;
+        }
+
+        .button:focus {
+            outline: 1px;
+            border-color: white;
+        }
+
+        input[type=text] {
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border: #a9a9a9 1px solid;
+            -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            width: 200px;
+            height: 25px;
+            padding: 0 3px;
+        }
+
+        #setumei{
+            position: absolute;
+            top:110px;
+            left:520px;
+        }
+
+        ul {
+            list-style: none;
         }
     </style>
     <script type="text/javascript">
@@ -117,6 +187,7 @@
         var forward4Src = "{% static 'img/forward4.png' %}";
         var cBGImageSrc = "{% static 'img/createBG1px.jpg' %}";
         var c_selectSrc = "{% static 'img/c_select.png' %}";
+
         /**
          * サーバー側から送信されるデータを取得
          */
@@ -130,23 +201,35 @@
 <body onselectstart="return false">
 <div id="headline"></div>
 <h1 id="title">クリエイトモード</h1>
-<div id="create">
-    <canvas id="backCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
-    <canvas id="middleCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
-    <canvas id="createCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"
-            oncontextmenu="{return false;}"></canvas>
-</div>
-<div id="paletBtns">
-    <button id="blockBtn" class="paletBtn"></button>
-    <button id="characterBtn" class="paletBtn"></button>
-    <button id="goalBtn" class="paletBtn"></button>
-    <button id="deleteBtn" class="paletBtn"></button>
-    <form name="mapTrans" action="" method="post" onsubmit="return checkSubmit();">{% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
-        <input type="hidden" id="hiddenRoot" name="root" value="">
-        <input type="text" name="user" value="" placeholder="ユーザー名">
-        <input type="hidden" id="passCode" name="passCode" value="">
-        <input type="submit" value="送信"/>
-    </form>
+<div id="content">
+    <div id="create">
+        <canvas id="backCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
+        <canvas id="middleCreateCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"></canvas>
+        <canvas id="createCvs" height="{{ cvs_height }}px" width="{{ cvs_width }}px"
+                oncontextmenu="{return false;}"></canvas>
+    </div>
+    <div id="paletBtns">
+        <button id="blockBtn" class="paletBtn"></button>
+        <button id="characterBtn" class="paletBtn"></button>
+        <button id="goalBtn" class="paletBtn"></button>
+        <button id="deleteBtn" class="paletBtn"></button>
+    </div>
+    <div id="forms">
+        <form name="mapTrans" action="" method="post" onsubmit="return checkSubmit();">
+            {% csrf_token %}<!-- クロスサイトリクエストフォージェリ (CSRF) 対策 -->
+            <input type="hidden" id="hiddenRoot" name="root" value="">
+            <input type="text" id="user" name="user" value="" placeholder="ユーザー名">
+            <input type="hidden" id="passCode" name="passCode" value="">
+            <input type="submit" class="button" value="作成完了">
+        </form>
+    </div>
+    <div id="setumei">
+        <h3>操作説明</h3>
+        <ul>
+            <li>① 画面左のパレットから設置したい物を左クリックで選択する</li>
+            <li>② キャンバス上をマウス左ボタンを押すことで設置、マウス右ボタンで選択した場所を削除</li>
+        </ul>
+    </div>
 </div>
 <script type="text/javascript" src="{% static 'js/createMap.js' %}"></script>
 </body>

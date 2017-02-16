@@ -35,6 +35,42 @@
             top:20px;
             left:440px;
         }
+
+        .button {
+            margin-top: 1em;
+            padding: 10px;
+            color: #e8e8e8;
+            border-radius: 6px;
+            text-shadow: 0 -1px rgba(206, 207, 211, 0.12);
+            background: #202020;
+            background: linear-gradient(
+                    to bottom,
+                    #525252 0%,
+                    #272727 70%,
+                    #1c1c1c 100%);
+            box-shadow: 2px 2px 5px #000;
+        }
+        input[type=text] {
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border: #a9a9a9 1px solid;
+            -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2), 0 0 2px rgba(0, 0, 0, 0.3);
+            width: 200px;
+            height: 25px;
+            padding: 0 3px;
+            color: black;
+        }
+
+        input[type=text]:focus {
+            border: solid 1px #20b2aa;
+        }
+
+        input[type=text], select {
+            outline: none;
+        }
     </style>
     <script type="text/javascript">
         var uid = "{{ uid }}";
@@ -58,7 +94,7 @@
 </head>
 <body>
     <canvas id="cvs" width="400px" height="400px"></canvas>
-    <p>ユニークID : {{ uid }}</p>
+    <p>作成したID : {{ uid }}</p>
     <canvas id="backCvs" width="400px" height="400px"></canvas>
 
     <!-- Javascriptファイル読み込み -->
@@ -71,15 +107,14 @@
         <p>コピーして友達と共有してね</p>
         <input type="text" value="{{ uid }}">
         <form action="" method="post" onsubmit="createMapPlay()">{% csrf_token %}
-            <input type="submit" value="作成したMAPをプレイする">
+            <input type="submit" id="play" class="button" value="作成したMAPをプレイする">
             <input type="hidden" id="hiddenRoot" name="root" value="reslutToMain">
             <input type="hidden" id="hiddenPass" name="passCode" value="{{ uid }}">
             <input type="hidden" id="hiddenMap" name="mapData" value="{{ mapData|safe }}">
             <input type="hidden" id="hiddenPX" name="pX" value="">
             <input type="hidden" id="hiddenPY" name="pY" value="">
         </form>
-        作成したMAPをプレイする
-        <a href="{% url 'algApp:ddplusmove' %}">TOP</a>
+        <a href="{% url 'algApp:ddplusmove' %}"><button class="button">トップページに戻る</button></a>
     </div>
     <script type="text/javascript">
         function createMapPlay() {

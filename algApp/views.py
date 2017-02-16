@@ -246,6 +246,7 @@ def returnddplus(request):
                 'pPositionY': pPositionY,
                 'cvs_width': cvs_width,
                 'cvs_height': cvs_height,
+                'uid': passCode,
             }
             return render(request, 'ddPlusMove.html', data)
     # 復活の呪文に失敗した場合
@@ -265,5 +266,6 @@ def returnddplus(request):
         'pPositionY': pPositionY,
         'cvs_width': cvs_width,
         'cvs_height': cvs_height,
+        'uid': passCode,
     }
     return render(request, 'ddPlusMove.html', data)

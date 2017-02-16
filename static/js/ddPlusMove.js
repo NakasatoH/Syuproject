@@ -13,7 +13,6 @@ var while_x = 0;// 最も後にドロップされたwhileイメージの位置�
 var shadowFlg = 0;// 影の表示に使うフラグ
 var checkFlg = 0;// 影を表示後に座標が変更された際その都度一度だけ影を削除し、インデントを調整するための変数
 var bottomDiv = document.getElementById('bottom');// ドロップ先Divの位置を把握する必要がある
-var rect = bottomDiv.getBoundingClientRect();
 var images = [];// ドロップした順にidを保管するための配列
 var codeNums = [];// images配列に合わせてコード番号を保管する配列
 var bkCodeNums = [];// codeNumsのバックアップ用配列
@@ -82,6 +81,7 @@ function f_dragstart(event) {
 
 // ドラッグ要素がドロップ要素に重なっている間の処理
 function f_dragover(event) {
+    var rect = bottomDiv.getBoundingClientRect();
     var btm_elm = document.getElementById("bottom");
     var side_elm = document.getElementById("sidePoint");
     var id;
@@ -182,6 +182,7 @@ function deleteShadow() {
  * @param event
  */
 function f_drop(event) {
+    var rect = bottomDiv.getBoundingClientRect();
     var id_name = event.dataTransfer.getData("text");// ドラッグされたデータのid名をDataTransferオブジェクトから取得
     var drag_elm = document.getElementById(id_name);// id名からドラッグされた要素を取得
 
@@ -363,8 +364,6 @@ function f_drop(event) {
                  * 実装予定
                  * ここに　wCntが1以上の場合 x軸ごとに
                  */
-
-
                 // 再配置
                 for (i = yPoint; i < images.length; i++) {
                     if (images[i] != "endWhile") {
@@ -386,7 +385,6 @@ function f_drop(event) {
                     }
                 }
             }
-
         }
         //途中挿入の場合（while以外）
     }
@@ -516,8 +514,6 @@ function ImageToCanvas(im, direction, num) {
         blockFlg = true;//ゴールしたあと壁を突き抜けるバグ対策
     }
 }
-
-
 /**
  * 複数回同時実行禁止！
  */
@@ -663,10 +659,12 @@ function action() {
             //console.log("data-d : w 検出 : while開始");
         }
     }
+
     // whileを解体して"w"と"e"マークの無い配列を生成、代入
     if (firstFlg) {
         firstAction();
     }
+
     // 内側で宣言したactionを呼び出す
     action2();
     /**
@@ -799,6 +797,7 @@ function action() {
                         document.getElementById("sidePoint").style.backgroundPositionY = 33;
                         if (goalFlg) {
                             alert("ゴール！");
+                            window.location.reload();
                         }
                         goalFlg = false;
                         runFlg = false;
@@ -845,7 +844,6 @@ function action() {
      * codeNums配列にコード番号を挿入する
      */
     function firstAction() {
-
         /**
          * 見た目上の行番号をimages配列と同じ大きさのcodeNums配列に格納
          * 例： f1 w2 east f1 end f1   →        images: f1 east f1 east f1 f1
@@ -860,6 +858,7 @@ function action() {
             }
             codeNums[codeNums.length] = i - eCnt;
         }
+
         // 最後に見た目通りの配列に戻すためのバックアップを生成;
         bkImages = images;
         bkWCnt = wCnt;
@@ -888,7 +887,6 @@ function action() {
         firstFlg = false;
     }
 }
-
 
 /**--------------------------------------------------------
  * 繰り返し処理 wBreakDown()
@@ -968,6 +966,7 @@ function wBreakDown(index, wIdx, wNum) {
             workNum2++;
         }
     }
+
     // frontIsolateArray配列に images配列内の"w"から"e"マークまでのデータ(workArray)を"w"のdata_n回繰り返し追加する
     for (var j = 0; j < wNum; j++) {
         for (var k = 0; k < workArray.length; k++) {
@@ -976,6 +975,7 @@ function wBreakDown(index, wIdx, wNum) {
             cnt++;
         }
     }
+
     // frontIsolateArray配列とbackIsolateArray配列を結合
     for (i = 0; i < backIsolateArray.length; i++) {
         frontIsolateArray[index + cnt + i] = backIsolateArray[i];
@@ -985,6 +985,7 @@ function wBreakDown(index, wIdx, wNum) {
     codeNums = fia2;
     return frontIsolateArray;
 }
+
 /**
  * dNumControl()
  * 処理概要：wBreakDownで解体されたwhileが格納されたimages配列内のdata-nに合わせて

@@ -71,8 +71,8 @@
         </tr>
         <tr>
             <td colspan="8">
-                CREATE TABLE alg_app(id INTEGER PRIMARY KEY AUTOINCREMENT,<br />
-                user TEXT, pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts DEFAULT CURRENT_TIMESTAMP)
+                CREATE TABLE alg_app(id INTEGER PRIMARY  KEY AUTOINCREMENT, user TEXT, </br>
+                pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts TIMESTAMP DEFAULT (DATETIME('now','localtime'))
             </td>
         </tr>
         <tr>
