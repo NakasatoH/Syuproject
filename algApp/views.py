@@ -109,7 +109,7 @@ def createmap(request):
             connector = sqlite3.connect("sp.sqlite3")
 
             # SQL文作成 sv_user テーブル作成 sql
-            sql = "CREATE TABLE alg_app(id INTEGER PRIMARY  KEY AUTOINCREMENT, user TEXT, pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts DEFAULT CURRENT_TIMESTAMP )"
+            sql = "CREATE TABLE alg_app(id INTEGER PRIMARY  KEY AUTOINCREMENT, user TEXT, pass_code TEXT NOT NULL, map_data TEXT NOT NULL, ts TIMESTAMP DEFAULT (DATETIME('now','localtime')))"
             try:
                 # SQL文実行
                 connector.execute(sql)
@@ -118,7 +118,6 @@ def createmap(request):
             except:
                 print("DB作成済み")
             connector.close()
-
             connector = sqlite3.connect("sp.sqlite3")
             try:
                 # 必ずu""でユニコードに変換すること

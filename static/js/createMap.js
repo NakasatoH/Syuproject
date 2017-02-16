@@ -31,6 +31,7 @@ var blockBtn = document.getElementById("blockBtn");
 var characterBtn = document.getElementById("characterBtn");
 var goalBtn = document.getElementById("goalBtn");
 var submitBtn = document.getElementById("submitBtn");
+var deleteBtn = document.getElementById("deleteBtn");
 
 // 一度だけ描画するためのフラグ
 var charBlockFlg = false;
@@ -241,31 +242,21 @@ var input_mouse_button = new InputMouseButton(window);
 
 
 function MouseEventFunc(e) {
-
-    // ここで無名関数のメソッド呼び出し
-    if (document.addEventListener) {
-        //console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight());
-    } else if (document.attachEvent) {
-        /*setTimeout(
-         console.log("左" + input_mouse_button.isDownLeft() + " 右：" + input_mouse_button.isDownRight()), 1);
-         */
-    }
     input_mouse_button.selectEvent(e);
-    //console.log("buttons:" + e.buttons + " button:" + e.button + " which:" + e.which + " type:\"" + e.type + "\"");
 }
 
 
 function checkSubmit() {
-    var playerExist_b =false;
+    var playerExist_b = false;
     var goalExist_b = false;
     var mapStr = "";
     var errMes_s = "";
     var uniqueId = uid();
     for (var i = 0; i < 10; i++) {
         for (var j = 0; j < 10; j++) {
-            if(mapData[i][j] == "p"){
+            if (mapData[i][j] == "p") {
                 playerExist_b = true;
-            }else if(mapData[i][j] == "g"){
+            } else if (mapData[i][j] == "g") {
                 goalExist_b = true;
             }
             makeHidden("c_map[" + i + "][" + j + "]", mapData[i][j], "mapTrans");
@@ -277,20 +268,20 @@ function checkSubmit() {
     makeHidden('uniqueId', uniqueId, "mapTrans");
     // 再送信防止
     makeHidden('old_map', mapStr, "mapTrans");
-    if(old_map == mapStr || !playerExist_b || !goalExist_b){
-        if(!playerExist_b && !goalExist_b){
+    if (old_map == mapStr || !playerExist_b || !goalExist_b) {
+        if (!playerExist_b && !goalExist_b) {
             errMes_s = "エラー：プレイヤーとゴールの位置が設定されていません。"
-        }else if(!playerExist_b){
+        } else if (!playerExist_b) {
             errMes_s = "エラー：プレイヤーの位置が設定されていません。"
-        }else if(!goalExist_b){
+        } else if (!goalExist_b) {
             errMes_s = "エラー：ゴールの位置が設定されていません。"
-        }else{
+        } else {
             errMes_s = "エラー：以前と同じMAPを送信しようとしていませんか？"
         }
         alert(errMes_s);
         document.getElementById("hiddenRoot").setAttribute("value", "toCreate");
         return false;
-    }else{
+    } else {
         document.getElementById("hiddenRoot").setAttribute("value", "toResult");
         return true;
     }
@@ -333,6 +324,25 @@ characterBtn.addEventListener("click", function () {
 goalBtn.addEventListener("click", function () {
     select_i = 2;
     console.table(mapData);
+});
+
+deleteBtn.addEventListener("click", function () {
+    mapData = [
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+    ];
+    charBlockFlg = false;
+    goalBlockFlg = false;
+    console.table(mapData);
+    c_mid_ctx.clearRect(0, 0, 400, 400);
 });
 
 /**
